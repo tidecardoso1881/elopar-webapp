@@ -121,10 +121,4 @@ As seguintes tarefas serão adiadas para sprints posteriores:
 - Revisar daily a situação de EP-004 (autenticação) - task crítica
 - Documentar todas as decisões de arquitetura
 - Preparar ambiente para que Sprint 2 possa começar sem bloqueios
-- Manter comunicação clara sobre qualquer mudança de scope
-
----
-
-**Aprovado por:** Orchestrator
-**Data:** 5 de abril de 2026
-**Próximo Review:** 20 de abril de 2026
+- Manter comunicação clara sobre qualquer mu

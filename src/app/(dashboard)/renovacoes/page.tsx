@@ -7,6 +7,4 @@ export default function RenovacoesPage() {
       <p className="text-sm text-gray-400">
         Implementação em Sprint 3 (EP-020 a EP-022)
       </p>
-    </div>
-  )
-}
+    </di

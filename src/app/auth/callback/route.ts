@@ -16,5 +16,4 @@ export async function GET(request: Request) {
   }
 
   // Erro ou código ausente → volta para login com mensagem
-  return NextResponse.redirect(`${origin}/login?error=link-invalido`)
-}
+  return NextResponse.redirect(`${origin}/login?error=

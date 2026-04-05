@@ -447,16 +447,4 @@ Como desenvolvedor, quero ter testes unitários cobrindo os componentes principa
 | EP-009 | Dashboard com KPI Cards | 8 | P0 | TODO |
 | EP-010 | Gráfico de distribuição por senioridade | 5 | P0 | TODO |
 | EP-011 | Gráfico de distribuição por cliente | 5 | P0 | TODO |
-| EP-012 | Listagem de profissionais com tabela | 8 | P0 | TODO |
-| EP-013 | Filtros de profissionais | 5 | P0 | TODO |
-| EP-014 | Busca por nome/email com debounce | 3 | P0 | TODO |
-| EP-015 | Paginação da listagem | 3 | P0 | TODO |
-| EP-016 | Página de detalhes do profissional | 8 | P0 | TODO |
-| EP-017 | Testes unitários dos componentes Sprint 2 | 5 | P1 | TODO |
-
-**Total:** 50 story points
-
----
-
-**Última atualização:** 5 de abril de 2026
-**Próximo review:** 4 de maio de 2026
+| EP-012 | Listagem de profissionais com ta

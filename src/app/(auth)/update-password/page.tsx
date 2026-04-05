@@ -101,11 +101,4 @@ export default function UpdatePasswordPage() {
             <PasswordInput id="password" name="password" label="Nova senha" placeholder="Mínimo 8 caracteres" />
             <PasswordInput id="confirmPassword" name="confirmPassword" label="Confirmar senha" placeholder="Repita a senha" />
             <div className="pt-2">
-              <SubmitButton />
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  )
-}
+          

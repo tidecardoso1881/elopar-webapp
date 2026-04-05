@@ -59,6 +59,3 @@ Mesmos critérios de Sprint 2, com adição de:
 4. Velocity consistente com Sprints anteriores
 
 ---
-
-**Aprovado por:** Orchestrator
-**Data:** 5 de abril de 2026

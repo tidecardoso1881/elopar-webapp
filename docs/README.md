@@ -149,10 +149,4 @@ Para decisões adicionais, veja [DECISION_LOG.md](./05-gestao/DECISION_LOG.md).
 - **GitHub:** [elopar-webapp](https://github.com/user/elopar-webapp)
 - **Supabase Dashboard:** [Link do projeto Supabase]
 - **Vercel Dashboard:** [Link do deployment Vercel]
-- **Design Figma:** [Link do arquivo Figma]
-
----
-
-**Última atualização:** 5 de abril de 2026
-**Mantém por:** Orquestrador + Tide Cardoso
-**Próximo review:** 20 de abril de 2026
+- **Design Figma:** [Link do ar

@@ -61,6 +61,3 @@ Sprint 6 é a sprint final do MVP, focando em features avançadas (export, relat
 5. Monitoring e alertas ativados
 
 ---
-
-**Aprovado por:** Orchestrator
-**Data:** 5 de abril de 2026

@@ -263,12 +263,4 @@ Como sistema, quero fazer o deploy do aplicativo em produção, disponibilizando
 | EP-040 | Relatórios básicos | 8 | P1 | TODO |
 | EP-041 | Audit log de mudanças | 5 | P2 | TODO |
 | EP-042 | Notificações por email | 8 | P2 | TODO |
-| EP-043 | Teste de carga e performance final | 3 | P1 | TODO |
-| EP-044 | Documentação de deploy e manual | 5 | P0 | TODO |
-| EP-045 | Deploy em produção no Vercel | 3 | P0 | TODO |
-
-**Total:** 40 story points
-
----
-
-**Última atualização:** 5 de abril de 2026
+| 

@@ -59,6 +59,3 @@ Sprint 5 transforma o MVP read-only em um sistema totalmente funcional com capac
 4. Testes cobrindo casos de sucesso e erro
 
 ---
-
-**Aprovado por:** Orchestrator
-**Data:** 5 de abril de 2026

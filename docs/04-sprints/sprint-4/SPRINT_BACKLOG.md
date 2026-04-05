@@ -250,12 +250,3 @@ Como produto, quero corrigir bugs encontrados nas sprints anteriores e refinar U
 | EP-026 | Listagem de férias com calendário | 8 | P0 | TODO |
 | EP-027 | Responsividade mobile completa | 5 | P0 | TODO |
 | EP-028 | Performance optimization | 5 | P1 | TODO |
-| EP-029 | Testes E2E completos | 8 | P1 | TODO |
-| EP-030 | Testes de acessibilidade WCAG 2.1 AA | 3 | P1 | TODO |
-| EP-031 | Bug fixes e polish de UI | 5 | P0 | TODO |
-
-**Total:** 39 story points
-
----
-
-**Última atualização:** 5 de abril de 2026

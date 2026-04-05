@@ -419,16 +419,4 @@ VALUES (%s, %s, %s, %s)
 
 # Dry-run mode
 DRY_RUN = True
-if DRY_RUN:
-    logger.info('DRY RUN - no data committed')
-else:
-    cur.executemany(upsert_sql, records)
-    cur.execute(import_meta_sql, (filename, datetime.now(), len(records), len(errors)))
-    conn.commit()
-```
-
-## See Also
-
-- `/scripts/seed_template.py` - Full production-ready seed script
-- `/scripts/validate_data.py` - Reusable validation utilities
-- `/references/column-mapping-guide.md` - Column mapping strategies
+if DR
