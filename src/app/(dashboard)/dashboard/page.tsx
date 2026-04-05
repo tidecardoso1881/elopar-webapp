@@ -169,8 +169,8 @@ export default async function DashboardPage() {
             })}
           </div>
         ) : (
-          <div className="flex items-center justify-center py-12">
-            <p className="text-sm text-gray-500">Nenhum cliente cadastrado</p>
+          <div className="flex items-center justify-center py-12 text-gray-400">
+            <p className="text-sm">Nenhum dado de cliente encontrado.</p>
           </div>
         )}
       </div>
