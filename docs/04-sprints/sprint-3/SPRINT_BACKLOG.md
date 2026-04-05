@@ -299,13 +299,4 @@ Como desenvolvedor, quero ter testes E2E cobrindo fluxos críticos (login, dashb
 | EP-018 | Listagem de clientes com cards | 5 | P0 | TODO |
 | EP-019 | Página de detalhes do cliente | 8 | P0 | TODO |
 | EP-020 | Sistema de alertas de renovação | 8 | P0 | TODO |
-| EP-021 | Página de renovações com tabs por urgência | 5 | P0 | TODO |
-| EP-022 | Indicadores visuais de urgência | 3 | P0 | TODO |
-| EP-023 | Testes de integração API/Actions | 5 | P1 | TODO |
-| EP-024 | Testes E2E auth + dashboard | 5 | P1 | TODO |
-
-**Total:** 39 story points
-
----
-
-**Última atualização:** 5 de abril de 2026
+| EP-021 | Página de renovações com

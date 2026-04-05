@@ -4,6 +4,7 @@ import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { signIn } from './actions'
 import { useState } from 'react'
+import Link from 'next/link'
 
 function SubmitButton() {
   const { pending } = useFormStatus()
@@ -165,13 +166,15 @@ export default function LoginPage() {
               <SubmitButton />
             </div>
           </form>
+
+          <div className="mt-4 text-center">
+            <Link
+              href="/reset-password"
+              className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
+            >
+              Esqueceu a senha ou primeiro acesso?
+            </Link>
+          </div>
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-blue-400 mt-6">
-          Sistema interno — acesso restrito a colaboradores autorizados
-        </p>
-      </div>
-    </div>
-  )
-}

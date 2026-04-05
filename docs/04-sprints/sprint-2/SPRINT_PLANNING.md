@@ -121,10 +121,4 @@ As seguintes tarefas serão adiadas para sprints posteriores:
 - Biblioteca de gráficos deve ser definida na primeira daily
 - Considerar usar Server Components do Next.js para performance
 - Documentar queries Supabase para reutilização posterior
-- Validar dados do Excel importado para identificar inconsistências
-
----
-
-**Aprovado por:** Orchestrator
-**Data:** 5 de abril de 2026
-**Próximo Review:** 4 de maio de 2026
+- Validar dados do Excel importado para identificar

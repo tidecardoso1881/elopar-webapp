@@ -7,6 +7,4 @@ export default function ClientesPage() {
       <p className="text-sm text-gray-400">
         Implementação em Sprint 3 (EP-018, EP-019)
       </p>
-    </div>
-  )
-}
+    </di

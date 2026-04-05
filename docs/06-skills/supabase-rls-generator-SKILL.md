@@ -339,13 +339,4 @@ CREATE POLICY "policy_delete_auth" ON public.table_name
   FOR DELETE TO authenticated
   USING (user_id = auth.uid());
 
--- Index for performance
-CREATE INDEX idx_table_name_user_id ON public.table_name(user_id);
-```
-
-## Next Steps
-
-- Review `/references/policy-patterns.md` for 15+ additional patterns
-- Use `/references/migration-template.sql` as a starter for your tables
-- Test policies in Supabase SQL editor before deploying
-- Document your RLS strategy in your project README
+-- Index for performa

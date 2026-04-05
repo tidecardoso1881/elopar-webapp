@@ -1,0 +1,56 @@
+name: CI
+
+# Dispara em pushes para branches principais e em Pull Requests
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'sprint-*'
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  ci:
+    name: Lint · TypeCheck · Test · Build
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout do código
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Configura Node.js 20 com cache de npm
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      # 3. Instala dependências de forma determinística (usa package-lock.json)
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. TypeScript — verifica tipos sem gerar arquivos
+      - name: Type check
+        run: npx tsc --noEmit
+
+      # 5. ESLint — linting com flat config (eslint.config.mjs)
+      - name: Lint
+        run: npm run lint
+
+      # 6. Vitest — roda todos os testes unitários
+      - name: Run tests
+        run: npm test
+
+      # 7. Next.js Build — garante que o projeto compila corretamente
+      #    NEXT_PUBLIC_* são necessários para o compilador, mas não precisam
+      #    ser valores reais em CI (o build não executa o runtime do servidor).
+      #    Configure os secrets reais em: GitHub → Settings → Secrets → Actions
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOi
