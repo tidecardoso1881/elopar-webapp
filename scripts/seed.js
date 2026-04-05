@@ -18,30 +18,35 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-// Normalization maps
+// Normalization maps - valores devem corresponder às constraints do banco:
+// seniority: JUNIOR | PLENO | SENIOR | ESPECIALISTA
+// status: ATIVO | DESLIGADO
+// contract_type: CLT_ESTRATEGICO | PJ | CLT_ILATI
 const SENIORITY_MAP = {
-  'JÚNIOR': 'Junior', 'JUNIOR': 'Junior', 'Júnior': 'Junior',
-  'PLENO': 'Pleno', 'Pleno': 'Pleno',
-  'SÊNIOR': 'Senior', 'SENIOR': 'Senior', 'Sênior': 'Senior', 'Senior': 'Senior',
-  'SÊNIOR II': 'Senior II', 'SENIOR II': 'Senior II', 'Sênior II': 'Senior II', 'Senior II': 'Senior II',
-  'ESPECIALISTA': 'Especialista', 'Especialista': 'Especialista',
-  'LÍDER': 'Lider', 'LIDER': 'Lider', 'Líder': 'Lider', 'Lider': 'Lider',
-  'GESTOR': 'Gestor', 'Gestor': 'Gestor',
-  'DIRETOR': 'Diretor', 'Diretor': 'Diretor',
+  'JÚNIOR': 'JUNIOR', 'JUNIOR': 'JUNIOR', 'Júnior': 'JUNIOR', 'Junior': 'JUNIOR',
+  'PLENO': 'PLENO', 'Pleno': 'PLENO',
+  'SÊNIOR': 'SENIOR', 'SENIOR': 'SENIOR', 'Sênior': 'SENIOR', 'Senior': 'SENIOR',
+  'SÊNIOR II': 'SENIOR', 'SENIOR II': 'SENIOR', 'Sênior II': 'SENIOR', 'Senior II': 'SENIOR',
+  'ESPECIALISTA': 'ESPECIALISTA', 'Especialista': 'ESPECIALISTA',
+  'LÍDER': 'ESPECIALISTA', 'LIDER': 'ESPECIALISTA', 'Líder': 'ESPECIALISTA', 'Lider': 'ESPECIALISTA',
+  'GESTOR': 'ESPECIALISTA', 'Gestor': 'ESPECIALISTA',
+  'DIRETOR': 'ESPECIALISTA', 'Diretor': 'ESPECIALISTA',
 };
 
 const CONTRACT_TYPE_MAP = {
-  'CLT ESTRÁTEGICO': 'CLT Estratégico', 'CLT ESTRATÉGICO': 'CLT Estratégico', 'clt estrategico': 'CLT Estratégico', 'CLT Estratégico': 'CLT Estratégico',
-  'CLT': 'CLT', 'clt': 'CLT',
+  'CLT ESTRÁTEGICO': 'CLT_ESTRATEGICO', 'CLT ESTRATÉGICO': 'CLT_ESTRATEGICO',
+  'clt estrategico': 'CLT_ESTRATEGICO', 'CLT Estratégico': 'CLT_ESTRATEGICO',
+  'CLT_ESTRATEGICO': 'CLT_ESTRATEGICO',
+  'CLT': 'CLT_ILATI', 'clt': 'CLT_ILATI', 'CLT_ILATI': 'CLT_ILATI',
   'PJ': 'PJ', 'pj': 'PJ',
-  'ESTÁGIO': 'Estágio', 'ESTAGIO': 'Estágio', 'estágio': 'Estágio', 'Estágio': 'Estágio',
+  'ESTÁGIO': 'PJ', 'ESTAGIO': 'PJ', 'estágio': 'PJ', 'Estágio': 'PJ',
 };
 
 const STATUS_MAP = {
-  'ATIVO': 'Ativo', 'Ativo': 'Ativo',
-  'INATIVO': 'Inativo', 'Inativo': 'Inativo',
-  'DESLIGADO': 'Desligado', 'Desligado': 'Desligado',
-  'FÉRIAS': 'Ferias', 'Férias': 'Ferias', 'ferias': 'Ferias',
+  'ATIVO': 'ATIVO', 'Ativo': 'ATIVO',
+  'INATIVO': 'DESLIGADO', 'Inativo': 'DESLIGADO',
+  'DESLIGADO': 'DESLIGADO', 'Desligado': 'DESLIGADO',
+  'FÉRIAS': 'ATIVO', 'Férias': 'ATIVO', 'ferias': 'ATIVO',
 };
 
 const CLIENT_SHEETS = ['Alelo', 'Livelo', 'Veloe', 'Pede Pronto', 'Idea Maker', 'Zamp'];
@@ -169,7 +174,7 @@ async function processSheet(sheetName, fileBuffer, clients, dryRun) {
     }
 
     const seniority = raw.seniority ? normalizeValue(raw.seniority, 'seniority') : undefined;
-    const status = raw.status ? normalizeValue(raw.status, 'status') || 'Ativo' : 'Ativo';
+    const status = raw.status ? normalizeValue(raw.status, 'status') || 'ATIVO' : 'ATIVO';
     const contractType = raw.contract_type ? normalizeValue(raw.contract_type, 'contract_type') : undefined;
     const contractStart = parseDate(raw.contract_start);
     const contractEnd = parseDate(raw.contract_end);
@@ -189,22 +194,35 @@ async function processSheet(sheetName, fileBuffer, clients, dryRun) {
       contract_start: contractStart || undefined,
       contract_end: contractEnd || undefined,
       renewal_deadline: renewalDeadline || undefined,
-      observations,
     });
   }
 
   // Insert into database
   if (professionals.length > 0) {
     if (!dryRun) {
-      try {
-        await supabase.from('professionals').insert(professionals);
-        console.log(`  ✅ ${professionals.length} profissionais inseridos`);
-      } catch (error) {
-        console.error(`  ❌ Erro ao inserir: ${error.message}`);
-        return { success: 0, errors: professionals.length, errorDetails: [error.message] };
+      const { error: insertError } = await supabase.from('professionals').insert(professionals);
+      if (insertError) {
+        console.error(`  ❌ Erro ao inserir: ${insertError.message}`);
+        console.error(`  Detalhes: ${JSON.stringify(insertError)}`);
+        // Tenta inserir um por um para identificar o problema
+        let inserted = 0;
+        for (const p of professionals) {
+          const { error: singleError } = await supabase.from('professionals').insert(p);
+          if (singleError) {
+            errors.push(`${p.name}: ${singleError.message} (seniority=${p.seniority}, status=${p.status}, contract_type=${p.contract_type})`);
+          } else {
+            inserted++;
+          }
+        }
+        console.log(`  ⚠️  Inserção individual: ${inserted}/${professionals.length} inseridos`);
+        return { success: inserted, errors: errors.length, errorDetails: errors };
       }
+      console.log(`  ✅ ${professionals.length} profissionais inseridos`);
     } else {
       console.log(`  ✅ [DRY-RUN] ${professionals.length} profissionais seriam inseridos`);
+      if (professionals[0]) {
+        console.log(`  Exemplo: ${professionals[0].name} | seniority=${professionals[0].seniority} | status=${professionals[0].status} | contract_type=${professionals[0].contract_type}`);
+      }
     }
   }
 
