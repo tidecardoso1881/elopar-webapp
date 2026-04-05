@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import { ClientDeleteButton } from '@/components/clientes/client-delete-button'
 
 interface ClientSummary {
   client_id: string
@@ -22,13 +23,24 @@ export default async function ClientesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold text-gray-900">Clientes</h1>
-        <p className="text-sm text-gray-500 mt-0.5">
-          {clientsSummary.length > 0
-            ? `${clientsSummary.length} cliente${clientsSummary.length !== 1 ? 's' : ''}`
-            : 'Nenhum cliente cadastrado'}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900">Clientes</h1>
+          <p className="text-sm text-gray-500 mt-0.5">
+            {clientsSummary.length > 0
+              ? `${clientsSummary.length} cliente${clientsSummary.length !== 1 ? 's' : ''}`
+              : 'Nenhum cliente cadastrado'}
+          </p>
+        </div>
+        <Link
+          href="/clientes/novo"
+          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Novo Cliente
+        </Link>
       </div>
 
       {/* Erro */}
@@ -73,10 +85,22 @@ export default async function ClientesPage() {
                 className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col"
               >
                 {/* Card Header */}
-                <div className="px-5 py-4 border-b border-gray-100">
-                  <h2 className="text-lg font-bold text-gray-900">
+                <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between gap-2">
+                  <h2 className="text-lg font-bold text-gray-900 truncate">
                     {client.client_name}
                   </h2>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <Link
+                      href={`/clientes/${client.client_id}/editar`}
+                      title="Editar cliente"
+                      className="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
+                    >
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                      </svg>
+                    </Link>
+                    <ClientDeleteButton id={client.client_id} name={client.client_name} />
+                  </div>
                 </div>
 
                 {/* Card Body */}

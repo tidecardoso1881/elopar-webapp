@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { ProfessionalsFilters } from '@/components/profissionais/professionals-filters'
 import { ProfessionalsTable } from '@/components/profissionais/professionals-table'
+import { ExportCsvButton } from '@/components/profissionais/export-csv-button'
 import { Suspense } from 'react'
 import Link from 'next/link'
 
@@ -77,6 +78,20 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
               ? `${totalCount} profissional${totalCount !== 1 ? 'is' : ''} encontrado${totalCount !== 1 ? 's' : ''}`
               : 'Nenhum profissional cadastrado'}
           </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Suspense>
+            <ExportCsvButton />
+          </Suspense>
+          <Link
+            href="/profissionais/novo"
+            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Novo Profissional
+          </Link>
         </div>
       </div>
 
