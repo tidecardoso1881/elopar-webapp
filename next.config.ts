@@ -5,4 +5,4 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 }
 
-export default next
+export default nextConfig
