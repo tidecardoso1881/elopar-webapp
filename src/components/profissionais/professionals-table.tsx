@@ -1,0 +1,104 @@
+import { formatDate, getRenewalStatus } from '@/lib/utils/formatting'
+
+interface Professional {
+  id: string
+  os: number | null
+  name: string
+  position: string | null
+  seniority: string | null
+  status: string
+  contract_type: string | null
+  renewal_deadline: string | null
+  client: { name: string } | null
+}
+
+interface ProfessionalsTableProps {
+  professionals: Professional[]
+}
+
+const STATUS_STYLES: Record<string, string> = {
+  ATIVO: 'bg-green-100 text-green-700',
+  INATIVO: 'bg-gray-100 text-gray-500',
+}
+
+const RENEWAL_STYLES: Record<string, { bg: string; label: string }> = {
+  expired:   { bg: 'bg-red-100 text-red-700',    label: 'Vencido' },
+  critical:  { bg: 'bg-red-50 text-red-600',     label: '≤30d' },
+  warning:   { bg: 'bg-orange-100 text-orange-700', label: '≤60d' },
+  attention: { bg: 'bg-yellow-100 text-yellow-700', label: '≤90d' },
+  ok:        { bg: 'bg-green-50 text-green-600',  label: 'OK' },
+  none:      { bg: 'bg-gray-100 text-gray-400',   label: '—' },
+}
+
+export function ProfessionalsTable({ professionals }: ProfessionalsTableProps) {
+  if (professionals.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <svg className="h-12 w-12 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <p className="text-gray-500 font-medium">Nenhum profissional encontrado</p>
+        <p className="text-gray-400 text-sm mt-1">Tente ajustar os filtros ou verificar se o seed foi executado.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead>
+          <tr className="bg-gray-50">
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">OS</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Cargo / Senioridade</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Cliente</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tipo</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Renovação</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-100">
+          {professionals.map((p) => {
+            const renewal = getRenewalStatus(p.renewal_deadline)
+            const renewalStyle = RENEWAL_STYLES[renewal]
+            return (
+              <tr key={p.id} className="hover:bg-gray-50 transition-colors">
+                <td className="px-4 py-3 text-sm text-gray-400 tabular-nums">
+                  {p.os ?? '—'}
+                </td>
+                <td className="px-4 py-3">
+                  <span className="text-sm font-medium text-gray-900">{p.name}</span>
+                </td>
+                <td className="px-4 py-3">
+                  <span className="text-sm text-gray-700">{p.position ?? '—'}</span>
+                  {p.seniority && (
+                    <span className="ml-1.5 text-xs text-gray-400">{p.seniority}</span>
+                  )}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-600">
+                  {p.client?.name ?? '—'}
+                </td>
+                <td className="px-4 py-3">
+                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[p.status] ?? 'bg-gray-100 text-gray-500'}`}>
+                    {p.status}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-600">
+                  {p.contract_type ?? '—'}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-gray-500">{formatDate(p.renewal_deadline)}</span>
+                    <span className={`inline-flex w-fit items-center rounded px-1.5 py-0.5 text-xs font-medium ${renewalStyle.bg}`}>
+                      {renewalStyle.label}
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
+  )
+}

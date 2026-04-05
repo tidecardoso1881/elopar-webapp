@@ -30,4 +30,8 @@ export async function updatePassword(
     if (error.message.includes('same password')) {
       return { error: 'A nova senha não pode ser igual à senha atual.' }
     }
-    return { error: 'Erro ao atualizar senha. O link pode ter expirado — solicite um novo.' }
+    return { error: 'Erro ao atualizar senha. O link pode ter expirado — solicite um novo.' }
+  }
+
+  redirect('/dashboard')
+}

@@ -77,4 +77,8 @@ export function normalizeContractType(value: string | null | undefined): string 
   const map: Record<string, string> = {
     'CLT ESTRATÉGICO': 'CLT_ESTRATEGICO',
     'CLT ESTRÁTEGICO': 'CLT_ESTRATEGICO',
-    'CLT ILA
+    'CLT ILAED': 'CLT_ILAED',
+    'PJ': 'PJ',
+  }
+  return map[normalized] ?? normalized
+}

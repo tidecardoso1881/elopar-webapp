@@ -15,3 +15,6 @@ export default function DashboardPage() {
       <p className="text-sm text-gray-400">
         Dashboard em implementação (EP-009 a EP-011) — Sprint 2
       </p>
+    </div>
+  )
+}

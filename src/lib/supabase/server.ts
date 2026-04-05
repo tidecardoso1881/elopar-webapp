@@ -22,4 +22,8 @@ export async function createClient() {
             // setAll chamado de um Server Component — pode ser ignorado com segurança
             // se há middleware atualizando as sessões de usuário
           }
-        
+        },
+      },
+    }
+  )
+}

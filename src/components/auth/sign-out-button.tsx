@@ -23,4 +23,7 @@ export function SignOutButton({ className, children }: SignOutButtonProps) {
       disabled={isPending}
       className={className}
     >
-      {isPending ? 'Saindo...' : (children ?? 'Sai
+      {isPending ? 'Saindo...' : (children ?? 'Sair')}
+    </button>
+  )
+}

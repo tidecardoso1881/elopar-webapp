@@ -42,4 +42,8 @@ export function Header({ user, profile }: HeaderProps) {
             <p className="text-sm font-medium text-gray-900">{displayName}</p>
             <p className="text-xs text-gray-500">{user.email}</p>
           </div>
-    
+        </div>
+      </div>
+    </header>
+  )
+}

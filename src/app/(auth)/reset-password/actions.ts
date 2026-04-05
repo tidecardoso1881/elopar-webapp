@@ -31,4 +31,5 @@ export async function requestPasswordReset(
   }
 
   // Sempre retornamos sucesso para não vazar quais emails existem
-  r
+  return { success: true, email }
+}

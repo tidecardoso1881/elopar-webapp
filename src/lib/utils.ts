@@ -8,4 +8,5 @@ export function cn(...inputs: (ClassValue | ClassValue[])[]): string {
   return inputs
     .flat()
     .filter((cls) => typeof cls === 'string' && cls.length > 0)
-    .jo
+    .join(' ')
+}

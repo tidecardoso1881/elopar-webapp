@@ -7,4 +7,6 @@ export default function EquipamentosPage() {
       <p className="text-sm text-gray-400">
         Implementação em Sprint 4 (EP-025)
       </p>
-    </di
+    </div>
+  )
+}
