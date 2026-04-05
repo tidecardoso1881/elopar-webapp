@@ -362,7 +362,7 @@ async function seed() {
   process.exit(totalErrors > 0 ? 1 : 0)
 }
 
-main().catch((err) => {
+seed().catch((err) => {
   console.error('Erro fatal no seed:', err)
   process.exit(1)
 })
