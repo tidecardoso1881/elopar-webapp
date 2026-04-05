@@ -354,4 +354,15 @@ async function seed() {
     console.log('\nErros encontrados:');
     allErrors.forEach(e => console.log(`  - ${e}`));
   } else if (allErrors.length > 10) {
-    co
+    console.log(`\n${allErrors.length} erros encontrados (mostrando primeiros 10):`);
+    allErrors.slice(0, 10).forEach(e => console.log(`  - ${e}`));
+  }
+
+  console.log('\nSeed concluído!')
+  process.exit(totalErrors > 0 ? 1 : 0)
+}
+
+main().catch((err) => {
+  console.error('Erro fatal no seed:', err)
+  process.exit(1)
+})
