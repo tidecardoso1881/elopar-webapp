@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# seed
+.env.seed
+scripts/.env.seed
+
+# dados Excel (não versionar arquivos binários grandes)
+*.xlsx
+*.xls
+*.csv
