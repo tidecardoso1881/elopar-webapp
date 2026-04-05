@@ -178,3 +178,10 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
+        <p className="mt-6 text-center text-xs text-blue-300/60">
+          Sistema interno — acesso restrito a colaboradores autorizados
+        </p>
+      </div>
+    </div>
+  )
+}
