@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arquitetura do Sistema Elopar</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #64748b;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            border: none;
+            background: #334155;
+            color: #cbd5e1;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        .tab-button:hover {
+            background: #475569;
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        svg {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .box {
+            fill: #1e293b;
+            stroke: #3b82f6;
+            stroke-width: 2;
+        }
+
+        .box-client {
+            fill: #065f46;
+            stroke: #10b981;
+            stroke-width: 2;
+        }
+
+        .box-frontend {
+            fill: #1e3a8a;
+            stroke: #3b82f6;
+            stroke-width: 2;
+        }
+
+        .box-backend {
+            fill: #7c2d12;
+            stroke: #f97316;
+            stroke-width: 2;
+        }
+
+        .box-database {
+            fill: #581c87;
+            stroke: #d946ef;
+            stroke-width: 2;
+        }
+
+        .box-infra {
+            fill: #1f2937;
+            stroke: #9ca3af;
+            stroke-width: 2;
+        }
+
+        .label {
+            fill: #f1f5f9;
+            font-size: 14px;
+            font-weight: 500;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+
+        .label-small {
+            fill: #cbd5e1;
+            font-size: 12px;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+
+        .arrow {
+            stroke: #64748b;
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+
+        .arrow-data {
+            stroke: #10b981;
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead-green);
+            stroke-dasharray: 5,5;
+        }
+
+        .legend {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            padding: 20px;
+            background: #0f172a;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            border: 2px solid;
+        }
+
+        .tree {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+            overflow-x: auto;
+            color: #e2e8f0;
+        }
+
+        .tree-item {
+            margin-left: 20px;
+        }
+
+        .tree-folder {
+            color: #3b82f6;
+            font-weight: 600;
+        }
+
+        .tree-file {
+            color: #94a3b8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        th {
+            background: #334155;
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #475569;
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border: 1px solid #334155;
+            color: #cbd5e1;
+        }
+
+        tr:nth-child(even) {
+            background: #0f172a;
+        }
+
+        tr:hover {
+            background: #1e293b;
+        }
+
+        .stage-box {
+            background: #0f172a;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .stage-label {
+            color: #60a5fa;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .stage-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stage-item {
+            background: #334155;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #e2e8f0;
+        }
+
+        .diagram-title {
+            font-size: 1.3em;
+            color: #60a5fa;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .description {
+            background: #0f172a;
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            color: #cbd5e1;
+        }
+
+        .flow-diagram {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .flow-step {
+            background: #1e293b;
+            border: 2px solid #3b82f6;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+
+        .flow-step-title {
+            color: #60a5fa;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .flow-step-desc {
+            color: #cbd5e1;
+            font-size: 0.95em;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                width: 100%;
+            }
+
+            .legend {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            svg {
+                max-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Arquitetura do Sistema Elopar</h1>
+            <p class="subtitle">Gestão Profissional - Diagrama de Arquitetura Completo</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab(event, 'tab1')">Arquitetura de Sistema</button>
+            <button class="tab-button" onclick="switchTab(event, 'tab2')">Fluxo de Dados</button>
+            <button class="tab-button" onclick="switchTab(event, 'tab3')">Modelo de Dados</button>
+            <button class="tab-button" onclick="switchTab(event, 'tab4')">Estrutura do Projeto</button>
+            <button class="tab-button" onclick="switchTab(event, 'tab5')">Pipeline CI/CD</button>
+        </div>
+
+        <!-- TAB 1: ARQUITETURA DE SISTEMA -->
+        <div id="tab1" class="tab-content active">
+            <h2 class="diagram-title">Arquitetura em Camadas do Sistema</h2>
+            <p class="description">
+                O Elopar é um sistema full-stack construído com Next.js 16, integrado ao Supabase para backend. A arquitetura segue um padrão moderno de aplicações serverless com componentes de servidor e cliente.
+            </p>
+
+            <svg width="100%" height="600" viewBox="0 0 900 600">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#64748b" />
+                    </marker>
+                </defs>
+
+                <!-- Browser/Client -->
+                <rect x="250" y="20" width="400" height="80" class="box-client" rx="8"/>
+                <text x="450" y="60" class="label">🌐 Navegador / Cliente</text>
+                <text x="450" y="80" class="label-small">Next.js App (React 19 + TypeScript)</text>
+
+                <!-- Arrow -->
+                <line x1="450" y1="100" x2="450" y2="130" class="arrow"/>
+                <text x="500" y="120" class="label-small">HTTPS</text>
+
+                <!-- Vercel Edge -->
+                <rect x="200" y="130" width="500" height="90" class="box-infra" rx="8"/>
+                <text x="450" y="160" class="label">⚡ Vercel Edge Network / CDN</text>
+                <text x="450" y="185" class="label-small">Edge Functions • CDN • SSR Caching</text>
+
+                <!-- Arrow -->
+                <line x1="450" y1="220" x2="450" y2="250" class="arrow"/>
+
+                <!-- Next.js 16 -->
+                <rect x="150" y="250" width="600" height="120" class="box-frontend" rx="8"/>
+                <text x="450" y="280" class="label">📦 Next.js 16 App Router</text>
+                <line x1="170" y1="295" x2="730" y2="295" stroke="#475569" stroke-width="1"/>
+                <text x="220" y="315" class="label-small">Server Components (SSR)</text>
+                <text x="450" y="315" class="label-small">Client Components (CSR)</text>
+                <text x="680" y="315" class="label-small">Server Actions</text>
+                <text x="220" y="340" class="label-small">API Routes</text>
+
+                <!-- Arrow -->
+                <line x1="450" y1="370" x2="450" y2="400" class="arrow"/>
+                <text x="520" y="390" class="label-small">Supabase JS Client</text>
+
+                <!-- Supabase Platform -->
+                <rect x="150" y="400" width="600" height="140" class="box-database" rx="8"/>
+                <text x="450" y="430" class="label">🔐 Plataforma Supabase</text>
+                <line x1="170" y1="445" x2="730" y2="445" stroke="#9333ea" stroke-width="1"/>
+                <text x="240" y="465" class="label-small">PostgreSQL</text>
+                <text x="450" y="465" class="label-small">Auth (JWT + RLS)</text>
+                <text x="680" y="465" class="label-small">Edge Functions</text>
+                <text x="340" y="495" class="label-small">Realtime Subscriptions</text>
+                <text x="620" y="495" class="label-small">Storage (futuro)</text>
+
+                <!-- Storage Bucket -->
+                <rect x="50" y="490" width="90" height="50" class="box-database" rx="4"/>
+                <text x="95" y="525" class="label-small" font-size="11">PostgreSQL DB</text>
+
+                <!-- Auth -->
+                <rect x="160" y="490" width="90" height="50" class="box-database" rx="4"/>
+                <text x="205" y="525" class="label-small" font-size="11">Auth System</text>
+
+                <!-- RLS -->
+                <rect x="270" y="490" width="90" height="50" class="box-database" rx="4"/>
+                <text x="315" y="525" class="label-small" font-size="11">RLS Policies</text>
+
+                <!-- Storage -->
+                <rect x="380" y="490" width="90" height="50" class="box-database" rx="4"/>
+                <text x="425" y="525" class="label-small" font-size="11">Storage Bucket</text>
+
+                <!-- GitHub -->
+                <rect x="540" y="490" width="90" height="50" class="box-infra" rx="4"/>
+                <text x="585" y="525" class="label-small" font-size="11">GitHub Repo</text>
+
+                <!-- Version Control -->
+                <rect x="650" y="490" width="90" height="50" class="box-infra" rx="4"/>
+                <text x="695" y="525" class="label-small" font-size="11">CI/CD Actions</text>
+            </svg>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #065f46; border-color: #10b981;"></div>
+                    <span>Camada Cliente</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #1e3a8a; border-color: #3b82f6;"></div>
+                    <span>Camada Frontend/API</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #581c87; border-color: #d946ef;"></div>
+                    <span>Camada Backend/Database</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #1f2937; border-color: #9ca3af;"></div>
+                    <span>Infraestrutura</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: FLUXO DE DADOS -->
+        <div id="tab2" class="tab-content">
+            <h2 class="diagram-title">Fluxos de Dados Principais</h2>
+            <p class="description">
+                Exemplos de fluxos de dados para operações críticas do sistema, mostrando como os dados fluem entre as camadas.
+            </p>
+
+            <div class="flow-diagram">
+                <div class="flow-step">
+                    <div class="flow-step-title">1️⃣ Autenticação e Login</div>
+                    <div class="flow-step-desc">
+                        <strong>Fluxo:</strong> Usuário preenche credenciais → Browser envia para Next.js → Server Action valida com Supabase Auth → JWT retorna → Cliente armazena token → RLS ativado para requisições futuras<br>
+                        <strong>Tecnologias:</strong> Supabase Auth, JWT, Session Management, RLS Policies
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="flow-step-title">2️⃣ Carregamento do Dashboard</div>
+                    <div class="flow-step-desc">
+                        <strong>Fluxo:</strong> Next.js Server Component renderiza no servidor → Executa query ao PostgreSQL com contexto do usuário → RLS valida acesso → Retorna KPIs agregados → HTML é enviado ao cliente → Componentes interativos hidratam<br>
+                        <strong>Tecnologias:</strong> Server Components, RLS, PostgreSQL Aggregate Functions
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="flow-step-title">3️⃣ Busca de Profissionais</div>
+                    <div class="flow-step-desc">
+                        <strong>Fluxo:</strong> Usuário digita no campo de busca (Client Component) → onChange dispara Server Action → SQL query com filtros → Resultados retornam com RLS aplicado → UI atualiza via React state → Cards de profissional renderizam<br>
+                        <strong>Tecnologias:</strong> Server Actions, Full-text Search, Client State Management
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="flow-step-title">4️⃣ Alerta de Renovação</div>
+                    <div class="flow-step-desc">
+                        <strong>Fluxo:</strong> Server Component executa query de datas → Filtra profissionais com renovação próxima → Supabase Realtime notifica mudanças → Componente se revalida → Alert cards aparecem na UI → Usuário clica para ação<br>
+                        <strong>Tecnologias:</strong> Supabase Realtime, Next.js ISR, Server Components
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="flow-step-title">5️⃣ Submissão de Formulário</div>
+                    <div class="flow-step-desc">
+                        <strong>Fluxo:</strong> Usuário submete form → Client Component valida dados → Server Action persiste no PostgreSQL → Supabase retorna confirmação → UI mostra toast de sucesso → Dados são revalidados no servidor → Cache é limpo<br>
+                        <strong>Tecnologias:</strong> Server Actions, Form Validation, Revalidation, Toast Notifications
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="color: #60a5fa; margin-top: 30px; margin-bottom: 15px;">Comunicação entre Camadas</h3>
+            <svg width="100%" height="300" viewBox="0 0 900 300">
+                <defs>
+                    <marker id="arrowhead-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#10b981" />
+                    </marker>
+                </defs>
+
+                <!-- Cliente -->
+                <rect x="50" y="50" width="150" height="80" class="box-client" rx="6"/>
+                <text x="125" y="95" class="label">Cliente</text>
+                <text x="125" y="115" class="label-small" font-size="11">(React Component)</text>
+
+                <!-- Servidor -->
+                <rect x="375" y="50" width="150" height="80" class="box-frontend" rx="6"/>
+                <text x="450" y="95" class="label">Servidor</text>
+                <text x="450" y="115" class="label-small" font-size="11">(Next.js/API)</text>
+
+                <!-- Banco de Dados -->
+                <rect x="700" y="50" width="150" height="80" class="box-database" rx="6"/>
+                <text x="775" y="95" class="label">Banco de Dados</text>
+                <text x="775" y="115" class="label-small" font-size="11">(PostgreSQL)</text>
+
+                <!-- Setas para cima (Request) -->
+                <line x1="200" y1="80" x2="375" y2="80" class="arrow" stroke="#3b82f6"/>
+                <text x="280" y="70" class="label-small" fill="#3b82f6">Server Action / fetch</text>
+
+                <line x1="525" y1="80" x2="700" y2="80" class="arrow" stroke="#3b82f6"/>
+                <text x="605" y="70" class="label-small" fill="#3b82f6">SQL Query</text>
+
+                <!-- Setas para baixo (Response) -->
+                <line x1="375" y1="140" x2="200" y2="140" class="arrow-data"/>
+                <text x="280" y="165" class="label-small" fill="#10b981">JSON Response</text>
+
+                <line x1="700" y1="140" x2="525" y2="140" class="arrow-data"/>
+                <text x="605" y="165" class="label-small" fill="#10b981">Data Rows</text>
+
+                <!-- Realtime -->
+                <path d="M 700 140 Q 650 200 375 140" stroke="#f97316" stroke-width="2" fill="none" stroke-dasharray="8,4" marker-end="url(#arrowhead-green)"/>
+                <text x="550" y="185" class="label-small" fill="#f97316">Realtime Subscriptions (opcional)</text>
+            </svg>
+        </div>
+
+        <!-- TAB 3: MODELO DE DADOS -->
+        <div id="tab3" class="tab-content">
+            <h2 class="diagram-title">Diagrama Entidade-Relacionamento (ER)</h2>
+            <p class="description">
+                Estrutura de dados do PostgreSQL com as tabelas principais, campos e relacionamentos. O sistema utiliza RLS para controlar acesso aos dados.
+            </p>
+
+            <svg width="100%" height="500" viewBox="0 0 1000 500">
+                <!-- auth.users -->
+                <rect x="50" y="50" width="200" height="200" class="box-database" rx="6"/>
+                <text x="150" y="75" class="label" font-weight="700">auth.users</text>
+                <line x1="60" y1="85" x2="240" y2="85" stroke="#9333ea" stroke-width="1"/>
+                <text x="65" y="105" class="label-small" text-anchor="start">id (UUID) - PK</text>
+                <text x="65" y="125" class="label-small" text-anchor="start">email</text>
+                <text x="65" y="145" class="label-small" text-anchor="start">password_hash</text>
+                <text x="65" y="165" class="label-small" text-anchor="start">created_at</text>
+                <text x="65" y="185" class="label-small" text-anchor="start">updated_at</text>
+                <text x="65" y="205" class="label-small" text-anchor="start">confirmed_at</text>
+                <text x="65" y="225" class="label-small" text-anchor="start">last_sign_in_at</text>
+
+                <!-- profiles -->
+                <rect x="350" y="50" width="220" height="220" class="box-database" rx="6"/>
+                <text x="460" y="75" class="label" font-weight="700">profiles</text>
+                <line x1="360" y1="85" x2="560" y2="85" stroke="#9333ea" stroke-width="1"/>
+                <text x="365" y="105" class="label-small" text-anchor="start">id (UUID) - PK</text>
+                <text x="365" y="125" class="label-small" text-anchor="start">user_id (FK) → auth.users</text>
+                <text x="365" y="145" class="label-small" text-anchor="start">full_name</text>
+                <text x="365" y="165" class="label-small" text-anchor="start">company_name</text>
+                <text x="365" y="185" class="label-small" text-anchor="start">role</text>
+                <text x="365" y="205" class="label-small" text-anchor="start">created_at</text>
+                <text x="365" y="225" class="label-small" text-anchor="start">updated_at</text>
+
+                <!-- clients -->
+                <rect x="700" y="50" width="240" height="240" class="box-database" rx="6"/>
+                <text x="820" y="75" class="label" font-weight="700">clients</text>
+                <line x1="710" y1="85" x2="930" y2="85" stroke="#9333ea" stroke-width="1"/>
+                <text x="715" y="105" class="label-small" text-anchor="start">id (UUID) - PK</text>
+                <text x="715" y="125" class="label-small" text-anchor="start">profile_id (FK) → profiles</text>
+                <text x="715" y="145" class="label-small" text-anchor="start">name</text>
+                <text x="715" y="165" class="label-small" text-anchor="start">description</text>
+                <text x="715" y="185" class="label-small" text-anchor="start">status</text>
+                <text x="715" y="205" class="label-small" text-anchor="start">kpi_value</text>
+                <text x="715" y="225" class="label-small" text-anchor="start">created_at</text>
+                <text x="715" y="245" class="label-small" text-anchor="start">updated_at</text>
+
+                <!-- professionals -->
+                <rect x="200" y="320" width="260" height="160" class="box-database" rx="6"/>
+                <text x="330" y="345" class="label" font-weight="700">professionals</text>
+                <line x1="210" y1="355" x2="450" y2="355" stroke="#9333ea" stroke-width="1"/>
+                <text x="215" y="375" class="label-small" text-anchor="start">id (UUID) - PK</text>
+                <text x="215" y="395" class="label-small" text-anchor="start">client_id (FK) → clients</text>
+                <text x="215" y="415" class="label-small" text-anchor="start">name</text>
+                <text x="215" y="435" class="label-small" text-anchor="start">cpf, status</text>
+                <text x="215" y="455" class="label-small" text-anchor="start">created_at</text>
+
+                <!-- vacations -->
+                <rect x="550" y="320" width="240" height="160" class="box-database" rx="6"/>
+                <text x="670" y="345" class="label" font-weight="700">vacations</text>
+                <line x1="560" y1="355" x2="780" y2="355" stroke="#9333ea" stroke-width="1"/>
+                <text x="565" y="375" class="label-small" text-anchor="start">id (UUID) - PK</text>
+                <text x="565" y="395" class="label-small" text-anchor="start">professional_id (FK)</text>
+                <text x="565" y="415" class="label-small" text-anchor="start">start_date, end_date</text>
+                <text x="565" y="435" class="label-small" text-anchor="start">reason, status</text>
+                <text x="565" y="455" class="label-small" text-anchor="start">created_at</text>
+
+                <!-- equipment -->
+                <rect x="850" y="320" width="250" height="160" class="box-database" rx="6"/>
+                <text x="975" y="345" class="label" font-weight="700">equipment</text>
+                <line x1="860" y1="355" x2="1090" y2="355" stroke="#9333ea" stroke-width="1"/>
+                <text x="865" y="375" class="label-small" text-anchor="start">id (UUID) - PK</text>
+                <text x="865" y="395" class="label-small" text-anchor="start">professional_id (FK)</text>
+                <text x="865" y="415" class="label-small" text-anchor="start">name, type, status</text>
+                <text x="865" y="435" class="label-small" text-anchor="start">renewal_date</text>
+                <text x="865" y="455" class="label-small" text-anchor="start">created_at</text>
+
+                <!-- Relações -->
+                <line x1="150" y1="250" x2="300" y2="320" stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                <text x="180" y="280" class="label-small" fill="#64748b">1:N</text>
+
+                <line x1="460" y1="270" x2="520" y2="320" stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                <text x="480" y="290" class="label-small" fill="#64748b">1:N</text>
+
+                <line x1="460" y1="270" x2="650" y2="320" stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                <text x="520" y="290" class="label-small" fill="#64748b">1:N</text>
+
+                <line x1="460" y1="270" x2="800" y2="320" stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                <text x="570" y="290" class="label-small" fill="#64748b">1:N</text>
+            </svg>
+
+            <h3 style="color: #60a5fa; margin-top: 30px; margin-bottom: 15px;">Detalhes das Tabelas</h3>
+
+            <h4 style="color: #94a3b8; margin-top: 20px; margin-bottom: 10px;">📋 Clients (Clientes)</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Campo</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td>UUID</td>
+                        <td>Chave primária</td>
+                    </tr>
+                    <tr>
+                        <td>profile_id</td>
+                        <td>UUID FK</td>
+                        <td>Referência ao perfil do usuário</td>
+                    </tr>
+                    <tr>
+                        <td>name</td>
+                        <td>VARCHAR</td>
+                        <td>Nome do cliente/empresa</td>
+                    </tr>
+                    <tr>
+                        <td>description</td>
+                        <td>TEXT</td>
+                        <td>Descrição ou observações</td>
+                    </tr>
+                    <tr>
+                        <td>status</td>
+                        <td>ENUM</td>
+                        <td>ativo, inativo, suspenso</td>
+                    </tr>
+                    <tr>
+                        <td>kpi_value</td>
+                        <td>INTEGER</td>
+                        <td>KPI ou valor agregado</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4 style="color: #94a3b8; margin-top: 20px; margin-bottom: 10px;">👤 Professionals (Profissionais)</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Campo</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td>UUID</td>
+                        <td>Chave primária</td>
+                    </tr>
+                    <tr>
+                        <td>client_id</td>
+                        <td>UUID FK</td>
+                        <td>Cliente associado</td>
+                    </tr>
+                    <tr>
+                        <td>name</td>
+                        <td>VARCHAR</td>
+                        <td>Nome do profissional</td>
+                    </tr>
+                    <tr>
+                        <td>cpf</td>
+                        <td>VARCHAR</td>
+                        <td>CPF (único)</td>
+                    </tr>
+                    <tr>
+                        <td>status</td>
+                        <td>ENUM</td>
+                        <td>ativo, inativo, férias</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4 style="color: #94a3b8; margin-top: 20px; margin-bottom: 10px;">🏖️ Vacations (Férias)</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Campo</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td>UUID</td>
+                        <td>Chave primária</td>
+                    </tr>
+                    <tr>
+                        <td>professional_id</td>
+                        <td>UUID FK</td>
+                        <td>Profissional em férias</td>
+                    </tr>
+                    <tr>
+                        <td>start_date</td>
+                        <td>DATE</td>
+                        <td>Data de início</td>
+                    </tr>
+                    <tr>
+                        <td>end_date</td>
+                        <td>DATE</td>
+                        <td>Data de término</td>
+                    </tr>
+                    <tr>
+                        <td>reason</td>
+                        <td>VARCHAR</td>
+                        <td>Motivo das férias</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4 style="color: #94a3b8; margin-top: 20px; margin-bottom: 10px;">🔧 Equipment (Equipamentos)</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Campo</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td>UUID</td>
+                        <td>Chave primária</td>
+                    </tr>
+                    <tr>
+                        <td>professional_id</td>
+                        <td>UUID FK</td>
+                        <td>Profissional proprietário</td>
+                    </tr>
+                    <tr>
+                        <td>name</td>
+                        <td>VARCHAR</td>
+                        <td>Nome do equipamento</td>
+                    </tr>
+                    <tr>
+                        <td>type</td>
+                        <td>VARCHAR</td>
+                        <td>Tipo/categoria</td>
+                    </tr>
+                    <tr>
+                        <td>renewal_date</td>
+                        <td>DATE</td>
+                        <td>Data de renovação/vencimento</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TAB 4: ESTRUTURA DO PROJETO -->
+        <div id="tab4" class="tab-content">
+            <h2 class="diagram-title">Estrutura de Diretórios do Projeto</h2>
+            <p class="description">
+                Organização dos arquivos no repositório Elopar, seguindo a estrutura recomendada do Next.js 16 com App Router.
+            </p>
+
+            <div class="tree">
+elopar-webapp/<br>
+├── <span class="tree-folder">.github/</span><br>
+│   └── <span class="tree-folder">workflows/</span><br>
+│       ├── <span class="tree-file">ci.yml</span> (Lint, Type Check, Test)<br>
+│       ├── <span class="tree-file">deploy.yml</span> (Build & Deploy Vercel)<br>
+│       └── <span class="tree-file">e2e-tests.yml</span> (E2E Tests)<br>
+│<br>
+├── <span class="tree-folder">src/</span><br>
+│   ├── <span class="tree-folder">app/</span> (App Router)<br>
+│   │   ├── <span class="tree-file">layout.tsx</span> (Root Layout)<br>
+│   │   ├── <span class="tree-file">page.tsx</span> (Home Page)<br>
+│   │   ├── <span class="tree-folder">(auth)/</span><br>
+│   │   │   ├── <span class="tree-folder">login/</span><br>
+│   │   │   │   └── <span class="tree-file">page.tsx</span><br>
+│   │   │   └── <span class="tree-folder">register/</span><br>
+│   │   │       └── <span class="tree-file">page.tsx</span><br>
+│   │   ├── <span class="tree-folder">dashboard/</span><br>
+│   │   │   ├── <span class="tree-file">layout.tsx</span><br>
+│   │   │   ├── <span class="tree-file">page.tsx</span> (Dashboard Server Component)<br>
+│   │   │   ├── <span class="tree-folder">clients/</span><br>
+│   │   │   │   ├── <span class="tree-file">page.tsx</span> (Listagem)<br>
+│   │   │   │   └── <span class="tree-folder">[id]/</span><br>
+│   │   │   │       └── <span class="tree-file">page.tsx</span> (Detalhes)<br>
+│   │   │   ├── <span class="tree-folder">professionals/</span><br>
+│   │   │   │   ├── <span class="tree-file">page.tsx</span><br>
+│   │   │   │   └── <span class="tree-folder">[id]/</span><br>
+│   │   │   │       └── <span class="tree-file">page.tsx</span><br>
+│   │   │   └── <span class="tree-folder">settings/</span><br>
+│   │   │       └── <span class="tree-file">page.tsx</span><br>
+│   │   └── <span class="tree-folder">api/</span><br>
+│   │       ├── <span class="tree-folder">auth/</span><br>
+│   │       │   └── <span class="tree-file">[...nextauth].ts</span><br>
+│   │       ├── <span class="tree-folder">clients/</span><br>
+│   │       │   └── <span class="tree-file">route.ts</span><br>
+│   │       └── <span class="tree-folder">professionals/</span><br>
+│   │           └── <span class="tree-file">route.ts</span><br>
+│   │<br>
+│   ├── <span class="tree-folder">components/</span><br>
+│   │   ├── <span class="tree-folder">ui/</span> (shadcn/ui components)<br>
+│   │   │   ├── <span class="tree-file">button.tsx</span><br>
+│   │   │   ├── <span class="tree-file">card.tsx</span><br>
+│   │   │   ├── <span class="tree-file">input.tsx</span><br>
+│   │   │   ├── <span class="tree-file">table.tsx</span><br>
+│   │   │   └── ... (mais componentes)<br>
+│   │   ├── <span class="tree-folder">dashboard/</span><br>
+│   │   │   ├── <span class="tree-file">DashboardHeader.tsx</span><br>
+│   │   │   ├── <span class="tree-file">DashboardNav.tsx</span><br>
+│   │   │   └── <span class="tree-file">KPICard.tsx</span><br>
+│   │   ├── <span class="tree-folder">professionals/</span><br>
+│   │   │   ├── <span class="tree-file">ProfessionalList.tsx</span><br>
+│   │   │   ├── <span class="tree-file">ProfessionalCard.tsx</span><br>
+│   │   │   ├── <span class="tree-file">ProfessionalSearch.tsx</span> (Client Component)<br>
+│   │   │   └── <span class="tree-file">ProfessionalForm.tsx</span><br>
+│   │   ├── <span class="tree-folder">clients/</span><br>
+│   │   │   ├── <span class="tree-file">ClientList.tsx</span><br>
+│   │   │   └── <span class="tree-file">ClientCard.tsx</span><br>
+│   │   ├── <span class="tree-folder">common/</span><br>
+│   │   │   ├── <span class="tree-file">Header.tsx</span><br>
+│   │   │   ├── <span class="tree-file">Sidebar.tsx</span><br>
+│   │   │   ├── <span class="tree-file">Footer.tsx</span><br>
+│   │   │   └── <span class="tree-file">Loading.tsx</span><br>
+│   │   └── <span class="tree-folder">auth/</span><br>
+│   │       ├── <span class="tree-file">LoginForm.tsx</span><br>
+│   │       └── <span class="tree-file">RegisterForm.tsx</span><br>
+│   │<br>
+│   ├── <span class="tree-folder">lib/</span><br>
+│   │   ├── <span class="tree-file">supabase.ts</span> (Client)<br>
+│   │   ├── <span class="tree-file">supabase-server.ts</span> (Server)<br>
+│   │   ├── <span class="tree-file">auth.ts</span> (Auth utilities)<br>
+│   │   ├── <span class="tree-file">db.ts</span> (Database queries)<br>
+│   │   ├── <span class="tree-file">utils.ts</span> (Helper functions)<br>
+│   │   └── <span class="tree-file">constants.ts</span><br>
+│   │<br>
+│   ├── <span class="tree-folder">hooks/</span><br>
+│   │   ├── <span class="tree-file">useAuth.ts</span><br>
+│   │   ├── <span class="tree-file">useClient.ts</span><br>
+│   │   ├── <span class="tree-file">useProfessionals.ts</span><br>
+│   │   └── <span class="tree-file">useSupabase.ts</span><br>
+│   │<br>
+│   ├── <span class="tree-folder">actions/</span> (Server Actions)<br>
+│   │   ├── <span class="tree-file">auth.actions.ts</span><br>
+│   │   ├── <span class="tree-file">clients.actions.ts</span><br>
+│   │   ├── <span class="tree-file">professionals.actions.ts</span><br>
+│   │   └── <span class="tree-file">equipment.actions.ts</span><br>
+│   │<br>
+│   ├── <span class="tree-folder">types/</span><br>
+│   │   ├── <span class="tree-file">index.ts</span> (Type definitions)<br>
+│   │   ├── <span class="tree-file">database.types.ts</span> (Generated by Supabase)<br>
+│   │   └── <span class="tree-file">api.types.ts</span><br>
+│   │<br>
+│   ├── <span class="tree-folder">styles/</span><br>
+│   │   ├── <span class="tree-file">globals.css</span> (Tailwind + global styles)<br>
+│   │   └── <span class="tree-file">variables.css</span> (CSS variables)<br>
+│   │<br>
+│   └── <span class="tree-folder">middleware.ts</span> (Auth middleware)<br>
+│<br>
+├── <span class="tree-folder">public/</span><br>
+│   ├── <span class="tree-file">logo.svg</span><br>
+│   ├── <span class="tree-file">favicon.ico</span><br>
+│   └── <span class="tree-folder">images/</span><br>
+│<br>
+├── <span class="tree-folder">docs/</span><br>
+│   ├── <span class="tree-file">ARQUITETURA_SISTEMA.html</span> (você está aqui)<br>
+│   ├── <span class="tree-file">API.md</span><br>
+│   ├── <span class="tree-file">DATABASE.md</span><br>
+│   ├── <span class="tree-file">DEPLOYMENT.md</span><br>
+│   └── <span class="tree-file">CONTRIBUTING.md</span><br>
+│<br>
+├── <span class="tree-folder">tests/</span><br>
+│   ├── <span class="tree-folder">unit/</span><br>
+│   │   ├── <span class="tree-file">auth.test.ts</span><br>
+│   │   └── <span class="tree-file">utils.test.ts</span><br>
+│   ├── <span class="tree-folder">integration/</span><br>
+│   │   ├── <span class="tree-file">clients.integration.test.ts</span><br>
+│   │   └── <span class="tree-file">professionals.integration.test.ts</span><br>
+│   └── <span class="tree-folder">e2e/</span><br>
+│       ├── <span class="tree-file">auth.e2e.test.ts</span><br>
+│       └── <span class="tree-file">dashboard.e2e.test.ts</span><br>
+│<br>
+├── <span class="tree-folder">scripts/</span><br>
+│   ├── <span class="tree-file">setup-db.ts</span> (Setup banco de dados)<br>
+│   └── <span class="tree-file">migrate.ts</span> (Migrations)<br>
+│<br>
+├── <span class="tree-file">next.config.ts</span><br>
+├── <span class="tree-file">tsconfig.json</span><br>
+├── <span class="tree-file">tailwind.config.ts</span><br>
+├── <span class="tree-file">postcss.config.js</span><br>
+├── <span class="tree-file">package.json</span><br>
+├── <span class="tree-file">package-lock.json</span><br>
+├── <span class="tree-file">.env.example</span><br>
+├── <span class="tree-file">.env.local</span> (não versionado)<br>
+├── <span class="tree-file">.gitignore</span><br>
+├── <span class="tree-file">README.md</span><br>
+└── <span class="tree-file">LICENSE</span><br>
+            </div>
+
+            <h3 style="color: #60a5fa; margin-top: 30px; margin-bottom: 15px;">Arquivos Principais</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Arquivo/Pasta</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>src/app/</strong></td>
+                        <td>Next.js App Router - páginas e layouts</td>
+                    </tr>
+                    <tr>
+                        <td><strong>src/components/</strong></td>
+                        <td>Componentes React (UI, páginas, features)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>src/lib/</strong></td>
+                        <td>Utilitários e integrações (Supabase, auth)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>src/actions/</strong></td>
+                        <td>Server Actions (mutações no servidor)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>src/hooks/</strong></td>
+                        <td>React Custom Hooks</td>
+                    </tr>
+                    <tr>
+                        <td><strong>src/types/</strong></td>
+                        <td>TypeScript type definitions</td>
+                    </tr>
+                    <tr>
+                        <td><strong>tests/</strong></td>
+                        <td>Unit, Integration e E2E tests</td>
+                    </tr>
+                    <tr>
+                        <td><strong>docs/</strong></td>
+                        <td>Documentação do projeto</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TAB 5: CI/CD PIPELINE -->
+        <div id="tab5" class="tab-content">
+            <h2 class="diagram-title">Pipeline de Integração e Deploy Contínuo</h2>
+            <p class="description">
+                O Elopar utiliza GitHub Actions para automação de testes, build e deploy. O pipeline garante qualidade de código antes de cada deploy para produção no Vercel.
+            </p>
+
+            <div class="stage-box">
+                <div class="stage-label">📊 Pipeline CI/CD Completo</div>
+                <div style="font-size: 0.9em; color: #cbd5e1; line-height: 2;">
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #60a5fa;">Push para GitHub</strong> →
+                        <strong style="color: #60a5fa;">GitHub Actions Triggered</strong> →
+                        <strong style="color: #60a5fa;">Ambiente Setup</strong> →
+                        <strong style="color: #60a5fa;">Lint & Format</strong>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #60a5fa;">Type Check</strong> →
+                        <strong style="color: #60a5fa;">Unit Tests</strong> →
+                        <strong style="color: #60a5fa;">Integration Tests</strong> →
+                        <strong style="color: #60a5fa;">Build Artifacts</strong>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #60a5fa;">Deploy to Vercel</strong> →
+                        <strong style="color: #60a5fa;">E2E Tests</strong> →
+                        <strong style="color: #60a5fa;">Smoke Tests</strong> →
+                        <strong style="color: #60a5fa;">Production Ready</strong>
+                    </div>
+                </div>
+            </div>
+
+            <svg width="100%" height="700" viewBox="0 0 1200 700">
+                <defs>
+                    <marker id="arrowhead-solid" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#3b82f6" />
+                    </marker>
+                    <marker id="arrowhead-fail" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#ef4444" />
+                    </marker>
+                </defs>
+
+                <!-- GitHub Push -->
+                <rect x="20" y="20" width="120" height="80" class="box-infra" rx="6"/>
+                <text x="80" y="55" class="label" font-size="14">📤 Push</text>
+                <text x="80" y="75" class="label-small">para GitHub</text>
+
+                <!-- Trigger -->
+                <line x1="140" y1="60" x2="200" y2="60" class="arrow" marker-end="url(#arrowhead-solid)"/>
+
+                <!-- GitHub Actions Setup -->
+                <rect x="200" y="20" width="120" height="80" class="box-infra" rx="6"/>
+                <text x="260" y="55" class="label" font-size="14">⚙️ GitHub</text>
+                <text x="260" y="75" class="label-small">Actions Triggered</text>
+
+                <!-- Lint/Format -->
+                <line x1="320" y1="60" x2="380" y2="60" class="arrow" marker-end="url(#arrowhead-solid)"/>
+                <rect x="380" y="20" width="120" height="80" class="box-frontend" rx="6"/>
+                <text x="440" y="45" class="label" font-size="13">✨ Lint &</text>
+                <text x="440" y="65" class="label">Format</text>
+                <text x="440" y="80" class="label-small">(ESLint, Prettier)</text>
+
+                <!-- Type Check -->
+                <line x1="500" y1="60" x2="560" y2="60" class="arrow" marker-end="url(#arrowhead-solid)"/>
+                <rect x="560" y="20" width="120" height="80" class="box-frontend" rx="6"/>
+                <text x="620" y="45" class="label" font-size="13">🔍 Type</text>
+                <text x="620" y="65" class="label">Check</text>
+                <text x="620" y="80" class="label-small">(TypeScript)</text>
+
+                <!-- Unit Tests -->
+                <line x1="680" y1="60" x2="740" y2="60" class="arrow" marker-end="url(#arrowhead-solid)"/>
+                <rect x="740" y="20" width="120" height="80" class="box-frontend" rx="6"/>
+                <text x="800" y="45" class="label" font-size="13">✓ Unit</text>
+                <text x="800" y="65" class="label">Tests</text>
+                <text x="800" y="80" class="label-small">(Jest, Vitest)</text>
+
+                <!-- Integration Tests -->
+                <line x1="860" y1="60" x2="920" y2="60" class="arrow" marker-end="url(#arrowhead-solid)"/>
+                <rect x="920" y="20" width="120" height="80" class="box-frontend" rx="6"/>
+                <text x="980" y="45" class="label" font-size="13">🔗 Integration</text>
+                <text x="980" y="65" class="label">Tests</text>
+                <text x="980" y="80" class="label-small">(API, DB)</text>
+
+                <!-- Build -->
+                <line x1="1040" y1="60" x2="1100" y2="60" class="arrow" marker-end="url(#arrowhead-solid)"/>
+                <rect x="1100" y="20" width="90" height="80" class="box-frontend" rx="6"/>
+                <text x="1145" y="45" class="label" font-size="13">📦 Build</text>
+                <text x="1145" y="80" class="label-small" font-size="11">Artifacts</text>
+
+                <!-- Fail arrow (left side) -->
+                <path d="M 60 100 L 60 150 L 1100 150 L 1100 160" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#arrowhead-fail)"/>
+                <text x="600" y="140" class="label-small" fill="#ef4444">Se falhar, notifica developer e para</text>
+
+                <!-- LINHA 2: DEPLOY E TESTES -->
+
+                <!-- Deploy to Vercel -->
+                <rect x="20" y="180" width="120" height="80" class="box-infra" rx="6"/>
+                <text x="80" y="215" class="label" font-size="14">🚀 Deploy</text>
+                <text x="80" y="235" class="label-small">to Vercel</text>
+
+                <line x1="140" y1="220" x2="200" y2="220" class="arrow" marker-end="url(#arrowhead-solid)"/>
+
+                <!-- Vercel Build -->
+                <rect x="200" y="180" width="120" height="80" class="box-infra" rx="6"/>
+                <text x="260" y="215" class="label" font-size="13">🔨 Vercel</text>
+                <text x="260" y="235" class="label">Build</text>
+
+                <line x1="320" y1="220" x2="380" y2="220" class="arrow" marker-end="url(#arrowhead-solid)"/>
+
+                <!-- E2E Tests -->
+                <rect x="380" y="180" width="120" height="80" class="box-frontend" rx="6"/>
+                <text x="440" y="210" class="label" font-size="13">🎭 E2E Tests</text>
+                <text x="440" y="230" class="label-small" font-size="11">(Playwright/Cypress)</text>
+
+                <line x1="500" y1="220" x2="560" y2="220" class="arrow" marker-end="url(#arrowhead-solid)"/>
+
+                <!-- Smoke Tests -->
+                <rect x="560" y="180" width="120" height="80" class="box-frontend" rx="6"/>
+                <text x="620" y="210" class="label" font-size="13">💨 Smoke</text>
+                <text x="620" y="230" class="label">Tests</text>
+
+                <line x1="680" y1="220" x2="740" y2="220" class="arrow" marker-end="url(#arrowhead-solid)"/>
+
+                <!-- Health Check -->
+                <rect x="740" y="180" width="120" height="80" class="box-frontend" rx="6"/>
+                <text x="800" y="210" class="label" font-size="13">❤️ Health</text>
+                <text x="800" y="230" class="label">Check</text>
+
+                <line x1="860" y1="220" x2="920" y2="220" class="arrow" marker-end="url(#arrowhead-solid)"/>
+
+                <!-- Production -->
+                <rect x="920" y="180" width="120" height="80" class="box-client" rx="6"/>
+                <text x="980" y="215" class="label" font-size="14">✅ Live em</text>
+                <text x="980" y="235" class="label">Produção</text>
+
+                <!-- Workflows description -->
+                <rect x="20" y="310" width="1090" height="380" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="5,5" rx="6"/>
+
+                <text x="40" y="340" class="label" text-anchor="start" style="fill: #60a5fa; font-size: 16; font-weight: bold;">Workflows GitHub Actions (.github/workflows/)</text>
+
+                <!-- Workflow boxes -->
+                <rect x="30" y="360" width="320" height="310" class="box" rx="4"/>
+                <text x="190" y="385" class="label" font-weight="700" font-size="14">ci.yml</text>
+                <text x="190" y="405" class="label-small" font-size="12">Continuous Integration</text>
+                <line x1="40" y1="415" x2="340" y2="415" stroke="#475569" stroke-width="1"/>
+                <text x="50" y="440" class="label-small" text-anchor="start" font-size="11">Trigger: push, pull_request</text>
+                <text x="50" y="460" class="label-small" text-anchor="start" font-size="11">Steps:</text>
+                <text x="60" y="480" class="label-small" text-anchor="start" font-size="11">• Checkout código</text>
+                <text x="60" y="495" class="label-small" text-anchor="start" font-size="11">• Setup Node.js</text>
+                <text x="60" y="510" class="label-small" text-anchor="start" font-size="11">• Install dependencies</text>
+                <text x="60" y="525" class="label-small" text-anchor="start" font-size="11">• Run lint</text>
+                <text x="60" y="540" class="label-small" text-anchor="start" font-size="11">• Type check</text>
+                <text x="60" y="555" class="label-small" text-anchor="start" font-size="11">• Run tests</text>
+                <text x="60" y="570" class="label-small" text-anchor="start" font-size="11">• Build (verificar)</text>
+
+                <rect x="370" y="360" width="320" height="310" class="box" rx="4"/>
+                <text x="530" y="385" class="label" font-weight="700" font-size="14">deploy.yml</text>
+                <text x="530" y="405" class="label-small" font-size="12">Build & Deploy</text>
+                <line x1="380" y1="415" x2="680" y2="415" stroke="#475569" stroke-width="1"/>
+                <text x="390" y="440" class="label-small" text-anchor="start" font-size="11">Trigger: push main</text>
+                <text x="390" y="460" class="label-small" text-anchor="start" font-size="11">Steps:</text>
+                <text x="400" y="480" class="label-small" text-anchor="start" font-size="11">• Checkout código</text>
+                <text x="400" y="495" class="label-small" text-anchor="start" font-size="11">• Setup Node.js</text>
+                <text x="400" y="510" class="label-small" text-anchor="start" font-size="11">• Install dependencies</text>
+                <text x="400" y="525" class="label-small" text-anchor="start" font-size="11">• Build Next.js</text>
+                <text x="400" y="540" class="label-small" text-anchor="start" font-size="11">• Deploy Vercel</text>
+                <text x="400" y="555" class="label-small" text-anchor="start" font-size="11">• Notify deployment</text>
+
+                <rect x="710" y="360" width="320" height="310" class="box" rx="4"/>
+                <text x="870" y="385" class="label" font-weight="700" font-size="14">e2e-tests.yml</text>
+                <text x="870" y="405" class="label-small" font-size="12">End-to-End Tests</text>
+                <line x1="720" y1="415" x2="1020" y2="415" stroke="#475569" stroke-width="1"/>
+                <text x="730" y="440" class="label-small" text-anchor="start" font-size="11">Trigger: deploy success</text>
+                <text x="730" y="460" class="label-small" text-anchor="start" font-size="11">Steps:</text>
+                <text x="740" y="480" class="label-small" text-anchor="start" font-size="11">• Checkout código</text>
+                <text x="740" y="495" class="label-small" text-anchor="start" font-size="11">• Setup browsers</text>
+                <text x="740" y="510" class="label-small" text-anchor="start" font-size="11">• Install Playwright</text>
+                <text x="740" y="525" class="label-small" text-anchor="start" font-size="11">• Run E2E tests</text>
+                <text x="740" y="540" class="label-small" text-anchor="start" font-size="11">• Run smoke tests</text>
+                <text x="740" y="555" class="label-small" text-anchor="start" font-size="11">• Report results</text>
+            </svg>
+
+            <h3 style="color: #60a5fa; margin-top: 30px; margin-bottom: 15px;">Estágios do Pipeline</h3>
+
+            <div class="stage-box">
+                <div class="stage-label">1️⃣ Code Quality (Pull Request)</div>
+                <div class="stage-items">
+                    <div class="stage-item">ESLint</div>
+                    <div class="stage-item">Prettier</div>
+                    <div class="stage-item">TypeScript Check</div>
+                    <div class="stage-item">Imports Sorting</div>
+                </div>
+            </div>
+
+            <div class="stage-box">
+                <div class="stage-label">2️⃣ Testing (PR + Main)</div>
+                <div class="stage-items">
+                    <div class="stage-item">Unit Tests (Jest)</div>
+                    <div class="stage-item">Integration Tests</div>
+                    <div class="stage-item">Coverage Reports</div>
+                    <div class="stage-item">Test Results</div>
+                </div>
+            </div>
+
+            <div class="stage-box">
+                <div class="stage-label">3️⃣ Build (Main Branch)</div>
+                <div class="stage-items">
+                    <div class="stage-item">Next.js Build</div>
+                    <div class="stage-item">Bundle Analysis</div>
+                    <div class="stage-item">Assets Optimization</div>
+                    <div class="stage-item">Build Artifacts</div>
+                </div>
+            </div>
+
+            <div class="stage-box">
+                <div class="stage-label">4️⃣ Deployment (Vercel)</div>
+                <div class="stage-items">
+                    <div class="stage-item">Build Preview</div>
+                    <div class="stage-item">Deploy to Staging</div>
+                    <div class="stage-item">Deploy Production</div>
+                    <div class="stage-item">DNS Update</div>
+                </div>
+            </div>
+
+            <div class="stage-box">
+                <div class="stage-label">5️⃣ Validation (Post-Deploy)</div>
+                <div class="stage-items">
+                    <div class="stage-item">E2E Tests (Playwright)</div>
+                    <div class="stage-item">Smoke Tests</div>
+                    <div class="stage-item">Health Checks</div>
+                    <div class="stage-item">Performance Monitoring</div>
+                </div>
+            </div>
+
+            <h3 style="color: #60a5fa; margin-top: 30px; margin-bottom: 15px;">Tecnologias do Pipeline</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ferramenta</th>
+                        <th>Propósito</th>
+                        <th>Configuração</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>GitHub Actions</strong></td>
+                        <td>Orquestração do CI/CD</td>
+                        <td>.github/workflows/*.yml</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ESLint</strong></td>
+                        <td>Lint e análise estática</td>
+                        <td>.eslintrc.json</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Prettier</strong></td>
+                        <td>Formatação de código</td>
+                        <td>.prettierrc</td>
+                    </tr>
+                    <tr>
+                        <td><strong>TypeScript</strong></td>
+                        <td>Type checking</td>
+                        <td>tsconfig.json</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Jest</strong></td>
+                        <td>Unit tests</td>
+                        <td>jest.config.js</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Playwright</strong></td>
+                        <td>E2E tests</td>
+                        <td>playwright.config.ts</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Vercel</strong></td>
+                        <td>Build e deployment</td>
+                        <td>vercel.json</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Next.js</strong></td>
+                        <td>Application build</td>
+                        <td>next.config.ts</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 style="color: #60a5fa; margin-top: 30px; margin-bottom: 15px;">Status Checks Obrigatórios (Branch Protection)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Check</th>
+                        <th>Status</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Lint & Format</td>
+                        <td>✓ Required</td>
+                        <td>Código deve passar em ESLint e Prettier</td>
+                    </tr>
+                    <tr>
+                        <td>Type Check</td>
+                        <td>✓ Required</td>
+                        <td>TypeScript não pode ter erros</td>
+                    </tr>
+                    <tr>
+                        <td>Unit Tests</td>
+                        <td>✓ Required</td>
+                        <td>Todos testes devem passar</td>
+                    </tr>
+                    <tr>
+                        <td>Integration Tests</td>
+                        <td>✓ Required</td>
+                        <td>Testes de integração devem passar</td>
+                    </tr>
+                    <tr>
+                        <td>Build Success</td>
+                        <td>✓ Required</td>
+                        <td>Build do Next.js deve completar</td>
+                    </tr>
+                    <tr>
+                        <td>E2E Tests</td>
+                        <td>✓ Recommended</td>
+                        <td>Testes E2E devem passar em staging</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(event, tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show the selected tab
+            const selectedTab = document.getElementById(tabName);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+
+            // Mark the clicked button as active
+            event.target.classList.add('active');
+        }
+
+        // Initialize first tab as active (already done in HTML, but ensures it)
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstTab = document.querySelector('.tab-button');
+            if (firstTab) {
+                firstTab.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
