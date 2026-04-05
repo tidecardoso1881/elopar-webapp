@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { formatDate, getRenewalStatus } from '@/lib/utils/formatting'
 
 interface Professional {
@@ -67,7 +68,12 @@ export function ProfessionalsTable({ professionals }: ProfessionalsTableProps) {
                   {p.os ?? '—'}
                 </td>
                 <td className="px-4 py-3">
-                  <span className="text-sm font-medium text-gray-900">{p.name}</span>
+                  <Link
+                    href={`/profissionais/${p.id}`}
+                    className="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors"
+                  >
+                    {p.name}
+                  </Link>
                 </td>
                 <td className="px-4 py-3">
                   <span className="text-sm text-gray-700">{p.position ?? '—'}</span>
