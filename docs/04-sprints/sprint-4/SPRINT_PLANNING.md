@@ -59,6 +59,3 @@ Sprint 4 complementa o MVP com módulos de equipamento e férias, implementa res
 4. Sem console errors em mobile
 
 ---
-
-**Aprovado por:** Orchestrator
-**Data:** 5 de abril de 2026

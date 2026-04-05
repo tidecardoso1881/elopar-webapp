@@ -231,12 +231,4 @@ Como desenvolvedor, quero testar todas as operações CRUD de forma completa.
 | EP-033 | Formulário de edição de profissional | 5 | P0 | TODO |
 | EP-034 | Exclusão de profissional com confirmação | 3 | P0 | TODO |
 | EP-035 | CRUD de clientes | 5 | P0 | TODO |
-| EP-036 | Validação de formulários (Zod + React Hook Form) | 5 | P0 | TODO |
-| EP-037 | Optimistic updates e loading states | 3 | P1 | TODO |
-| EP-038 | Testes unitários e integração CRUD | 5 | P1 | TODO |
-
-**Total:** 34 story points
-
----
-
-**Última atualização:** 5 de abril de 2026
+| EP-036 | Validação de formulários (Zod + React Hook For

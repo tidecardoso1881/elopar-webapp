@@ -63,7 +63,4 @@ describe('SignOutButton', () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByRole('button')).toBeDisabled()
-    })
-  })
-})
+      

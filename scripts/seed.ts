@@ -354,18 +354,4 @@ async function seed() {
     console.log('\nErros encontrados:');
     allErrors.forEach(e => console.log(`  - ${e}`));
   } else if (allErrors.length > 10) {
-    console.log(`\nErros encontrados (exibindo 10 de ${allErrors.length}):`);
-    allErrors.slice(0, 10).forEach(e => console.log(`  - ${e}`));
-  }
-
-  if (dryRun) {
-    console.log('\n[DRY-RUN] Execute sem --dry-run para inserir os dados');
-  }
-
-  console.log('='.repeat(80));
-}
-
-seed().catch(err => {
-  console.error('Erro fatal:', err);
-  process.exit(1);
-});
+    co

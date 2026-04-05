@@ -376,14 +376,4 @@ Como desenvolvedor, quero ter um pipeline de CI/CD básico com GitHub Actions, p
 | EP-002 | Configurar estrutura Next.js com App Router e shadcn/ui | 5 | P0 | TODO |
 | EP-003 | Implementar schema do banco de dados com migrations | 5 | P0 | TODO |
 | EP-004 | Implementar autenticação Supabase Auth | 8 | P0 | TODO |
-| EP-005 | Criar script de seed (Excel → Supabase) | 8 | P0 | TODO |
-| EP-006 | Implementar layout base (Sidebar, Header, Theme) | 5 | P0 | TODO |
-| EP-007 | Configurar Vitest e estrutura de testes | 3 | P0 | TODO |
-| EP-008 | Configurar CI/CD básico (GitHub Actions) | 3 | P1 | TODO |
-
-**Total:** 40 story points
-
----
-
-**Última atualização:** 5 de abril de 2026
-**Próximo review:** 20 de abril de 2026
+| EP-005 | Criar script de seed 

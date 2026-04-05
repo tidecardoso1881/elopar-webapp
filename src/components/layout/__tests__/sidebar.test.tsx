@@ -125,9 +125,4 @@ describe('Sidebar', () => {
       ]
 
       links.forEach(({ name, href }) => {
-        const link = screen.getByRole('link', { name })
-        expect(link).toHaveAttribute('href', href)
-      })
-    })
-  })
-})
+    

@@ -1319,44 +1319,4 @@ elopar-webapp/<br>
                     <tr>
                         <td>E2E Tests</td>
                         <td>✓ Recommended</td>
-                        <td>Testes E2E devem passar em staging</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <script>
-        function switchTab(event, tabName) {
-            // Hide all tab contents
-            const contents = document.querySelectorAll('.tab-content');
-            contents.forEach(content => {
-                content.classList.remove('active');
-            });
-
-            // Remove active class from all buttons
-            const buttons = document.querySelectorAll('.tab-button');
-            buttons.forEach(button => {
-                button.classList.remove('active');
-            });
-
-            // Show the selected tab
-            const selectedTab = document.getElementById(tabName);
-            if (selectedTab) {
-                selectedTab.classList.add('active');
-            }
-
-            // Mark the clicked button as active
-            event.target.classList.add('active');
-        }
-
-        // Initialize first tab as active (already done in HTML, but ensures it)
-        document.addEventListener('DOMContentLoaded', function() {
-            const firstTab = document.querySelector('.tab-button');
-            if (firstTab) {
-                firstTab.classList.add('active');
-            }
-        });
-    </script>
-</body>
-</html>
+                

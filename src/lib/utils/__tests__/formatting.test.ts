@@ -223,14 +223,4 @@ describe('normalizeContractType', () => {
   })
 
   it('normaliza "CLT ILATI"', () => {
-    expect(normalizeContractType('CLT ILATI')).toBe('CLT_ILATI')
-  })
-
-  it('normaliza "PJ"', () => {
-    expect(normalizeContractType('PJ')).toBe('PJ')
-  })
-
-  it('retorna o valor em maiúsculas para tipo desconhecido', () => {
-    expect(normalizeContractType('mei')).toBe('MEI')
-  })
-})
+    expect(normalizeContractType('CLT ILATI')).toBe('CLT_ILATI')

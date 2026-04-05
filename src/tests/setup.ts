@@ -5,4 +5,4 @@
  * - Importa os matchers do jest-dom (toBeInTheDocument, toHaveClass, etc.)
  * - Limpa mocks automaticamente entre testes
  */
-import '@testing-library/jest-dom'
+import '@testing-library/jes

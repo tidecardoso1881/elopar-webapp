@@ -185,6 +185,4 @@ Após seed bem-sucedido:
 
 ## Referências
 
-- Skill ETL: `/sessions/zealous-sharp-fermi/mnt/skills/excel-to-database-etl/SKILL.md`
-- Arquivo Excel: `docs/02-dados/CONTROLE_PROFISSIONAIS_GRUPO_ELOPAR.xlsx`
-- Supabase Docs: https://supabase.com/docs
+- Skill ETL: `/se

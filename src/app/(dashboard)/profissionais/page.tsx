@@ -7,6 +7,4 @@ export default function ProfissionaisPage() {
       <p className="text-sm text-gray-400">
         Lista em implementação (EP-012 a EP-016) — Sprint 2
       </p>
-    </div>
-  )
-}
+    </di
