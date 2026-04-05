@@ -176,11 +176,20 @@ async function processSheet(
 
   const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
 
-  // Find header row (usually row 3, index 2)
-  let headerRowIndex = 2;
-  let headerRow = rawData[headerRowIndex] as string[];
+  // Find header row - skip empty rows and look for "PROFISSIONAL"
+  let headerRowIndex = -1;
+  let headerRow: string[] = [];
 
-  if (!headerRow || !headerRow.some(h => h && String(h).toUpperCase().includes('PROFISSIONAL'))) {
+  for (let i = 0; i < rawData.length; i++) {
+    const row = rawData[i] as any[];
+    if (row && row.length > 0 && row.some(cell => cell && String(cell).toUpperCase().includes('PROFISSIONAL'))) {
+      headerRowIndex = i;
+      headerRow = row;
+      break;
+    }
+  }
+
+  if (headerRowIndex === -1 || headerRow.length === 0) {
     console.log(`  Cabeçalho não encontrado no padrão esperado`);
     return { success: 0, errors: 1, errorDetails: [`Cabeçalho não encontrado em ${sheetName}`] };
   }

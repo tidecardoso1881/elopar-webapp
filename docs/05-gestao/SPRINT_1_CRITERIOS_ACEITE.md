@@ -170,4 +170,10 @@ Marque ✅ quando passar, ❌ quando falhar (anote o erro).
 | EP-004 | Autenticação + Reset | 16 |
 | EP-005 | Seed Script | 5 |
 | EP-006 | Layout Sidebar/Header | 10 |
-| 
+| EP-007 | Vitest + RTL | 7 |
+| EP-008 | GitHub Actions | 7 |
+| **Total** | | **68 testes manuais** |
+
+---
+
+**Validado por:** _________________ | **Data:** _________________
