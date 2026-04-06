@@ -113,7 +113,7 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
     return `/profissionais${qs ? `?${qs}` : ''}`
   }
 
-  const buildSortUrl = (col: SortCol, dir: 'asc' | 'desc') => {
+  const buildSortUrl = (col: string, dir: 'asc' | 'desc') => {
     const p = new URLSearchParams()
     if (search) p.set('q', search)
     if (clienteId) p.set('cliente', clienteId)

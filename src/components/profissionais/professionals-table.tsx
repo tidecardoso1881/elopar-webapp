@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { formatDate, getRenewalStatus } from '@/lib/utils/formatting'
+import { SortableHeader } from '@/components/ui/sortable-header'
 
 interface Professional {
   id: string
@@ -13,55 +14,11 @@ interface Professional {
   client: { name: string } | null
 }
 
-type SortCol = 'name' | 'renewal_deadline' | 'status'
-
 interface ProfessionalsTableProps {
   professionals: Professional[]
-  sortBy?: SortCol
+  sortBy?: string
   sortDir?: 'asc' | 'desc'
-  buildSortUrl?: (col: SortCol, dir: 'asc' | 'desc') => string
-}
-
-function SortableHeader({
-  col,
-  label,
-  sortBy,
-  sortDir,
-  buildSortUrl,
-  className,
-}: {
-  col: SortCol
-  label: string
-  sortBy?: SortCol
-  sortDir?: 'asc' | 'desc'
-  buildSortUrl?: (col: SortCol, dir: 'asc' | 'desc') => string
-  className?: string
-}) {
-  const isActive = sortBy === col
-  const nextDir = isActive && sortDir === 'asc' ? 'desc' : 'asc'
-
-  if (!buildSortUrl) {
-    return (
-      <th scope="col" className={`px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider ${className ?? ''}`}>
-        {label}
-      </th>
-    )
-  }
-
-  return (
-    <th scope="col" className={`px-2 sm:px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${className ?? ''}`}>
-      <Link
-        href={buildSortUrl(col, nextDir)}
-        className={`inline-flex items-center gap-1 transition-colors select-none ${isActive ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
-        aria-label={`Ordenar por ${label} ${nextDir === 'asc' ? 'crescente' : 'decrescente'}`}
-      >
-        {label}
-        <span className="text-xs leading-none" aria-hidden="true">
-          {isActive ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
-        </span>
-      </Link>
-    </th>
-  )
+  buildSortUrl?: (col: string, dir: 'asc' | 'desc') => string
 }
 
 const STATUS_STYLES: Record<string, string> = {
