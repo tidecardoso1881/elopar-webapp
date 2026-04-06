@@ -69,7 +69,6 @@ const STATUS_MAP: Record<string, string> = {
   'Desligado': 'Desligado',
   'FÉRIAS': 'Ferias',
   'Férias': 'Ferias',
-  'FÉRIAS': 'Ferias',
   'ferias': 'Ferias',
 };
 

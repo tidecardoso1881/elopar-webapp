@@ -271,16 +271,4 @@ async function seed() {
     console.log(`Total de erros: ${totalErrors}`);
     if (allErrors.length > 0) {
       console.log('Erros encontrados:');
-      allErrors.forEach(e => console.log(`  - ${e}`));
-    }
-    console.log('Seed concluído!');
-  } catch (error) {
-    console.error('❌ Erro:', error.message);
-    process.exit(1);
-  }
-}
-
-seed().catch(err => {
-  console.error('Fatal error:', err);
-  process.exit(1);
-});
+   

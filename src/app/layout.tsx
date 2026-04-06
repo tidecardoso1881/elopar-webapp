@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Gestão de Profissionais | Grupo Elopar',
+  title: { default: 'Elopar', template: '%s | Elopar' },
   description: 'Sistema de gestão de profissionais do Grupo Elopar',
 };
 
