@@ -261,6 +261,69 @@ export type Database = {
         }
         Relationships: []
       }
+      test_health_logs: {
+        Row: {
+          id: string
+          recorded_at: string
+          coverage_percent: number
+          coverage_files_covered: number
+          coverage_files_total: number
+          integration_total: number
+          integration_passed: number
+          integration_failed: number
+          integration_duration_ms: number | null
+          e2e_total: number
+          e2e_passed: number
+          e2e_failed: number
+          e2e_duration_ms: number | null
+          branch: string | null
+          commit_sha: string | null
+          triggered_by: string | null
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          recorded_at?: string
+          coverage_percent?: number
+          coverage_files_covered?: number
+          coverage_files_total?: number
+          integration_total?: number
+          integration_passed?: number
+          integration_failed?: number
+          integration_duration_ms?: number | null
+          e2e_total?: number
+          e2e_passed?: number
+          e2e_failed?: number
+          e2e_duration_ms?: number | null
+          branch?: string | null
+          commit_sha?: string | null
+          triggered_by?: string | null
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          recorded_at?: string
+          coverage_percent?: number
+          coverage_files_covered?: number
+          coverage_files_total?: number
+          integration_total?: number
+          integration_passed?: number
+          integration_failed?: number
+          integration_duration_ms?: number | null
+          e2e_total?: number
+          e2e_passed?: number
+          e2e_failed?: number
+          e2e_duration_ms?: number | null
+          branch?: string | null
+          commit_sha?: string | null
+          triggered_by?: string | null
+          notes?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       v_client_summary: {
