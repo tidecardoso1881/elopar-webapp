@@ -1,6 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { ClientDeleteButton } from '@/components/clientes/client-delete-button'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Clientes',
+}
 
 interface ClientSummary {
   client_id: string
@@ -23,10 +28,10 @@ export default async function ClientesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Clientes</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 truncate">Clientes</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">
             {clientsSummary.length > 0
               ? `${clientsSummary.length} cliente${clientsSummary.length !== 1 ? 's' : ''}`
               : 'Nenhum cliente cadastrado'}
@@ -34,12 +39,12 @@ export default async function ClientesPage() {
         </div>
         <Link
           href="/clientes/novo"
-          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-xs sm:text-sm font-medium text-white hover:bg-indigo-700 active:scale-95 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all min-h-10"
         >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
-          Novo Cliente
+          <span>Novo</span>
         </Link>
       </div>
 
@@ -67,12 +72,12 @@ export default async function ClientesPage() {
             />
           </svg>
           <p className="text-gray-500 font-medium">Nenhum cliente encontrado</p>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-gray-400 text-xs sm:text-sm mt-1">
             Comece adicionando clientes ao sistema.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {clientsSummary.map((client) => {
             const activePercentage =
               client.total_count > 0
@@ -85,15 +90,15 @@ export default async function ClientesPage() {
                 className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col"
               >
                 {/* Card Header */}
-                <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between gap-2">
-                  <h2 className="text-lg font-bold text-gray-900 truncate">
+                <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-gray-100 flex items-center justify-between gap-2 min-h-16">
+                  <h2 className="text-base sm:text-lg font-bold text-gray-900 truncate">
                     {client.client_name}
                   </h2>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <Link
                       href={`/clientes/${client.client_id}/editar`}
                       title="Editar cliente"
-                      className="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
+                      className="inline-flex items-center justify-center h-8 w-8 sm:h-8 sm:w-8 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors min-h-10"
                     >
                       <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
@@ -104,7 +109,7 @@ export default async function ClientesPage() {
                 </div>
 
                 {/* Card Body */}
-                <div className="px-5 py-4 flex-1 space-y-4">
+                <div className="px-4 sm:px-5 py-3 sm:py-4 flex-1 space-y-3 sm:space-y-4">
                   {/* Badges */}
                   <div className="flex gap-2 flex-wrap">
                     <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-green-100 text-green-700">
@@ -163,7 +168,7 @@ export default async function ClientesPage() {
                 <div className="px-5 py-4 border-t border-gray-100 bg-gray-50">
                   <Link
                     href={`/profissionais?cliente=${client.client_id}`}
-                    className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-center text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-center text-sm font-medium text-gray-700 hover:bg-gray-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors transition-transform"
                   >
                     Ver profissionais
                   </Link>

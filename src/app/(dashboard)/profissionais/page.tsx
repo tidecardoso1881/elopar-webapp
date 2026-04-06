@@ -4,6 +4,11 @@ import { ProfessionalsTable } from '@/components/profissionais/professionals-tab
 import { ExportCsvButton } from '@/components/profissionais/export-csv-button'
 import { Suspense } from 'react'
 import Link from 'next/link'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Profissionais',
+}
 
 const PAGE_SIZE = 20
 
@@ -70,27 +75,27 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Profissionais</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 truncate">Profissionais</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">
             {totalCount > 0
               ? `${totalCount} profissional${totalCount !== 1 ? 'is' : ''} encontrado${totalCount !== 1 ? 's' : ''}`
               : 'Nenhum profissional cadastrado'}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-center gap-2">
           <Suspense>
             <ExportCsvButton />
           </Suspense>
           <Link
             href="/profissionais/novo"
-            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-xs sm:text-sm font-medium text-white hover:bg-indigo-700 active:scale-95 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all min-h-10"
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
-            Novo Profissional
+            <span>Novo</span>
           </Link>
         </div>
       </div>
@@ -99,7 +104,7 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
 
         {/* Filtros */}
-        <div className="px-5 py-4 border-b border-gray-100">
+        <div className="px-4 sm:px-5 py-4 border-b border-gray-100 overflow-x-auto">
           <Suspense>
             <ProfessionalsFilters clients={clients ?? []} />
           </Suspense>
@@ -107,38 +112,40 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
 
         {/* Erro */}
         {error && (
-          <div className="px-5 py-4 text-sm text-red-600 bg-red-50 border-b border-red-100">
+          <div className="px-4 sm:px-5 py-4 text-xs sm:text-sm text-red-600 bg-red-50 border-b border-red-100">
             Erro ao carregar profissionais: {error.message}
           </div>
         )}
 
         {/* Tabela */}
-        <ProfessionalsTable professionals={professionals ?? []} />
+        <div className="overflow-x-auto">
+          <ProfessionalsTable professionals={professionals ?? []} />
+        </div>
 
         {/* Paginação */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-4 border-t border-gray-100 bg-gray-50">
-            <p className="text-sm text-gray-500">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-5 py-4 border-t border-gray-100 bg-gray-50 gap-4">
+            <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
               Página {page} de {totalPages}
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-2 justify-center sm:justify-end">
               {page > 1 && (
                 <Link
                   href={buildUrl(page - 1)}
-                  className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all min-h-10"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                   </svg>
-                  Anterior
+                  <span>Anterior</span>
                 </Link>
               )}
               {page < totalPages && (
                 <Link
                   href={buildUrl(page + 1)}
-                  className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all min-h-10"
                 >
-                  Próxima
+                  <span>Próxima</span>
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
