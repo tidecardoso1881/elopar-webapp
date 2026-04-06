@@ -13,8 +13,55 @@ interface Professional {
   client: { name: string } | null
 }
 
+type SortCol = 'name' | 'renewal_deadline' | 'status'
+
 interface ProfessionalsTableProps {
   professionals: Professional[]
+  sortBy?: SortCol
+  sortDir?: 'asc' | 'desc'
+  buildSortUrl?: (col: SortCol, dir: 'asc' | 'desc') => string
+}
+
+function SortableHeader({
+  col,
+  label,
+  sortBy,
+  sortDir,
+  buildSortUrl,
+  className,
+}: {
+  col: SortCol
+  label: string
+  sortBy?: SortCol
+  sortDir?: 'asc' | 'desc'
+  buildSortUrl?: (col: SortCol, dir: 'asc' | 'desc') => string
+  className?: string
+}) {
+  const isActive = sortBy === col
+  const nextDir = isActive && sortDir === 'asc' ? 'desc' : 'asc'
+
+  if (!buildSortUrl) {
+    return (
+      <th scope="col" className={`px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider ${className ?? ''}`}>
+        {label}
+      </th>
+    )
+  }
+
+  return (
+    <th scope="col" className={`px-2 sm:px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${className ?? ''}`}>
+      <Link
+        href={buildSortUrl(col, nextDir)}
+        className={`inline-flex items-center gap-1 transition-colors select-none ${isActive ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
+        aria-label={`Ordenar por ${label} ${nextDir === 'asc' ? 'crescente' : 'decrescente'}`}
+      >
+        {label}
+        <span className="text-xs leading-none" aria-hidden="true">
+          {isActive ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
+        </span>
+      </Link>
+    </th>
+  )
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -45,7 +92,7 @@ const RENEWAL_STYLES: Record<string, { bg: string; label: string }> = {
   invalid:   { bg: 'bg-gray-100 text-gray-400',   label: 'Data não informada' },
 }
 
-export function ProfessionalsTable({ professionals }: ProfessionalsTableProps) {
+export function ProfessionalsTable({ professionals, sortBy, sortDir, buildSortUrl }: ProfessionalsTableProps) {
   if (professionals.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -63,12 +110,12 @@ export function ProfessionalsTable({ professionals }: ProfessionalsTableProps) {
       <table className="min-w-full divide-y divide-gray-200 text-xs sm:text-sm" aria-label="Lista de profissionais">
         <thead>
           <tr className="bg-gray-50">
-            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome</th>
+            <SortableHeader col="name" label="Nome" sortBy={sortBy} sortDir={sortDir} buildSortUrl={buildSortUrl} />
             <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Cargo / Senioridade</th>
             <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Cliente</th>
-            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+            <SortableHeader col="status" label="Status" sortBy={sortBy} sortDir={sortDir} buildSortUrl={buildSortUrl} />
             <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Tipo</th>
-            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Renovação</th>
+            <SortableHeader col="renewal_deadline" label="Renovação" sortBy={sortBy} sortDir={sortDir} buildSortUrl={buildSortUrl} />
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-100">

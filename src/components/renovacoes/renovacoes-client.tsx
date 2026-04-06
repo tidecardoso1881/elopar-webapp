@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
+import { formatDate } from '@/lib/utils/formatting'
 import { RenovarModal } from './renovar-modal'
 
 interface RenewalAlert {
@@ -21,14 +22,12 @@ interface RenovacoesClientProps {
   alerts: RenewalAlert[]
   totalOriginal: number
   renewalStatusConfig: Record<string, { bg: string; textColor: string; label: string; bgLight: string }>
-  formatDateFn: (d: string | null | undefined) => string
 }
 
 export function RenovacoesClient({
   alerts,
   totalOriginal,
   renewalStatusConfig,
-  formatDateFn,
 }: RenovacoesClientProps) {
   const [search, setSearch] = useState('')
   const [activeModal, setActiveModal] = useState<{
@@ -124,9 +123,9 @@ export function RenovacoesClient({
                     <td className="px-4 py-3 text-sm text-gray-600 hidden lg:table-cell">{alert.seniority ?? '—'}</td>
                     <td className="px-4 py-3 text-sm text-gray-600">
                       {isRenewed
-                        ? formatDateFn(renewedMap[alert.id ?? ''])
+                        ? formatDate(renewedMap[alert.id ?? ''])
                         : alert.contract_end
-                          ? formatDateFn(alert.contract_end)
+                          ? formatDate(alert.contract_end)
                           : '—'}
                     </td>
                     <td className="px-4 py-3 text-sm font-medium tabular-nums text-gray-900">
