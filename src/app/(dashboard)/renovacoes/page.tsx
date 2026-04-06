@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { formatDate } from '@/lib/utils/formatting'
-import Link from 'next/link'
+import { RenovacoesClient } from '@/components/renovacoes/renovacoes-client'
 
 // Alinhado com v_renewal_alerts view — views não têm NOT NULL no Supabase
 interface RenewalAlert {
@@ -48,6 +48,12 @@ const RENEWAL_STATUS_CONFIG: Record<string, { bg: string; textColor: string; lab
     textColor: 'text-green-700',
     bgLight: 'bg-green-50',
     label: 'OK',
+  },
+  invalid: {
+    bg: 'bg-gray-100',
+    textColor: 'text-gray-400',
+    bgLight: 'bg-gray-50',
+    label: 'Data não informada',
   },
 }
 
@@ -121,6 +127,15 @@ export default async function RenovacoesPage(props: RenovacoesPageProps) {
 
   let alerts: RenewalAlert[] = renewalAlerts ?? []
 
+  // BUG-02: Deduplicar por professional_id — cada profissional aparece exatamente 1x
+  const seenIds = new Set<string>()
+  alerts = alerts.filter((a) => {
+    if (!a.id) return false
+    if (seenIds.has(a.id)) return false
+    seenIds.add(a.id)
+    return true
+  })
+
   // Filtrar apenas profissionais ATIVOS com days_until_expiry não nulo
   alerts = alerts.filter(
     (a) => a.status === 'ATIVO' && a.days_until_expiry !== null
@@ -159,9 +174,6 @@ export default async function RenovacoesPage(props: RenovacoesPageProps) {
     warning: alerts.filter((a) => a.renewal_status === 'warning').length,
     attention: alerts.filter((a) => a.renewal_status === 'attention').length,
   }
-
-  const getRenewalConfig = (status: string | null) =>
-    RENEWAL_STATUS_CONFIG[status ?? 'ok'] ?? RENEWAL_STATUS_CONFIG['ok']
 
   return (
     <div className="space-y-6">
@@ -254,85 +266,17 @@ export default async function RenovacoesPage(props: RenovacoesPageProps) {
         )}
       </div>
 
-      {/* Table or Empty State */}
-      <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+      {/* Table — Client Component com busca + modal de renovar */}
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden p-4 space-y-4">
         {alerts.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="overflow-x-auto -mx-4 sm:mx-0">
-            <table className="min-w-full divide-y divide-gray-200 text-xs sm:text-sm">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    Profissional
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    Cliente
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    Sênioridade
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    Vencimento
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    Dias
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    Status
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    Ação
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 bg-white">
-                {alerts.map((alert, idx) => {
-                  const config = getRenewalConfig(alert.renewal_status)
-                  const days = alert.days_until_expiry ?? 0
-
-                  return (
-                    <tr key={alert.id ?? idx} className="transition-colors hover:bg-gray-50">
-                      <td className="px-4 py-3">
-                        <span className="text-sm font-medium text-gray-900">
-                          {alert.name ?? '—'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
-                        {alert.client_name ?? '—'}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
-                        {alert.seniority ?? '—'}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
-                        {alert.contract_end ? formatDate(alert.contract_end) : '—'}
-                      </td>
-                      <td className="px-4 py-3 text-sm font-medium tabular-nums text-gray-900">
-                        {days > 0 ? `+${days}` : days}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${config.bg} ${config.textColor}`}
-                        >
-                          {config.label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {alert.id && (
-                          <Link
-                            href={`/profissionais/${alert.id}`}
-                            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                          >
-                            Ver
-                          </Link>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+          <RenovacoesClient
+            alerts={alerts}
+            totalOriginal={alerts.length}
+            renewalStatusConfig={RENEWAL_STATUS_CONFIG}
+            formatDateFn={formatDate}
+          />
         )}
       </div>
 

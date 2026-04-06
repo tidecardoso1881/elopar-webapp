@@ -35,10 +35,28 @@ export function daysUntil(dateStr: string | null | undefined): number | null {
 }
 
 /**
- * Get renewal urgency level based on days until expiration
- * Returns: 'expired' | 'critical' | 'warning' | 'attention' | 'ok'
+ * Validate if a renewal date is meaningful (>= 2000-01-01)
+ * Dates before 2000 are treated as legacy/invalid data (BUG-01)
  */
-export function getRenewalStatus(dateStr: string | null | undefined): 'expired' | 'critical' | 'warning' | 'attention' | 'ok' | 'none' {
+export function isValidRenewalDate(dateStr: string | null | undefined): boolean {
+  if (!dateStr) return false
+  try {
+    const date = new Date(dateStr)
+    if (isNaN(date.getTime())) return false
+    return date.getFullYear() >= 2000
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Get renewal urgency level based on days until expiration
+ * Returns: 'expired' | 'critical' | 'warning' | 'attention' | 'ok' | 'none' | 'invalid'
+ * 'invalid' = date before 2000 (legacy/bad data — BUG-01)
+ */
+export function getRenewalStatus(dateStr: string | null | undefined): 'expired' | 'critical' | 'warning' | 'attention' | 'ok' | 'none' | 'invalid' {
+  if (!dateStr) return 'none'
+  if (!isValidRenewalDate(dateStr)) return 'invalid'
   const days = daysUntil(dateStr)
   if (days === null) return 'none'
   if (days < 0) return 'expired'
@@ -46,6 +64,28 @@ export function getRenewalStatus(dateStr: string | null | undefined): 'expired' 
   if (days <= 60) return 'warning'
   if (days <= 90) return 'attention'
   return 'ok'
+}
+
+/**
+ * Format currency or return "Não informado" for null/zero values (ACESS-01)
+ */
+export function formatCurrencyOrEmpty(value: number | null | undefined): string {
+  if (value === null || value === undefined || value === 0) return 'Não informado'
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value)
+}
+
+/**
+ * Calculate total billing: taxaHora * horasTrabalhadas (UX-03)
+ */
+export function calcularFaturamento(
+  taxaHora: number | null | undefined,
+  horasTrabalhadas: number | null | undefined
+): number {
+  if (!taxaHora || !horasTrabalhadas) return 0
+  return taxaHora * horasTrabalhadas
 }
 
 /**
