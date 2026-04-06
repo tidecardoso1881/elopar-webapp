@@ -3,9 +3,19 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { formatDate, formatCurrency, getRenewalStatus, daysUntil } from '@/lib/utils/formatting'
 import { ProfessionalActions } from '@/components/profissionais/professional-actions'
+import type { Metadata } from 'next'
 
 interface ProfissionalDetailPageProps {
   params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({ params }: ProfissionalDetailPageProps): Promise<Metadata> {
+  const { id } = await params
+  const supabase = await createClient()
+  const { data } = await supabase.from('professionals').select('name').eq('id', id).single()
+  return {
+    title: data?.name ? `${data.name} — Elopar` : 'Profissional — Elopar',
+  }
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -20,6 +30,7 @@ const RENEWAL_STYLES: Record<string, { bg: string; label: string }> = {
   attention: { bg: 'bg-yellow-100 text-yellow-700', label: 'Próximo (≤90d)' },
   ok:        { bg: 'bg-green-50 text-green-600',    label: 'OK' },
   none:      { bg: 'bg-gray-100 text-gray-400',     label: '—' },
+  invalid:   { bg: 'bg-gray-100 text-gray-400',     label: 'Data não informada' },
 }
 
 const CONTRACT_LABELS: Record<string, string> = {

@@ -4,9 +4,19 @@ import Link from 'next/link'
 import { ProfessionalForm } from '@/components/profissionais/professional-form'
 import { updateProfessional } from '@/actions/professionals'
 import { ActionResult } from '@/actions/professionals'
+import type { Metadata } from 'next'
 
 interface EditarProfissionalPageProps {
   params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({ params }: EditarProfissionalPageProps): Promise<Metadata> {
+  const { id } = await params
+  const supabase = await createClient()
+  const { data } = await supabase.from('professionals').select('name').eq('id', id).single()
+  return {
+    title: data?.name ? `${data.name} — Editar — Elopar` : 'Editar Profissional — Elopar',
+  }
 }
 
 export default async function EditarProfissionalPage({ params }: EditarProfissionalPageProps) {

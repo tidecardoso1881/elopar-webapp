@@ -265,3 +265,37 @@ export async function deleteProfessional(id: string): Promise<ActionResult> {
   revalidatePath(`/profissionais/${id}`)
   return { success: true }
 }
+
+// ─── RENEW PROFESSIONAL (EP-048) ──────────────────────────────────────────────
+
+export async function renewProfessional(
+  id: string,
+  newDate: string
+): Promise<ActionResult> {
+  if (!id) return { error: 'ID do profissional é obrigatório.' }
+
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+  if (!newDate || !dateRegex.test(newDate)) {
+    return { error: 'Data de renovação inválida. Use o formato YYYY-MM-DD.' }
+  }
+
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('professionals')
+    .update({
+      renewal_deadline: newDate,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+
+  if (error) {
+    console.error('[renewProfessional]', error)
+    return { error: `Erro ao renovar: ${error.message}` }
+  }
+
+  revalidatePath('/renovacoes')
+  revalidatePath('/profissionais')
+  revalidatePath(`/profissionais/${id}`)
+  return { success: true }
+}

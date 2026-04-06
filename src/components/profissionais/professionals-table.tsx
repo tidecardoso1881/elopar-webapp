@@ -42,6 +42,7 @@ const RENEWAL_STYLES: Record<string, { bg: string; label: string }> = {
   attention: { bg: 'bg-yellow-100 text-yellow-700', label: '≤90d' },
   ok:        { bg: 'bg-green-50 text-green-600',  label: 'OK' },
   none:      { bg: 'bg-gray-100 text-gray-400',   label: '—' },
+  invalid:   { bg: 'bg-gray-100 text-gray-400',   label: 'Data não informada' },
 }
 
 export function ProfessionalsTable({ professionals }: ProfessionalsTableProps) {
@@ -62,7 +63,6 @@ export function ProfessionalsTable({ professionals }: ProfessionalsTableProps) {
       <table className="min-w-full divide-y divide-gray-200 text-xs sm:text-sm" aria-label="Lista de profissionais">
         <thead>
           <tr className="bg-gray-50">
-            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">OS</th>
             <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome</th>
             <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Cargo / Senioridade</th>
             <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Cliente</th>
@@ -77,9 +77,6 @@ export function ProfessionalsTable({ professionals }: ProfessionalsTableProps) {
             const renewalStyle = RENEWAL_STYLES[renewal]
             return (
               <tr key={p.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-2 sm:px-4 py-3 text-xs sm:text-sm text-gray-400 tabular-nums">
-                  {p.os ?? '—'}
-                </td>
                 <td className="px-2 sm:px-4 py-3">
                   <Link
                     href={`/profissionais/${p.id}`}

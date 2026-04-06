@@ -143,7 +143,7 @@ export default async function DashboardPage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {/* Card 1: Total Profissionais */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-4 sm:p-6">
+        <Link href="/profissionais" className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer p-4 sm:p-6 block">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Total Profissionais</p>
@@ -155,10 +155,10 @@ export default async function DashboardPage() {
               </svg>
             </div>
           </div>
-        </div>
+        </Link>
 
         {/* Card 2: Ativos */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-4 sm:p-6">
+        <Link href="/profissionais?status=ATIVO" className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-green-300 transition-all cursor-pointer p-4 sm:p-6 block">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Ativos</p>
@@ -170,10 +170,10 @@ export default async function DashboardPage() {
               </svg>
             </div>
           </div>
-        </div>
+        </Link>
 
         {/* Card 3: Desligados */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-4 sm:p-6">
+        <Link href="/profissionais?status=INATIVO" className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-red-300 transition-all cursor-pointer p-4 sm:p-6 block">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Desligados</p>
@@ -185,10 +185,10 @@ export default async function DashboardPage() {
               </svg>
             </div>
           </div>
-        </div>
+        </Link>
 
         {/* Card 4: Renovações Críticas */}
-        <div className="bg-white rounded-lg border border-red-200 shadow-sm p-6">
+        <Link href="/renovacoes?status=critical" className="bg-white rounded-lg border border-red-200 shadow-sm hover:shadow-md hover:border-red-400 transition-all cursor-pointer p-4 sm:p-6 block">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-600">Renovações Críticas</p>
@@ -200,10 +200,10 @@ export default async function DashboardPage() {
               </svg>
             </div>
           </div>
-        </div>
+        </Link>
 
         {/* Card 5: Renovações Pendentes */}
-        <div className="bg-white rounded-lg border border-amber-200 shadow-sm p-6">
+        <Link href="/renovacoes?status=attention" className="bg-white rounded-lg border border-amber-200 shadow-sm hover:shadow-md hover:border-amber-400 transition-all cursor-pointer p-4 sm:p-6 block">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-600">Renovações Pendentes</p>
@@ -215,7 +215,7 @@ export default async function DashboardPage() {
               </svg>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Renovações Urgentes */}
