@@ -6,229 +6,432 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   public: {
     Tables: {
       clients: {
         Row: {
+          created_at: string
           id: string
           name: string
-          created_at: string
           updated_at: string
         }
         Insert: {
+          created_at?: string
           id?: string
           name: string
-          created_at?: string
           updated_at?: string
         }
         Update: {
+          created_at?: string
           id?: string
           name?: string
           updated_at?: string
         }
-      }
-      professionals: {
-        Row: {
-          id: string
-          os: number | null
-          name: string
-          email: string | null
-          manager: string | null
-          contact: string | null
-          profile: string | null
-          position: string | null
-          seniority: string | null
-          status: string
-          contract_type: string | null
-          date_start: string | null
-          date_end: string | null
-          contract_start: string | null
-          contract_end: string | null
-          renewal_deadline: string | null
-          hourly_rate: number | null
-          value_clt: number
-          value_strategic: number
-          hours_worked: number
-          payment_value: number
-          other_values: number
-          billing_rate: number
-          renewal_billing: number
-          total_billing: number
-          client_id: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          os?: number | null
-          name: string
-          email?: string | null
-          manager?: string | null
-          contact?: string | null
-          profile?: string | null
-          position?: string | null
-          seniority?: string | null
-          status?: string
-          contract_type?: string | null
-          date_start?: string | null
-          date_end?: string | null
-          contract_start?: string | null
-          contract_end?: string | null
-          renewal_deadline?: string | null
-          hourly_rate?: number | null
-          value_clt?: number
-          value_strategic?: number
-          hours_worked?: number
-          payment_value?: number
-          other_values?: number
-          billing_rate?: number
-          renewal_billing?: number
-          total_billing?: number
-          client_id: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          os?: number | null
-          name?: string
-          email?: string | null
-          manager?: string | null
-          contact?: string | null
-          profile?: string | null
-          position?: string | null
-          seniority?: string | null
-          status?: string
-          contract_type?: string | null
-          date_start?: string | null
-          date_end?: string | null
-          contract_start?: string | null
-          contract_end?: string | null
-          renewal_deadline?: string | null
-          hourly_rate?: number | null
-          value_clt?: number
-          value_strategic?: number
-          hours_worked?: number
-          payment_value?: number
-          other_values?: number
-          billing_rate?: number
-          renewal_billing?: number
-          total_billing?: number
-          client_id?: string
-          updated_at?: string
-        }
+        Relationships: []
       }
       equipment: {
         Row: {
-          id: string
-          professional_name: string
           company: string | null
+          created_at: string
+          id: string
           machine_model: string | null
           machine_type: string | null
-          office_package: boolean
+          office_package: boolean | null
+          professional_name: string
           software_details: string | null
-          created_at: string
         }
         Insert: {
-          id?: string
-          professional_name: string
           company?: string | null
+          created_at?: string
+          id?: string
           machine_model?: string | null
           machine_type?: string | null
-          office_package?: boolean
+          office_package?: boolean | null
+          professional_name: string
           software_details?: string | null
-          created_at?: string
         }
         Update: {
-          professional_name?: string
           company?: string | null
+          created_at?: string
+          id?: string
           machine_model?: string | null
           machine_type?: string | null
-          office_package?: boolean
+          office_package?: boolean | null
+          professional_name?: string
           software_details?: string | null
         }
+        Relationships: []
       }
-      vacations: {
+      professionals: {
         Row: {
-          id: string
-          client_area: string | null
-          leadership: string | null
-          professional_name: string
-          admission_date: string | null
-          acquisition_start: string | null
-          acquisition_end: string | null
-          concession_start: string | null
-          concession_end: string | null
-          days_balance: number
-          vacation_start: string | null
-          vacation_end: string | null
-          bonus_days: number
-          total_days: number
+          billing_rate: number | null
+          client_id: string
+          contact: string | null
+          contract_end: string | null
+          contract_start: string | null
+          contract_type: string | null
           created_at: string
+          date_end: string | null
+          date_start: string | null
+          email: string | null
+          hourly_rate: number | null
+          hours_worked: number | null
+          id: string
+          manager: string | null
+          name: string
+          os: number | null
+          other_values: number | null
+          payment_value: number | null
+          position: string | null
+          profile: string | null
+          renewal_billing: number | null
+          renewal_deadline: string | null
+          seniority: string | null
+          status: string
+          total_billing: number | null
+          updated_at: string
+          value_clt: number | null
+          value_strategic: number | null
         }
         Insert: {
-          id?: string
-          client_area?: string | null
-          leadership?: string | null
-          professional_name: string
-          admission_date?: string | null
-          acquisition_start?: string | null
-          acquisition_end?: string | null
-          concession_start?: string | null
-          concession_end?: string | null
-          days_balance?: number
-          vacation_start?: string | null
-          vacation_end?: string | null
-          bonus_days?: number
-          total_days?: number
+          billing_rate?: number | null
+          client_id: string
+          contact?: string | null
+          contract_end?: string | null
+          contract_start?: string | null
+          contract_type?: string | null
           created_at?: string
+          date_end?: string | null
+          date_start?: string | null
+          email?: string | null
+          hourly_rate?: number | null
+          hours_worked?: number | null
+          id?: string
+          manager?: string | null
+          name: string
+          os?: number | null
+          other_values?: number | null
+          payment_value?: number | null
+          position?: string | null
+          profile?: string | null
+          renewal_billing?: number | null
+          renewal_deadline?: string | null
+          seniority?: string | null
+          status?: string
+          total_billing?: number | null
+          updated_at?: string
+          value_clt?: number | null
+          value_strategic?: number | null
         }
         Update: {
-          client_area?: string | null
-          leadership?: string | null
-          professional_name?: string
-          admission_date?: string | null
-          acquisition_start?: string | null
-          acquisition_end?: string | null
-          concession_start?: string | null
-          concession_end?: string | null
-          days_balance?: number
-          vacation_start?: string | null
-          vacation_end?: string | null
-          bonus_days?: number
-          total_days?: number
+          billing_rate?: number | null
+          client_id?: string
+          contact?: string | null
+          contract_end?: string | null
+          contract_start?: string | null
+          contract_type?: string | null
+          created_at?: string
+          date_end?: string | null
+          date_start?: string | null
+          email?: string | null
+          hourly_rate?: number | null
+          hours_worked?: number | null
+          id?: string
+          manager?: string | null
+          name?: string
+          os?: number | null
+          other_values?: number | null
+          payment_value?: number | null
+          position?: string | null
+          profile?: string | null
+          renewal_billing?: number | null
+          renewal_deadline?: string | null
+          seniority?: string | null
+          status?: string
+          total_billing?: number | null
+          updated_at?: string
+          value_clt?: number | null
+          value_strategic?: number | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "professionals_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "professionals_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "v_client_summary"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "professionals_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "v_renewal_alerts"
+            referencedColumns: ["client_id"]
+          },
+        ]
       }
       profiles: {
         Row: {
-          id: string
-          full_name: string | null
-          role: string
           created_at: string
+          full_name: string | null
+          id: string
+          role: string
           updated_at: string
         }
         Insert: {
-          id: string
-          full_name?: string | null
-          role?: string
           created_at?: string
+          full_name?: string | null
+          id: string
+          role?: string
           updated_at?: string
         }
         Update: {
+          created_at?: string
           full_name?: string | null
+          id?: string
           role?: string
           updated_at?: string
         }
+        Relationships: []
+      }
+      vacations: {
+        Row: {
+          acquisition_end: string | null
+          acquisition_start: string | null
+          admission_date: string | null
+          bonus_days: number | null
+          client_area: string | null
+          concession_end: string | null
+          concession_start: string | null
+          created_at: string
+          days_balance: number | null
+          id: string
+          leadership: string | null
+          professional_name: string
+          total_days: number | null
+          vacation_end: string | null
+          vacation_start: string | null
+        }
+        Insert: {
+          acquisition_end?: string | null
+          acquisition_start?: string | null
+          admission_date?: string | null
+          bonus_days?: number | null
+          client_area?: string | null
+          concession_end?: string | null
+          concession_start?: string | null
+          created_at?: string
+          days_balance?: number | null
+          id?: string
+          leadership?: string | null
+          professional_name: string
+          total_days?: number | null
+          vacation_end?: string | null
+          vacation_start?: string | null
+        }
+        Update: {
+          acquisition_end?: string | null
+          acquisition_start?: string | null
+          admission_date?: string | null
+          bonus_days?: number | null
+          client_area?: string | null
+          concession_end?: string | null
+          concession_start?: string | null
+          created_at?: string
+          days_balance?: number | null
+          id?: string
+          leadership?: string | null
+          professional_name?: string
+          total_days?: number | null
+          vacation_end?: string | null
+          vacation_start?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
-      [_ in never]: never
+      v_client_summary: {
+        Row: {
+          active_count: number | null
+          client_id: string | null
+          client_name: string | null
+          terminated_count: number | null
+          total_billing: number | null
+          total_count: number | null
+        }
+        Relationships: []
+      }
+      v_dashboard_kpis: {
+        Row: {
+          renewals_critical: number | null
+          renewals_pending: number | null
+          total_active: number | null
+          total_all: number | null
+          total_terminated: number | null
+        }
+        Relationships: []
+      }
+      v_renewal_alerts: {
+        Row: {
+          client_id: string | null
+          client_name: string | null
+          contract_end: string | null
+          days_until_expiry: number | null
+          email: string | null
+          id: string | null
+          name: string | null
+          profile: string | null
+          renewal_deadline: string | null
+          renewal_status: string | null
+          seniority: string | null
+          status: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
     }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
 }
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const
