@@ -1,0 +1,153 @@
+name: 🤖 Kanban Automation
+
+# Atualiza o campo "Status Kanban" do projeto #4 automaticamente
+# conforme eventos de PR, review e issues.
+#
+# MAPEAMENTO DE EVENTOS:
+#   PR aberto/reaberto        → 🚧 Em Desenvolvimento
+#   PR pronto para review     → 🧪 Testes
+#   Review: changes requested → 🚧 Em Desenvolvimento
+#   Review: approved          → 👀 Code Review
+#   PR mergeado               → 🔎 Homologação
+#   Issue fechada             → 🚀 Produção
+#
+# PRÉ-REQUISITO:
+#   Secret PROJECT_TOKEN com scopes: repo + project
+#   Settings → Secrets → Actions → New repository secret
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, closed]
+  pull_request_review:
+    types: [submitted]
+  issues:
+    types: [closed]
+
+env:
+  PROJECT_NUMBER: 4
+  OWNER: tidecardoso1881
+
+jobs:
+  update-kanban:
+    name: Atualizar Status Kanban
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔄 Atualizar status no projeto
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const owner   = process.env.OWNER;
+            const projNum = parseInt(process.env.PROJECT_NUMBER);
+
+            // ── 1. Determinar status alvo ──────────────────────────────
+            let targetStatus = null;
+            const ev = context.eventName;
+            const action = context.payload.action;
+
+            if (ev === 'pull_request') {
+              if (['opened', 'reopened'].includes(action))   targetStatus = '🚧 Em Desenvolvimento';
+              if (action === 'ready_for_review')             targetStatus = '🧪 Testes';
+              if (action === 'closed' && context.payload.pull_request.merged)
+                                                             targetStatus = '🔎 Homologação';
+            }
+            if (ev === 'pull_request_review') {
+              const state = context.payload.review.state;
+              if (state === 'changes_requested') targetStatus = '🚧 Em Desenvolvimento';
+              if (state === 'approved')          targetStatus = '👀 Code Review';
+            }
+            if (ev === 'issues' && action === 'closed')      targetStatus = '🚀 Produção';
+
+            if (!targetStatus) {
+              console.log(`Evento '${ev}/${action}' não mapeado. Ignorando.`);
+              return;
+            }
+            console.log(`🎯 Status alvo: ${targetStatus}`);
+
+            // ── 2. Buscar projeto e campos ─────────────────────────────
+            const { user } = await github.graphql(`
+              query($owner: String!, $number: Int!) {
+                user(login: $owner) {
+                  projectV2(number: $number) {
+                    id
+                    fields(first: 30) {
+                      nodes {
+                        ... on ProjectV2SingleSelectField {
+                          id name
+                          options { id name }
+                        }
+                      }
+                    }
+                  }
+                }
+              }`, { owner, number: projNum });
+
+            const project     = user.projectV2;
+            const statusField = project.fields.nodes.find(f => f.name === 'Status Kanban');
+
+            if (!statusField) {
+              console.log('⚠️  Campo "Status Kanban" não encontrado no projeto.');
+              return;
+            }
+
+            const option = statusField.options.find(o => o.name === targetStatus);
+            if (!option) {
+              console.log(`⚠️  Opção "${targetStatus}" não encontrada no campo.`);
+              return;
+            }
+
+            // ── 3. Identificar o item no projeto ───────────────────────
+            const contentUrl = context.payload.pull_request?.html_url
+                            || context.payload.issue?.html_url;
+            const contentId  = context.payload.pull_request?.node_id
+                            || context.payload.issue?.node_id;
+
+            const { node } = await github.graphql(`
+              query($projectId: ID!) {
+                node(id: $projectId) {
+                  ... on ProjectV2 {
+                    items(first: 200) {
+                      nodes {
+                        id
+                        content {
+                          ... on PullRequest { url }
+                          ... on Issue       { url }
+                        }
+                      }
+                    }
+                  }
+                }
+              }`, { projectId: project.id });
+
+            let item = node.items.nodes.find(i => i.content?.url === contentUrl);
+
+            if (!item) {
+              console.log(`Item não encontrado no projeto. Adicionando...`);
+              const added = await github.graphql(`
+                mutation($projectId: ID!, $contentId: ID!) {
+                  addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) {
+                    item { id }
+                  }
+                }`, { projectId: project.id, contentId });
+              item = added.addProjectV2ItemById.item;
+            }
+
+            // ── 4. Atualizar o campo ───────────────────────────────────
+            await github.graphql(`
+              mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: $projectId
+                  itemId:    $itemId
+                  fieldId:   $fieldId
+                  value:     { singleSelectOptionId: $optionId }
+                }) {
+                  projectV2Item { id }
+                }
+              }`, {
+                projectId: project.id,
+                itemId:    item.id,
+                fieldId:   statusField.id,
+                optionId:  option.id
+              });
+
+            console.log(`✅ "${contentUrl}" → "${targetStatus}"`);
