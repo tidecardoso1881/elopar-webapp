@@ -1,25 +1,17 @@
 'use client'
 
 import { useActionState } from 'react'
-import { type ActionResult } from '@/actions/equipment'
+import { type ActionResult } from '@/actions/vacations'
 import { Database } from '@/lib/types/database'
 
-type Equipment = Database['public']['Tables']['equipment']['Row']
+type Vacation = Database['public']['Tables']['vacations']['Row']
 
-interface EquipmentFormProps {
+interface VacationFormProps {
   action: (prevState: ActionResult, formData: FormData) => Promise<ActionResult>
-  defaultValues?: Partial<Equipment>
+  defaultValues?: Partial<Vacation>
   submitLabel?: string
   cancelHref?: string
 }
-
-const MACHINE_TYPE_OPTIONS = [
-  { value: 'Notebook', label: 'Notebook' },
-  { value: 'Desktop', label: 'Desktop' },
-  { value: 'Tablet', label: 'Tablet' },
-  { value: 'Celular', label: 'Celular' },
-  { value: 'Outro', label: 'Outro' },
-]
 
 function FormField({
   label,
@@ -58,69 +50,6 @@ function FormField({
   )
 }
 
-function SelectField({
-  label,
-  name,
-  defaultValue,
-  required,
-  options,
-  placeholder,
-}: {
-  label: string
-  name: string
-  defaultValue?: string | null
-  required?: boolean
-  options: { value: string; label: string }[]
-  placeholder?: string
-}) {
-  return (
-    <div className="space-y-1.5">
-      <label htmlFor={name} className="block text-xs font-medium text-gray-600">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      <select
-        id={name}
-        name={name}
-        defaultValue={defaultValue ?? ''}
-        required={required}
-        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-colors"
-      >
-        {placeholder && <option value="">{placeholder}</option>}
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  )
-}
-
-function CheckboxField({
-  label,
-  name,
-  defaultValue,
-}: {
-  label: string
-  name: string
-  defaultValue?: boolean
-}) {
-  return (
-    <div className="flex items-center gap-3">
-      <input
-        id={name}
-        name={name}
-        type="checkbox"
-        defaultChecked={defaultValue}
-        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-colors cursor-pointer"
-      />
-      <label htmlFor={name} className="text-sm font-medium text-gray-700 cursor-pointer">
-        {label}
-      </label>
-    </div>
-  )
-}
-
 function TextAreaField({
   label,
   name,
@@ -149,12 +78,12 @@ function TextAreaField({
   )
 }
 
-export function EquipmentForm({
+export function VacationForm({
   action,
   defaultValues,
   submitLabel = 'Salvar',
-  cancelHref = '/equipamentos',
-}: EquipmentFormProps) {
+  cancelHref = '/ferias',
+}: VacationFormProps) {
   const [state, formAction, isPending] = useActionState(action, {})
 
   return (
@@ -165,6 +94,7 @@ export function EquipmentForm({
         </div>
       )}
 
+      {/* Identificação */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
         <h2 className="text-sm font-semibold text-gray-700 mb-5">Identificação</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -178,45 +108,103 @@ export function EquipmentForm({
             />
           </div>
           <FormField
-            label="Empresa"
-            name="company"
-            defaultValue={defaultValues?.company}
-            placeholder="Ex: Acme Corp"
+            label="Data de Admissão"
+            name="admission_date"
+            type="date"
+            defaultValue={defaultValues?.admission_date}
           />
         </div>
       </div>
 
+      {/* Período Aquisitivo */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-        <h2 className="text-sm font-semibold text-gray-700 mb-5">Equipamento</h2>
+        <h2 className="text-sm font-semibold text-gray-700 mb-5">Período Aquisitivo</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <SelectField
-            label="Tipo de Máquina"
-            name="machine_type"
-            defaultValue={defaultValues?.machine_type}
-            placeholder="Selecione um tipo..."
-            options={MACHINE_TYPE_OPTIONS}
+          <FormField
+            label="Data de Início"
+            name="acquisition_start"
+            type="date"
+            defaultValue={defaultValues?.acquisition_start}
           />
           <FormField
-            label="Modelo da Máquina"
-            name="machine_model"
-            defaultValue={defaultValues?.machine_model}
-            placeholder="Ex: MacBook Pro 14"
+            label="Data de Fim"
+            name="acquisition_end"
+            type="date"
+            defaultValue={defaultValues?.acquisition_end}
           />
-          <div className="md:col-span-2">
-            <CheckboxField
-              label="Pacote Office instalado"
-              name="office_package"
-              defaultValue={defaultValues?.office_package ?? false}
-            />
-          </div>
-          <div className="md:col-span-2">
-            <TextAreaField
-              label="Detalhes de Softwares"
-              name="software_details"
-              defaultValue={defaultValues?.software_details}
-              placeholder="Ex: VS Code, Node.js 18, Docker..."
-            />
-          </div>
+        </div>
+      </div>
+
+      {/* Período de Gozo */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <h2 className="text-sm font-semibold text-gray-700 mb-5">Período de Gozo</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            label="Data de Concessão Início"
+            name="concession_start"
+            type="date"
+            defaultValue={defaultValues?.concession_start}
+          />
+          <FormField
+            label="Data de Concessão Fim"
+            name="concession_end"
+            type="date"
+            defaultValue={defaultValues?.concession_end}
+          />
+          <FormField
+            label="Data de Férias Início"
+            name="vacation_start"
+            type="date"
+            defaultValue={defaultValues?.vacation_start}
+          />
+          <FormField
+            label="Data de Férias Fim"
+            name="vacation_end"
+            type="date"
+            defaultValue={defaultValues?.vacation_end}
+          />
+        </div>
+      </div>
+
+      {/* Dados Complementares */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <h2 className="text-sm font-semibold text-gray-700 mb-5">Dados Complementares</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <FormField
+            label="Total de Dias"
+            name="total_days"
+            type="number"
+            defaultValue={defaultValues?.total_days}
+            placeholder="Ex: 30"
+          />
+          <FormField
+            label="Dias Bônus"
+            name="bonus_days"
+            type="number"
+            defaultValue={defaultValues?.bonus_days}
+            placeholder="Ex: 5"
+          />
+          <FormField
+            label="Saldo de Dias"
+            name="days_balance"
+            type="number"
+            defaultValue={defaultValues?.days_balance}
+            placeholder="Ex: 25"
+          />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <FormField
+            label="Liderança"
+            name="leadership"
+            defaultValue={defaultValues?.leadership}
+            placeholder="Ex: Gerente de Projetos"
+          />
+          <FormField
+            label="Área / Cliente"
+            name="client_area"
+            defaultValue={defaultValues?.client_area}
+            placeholder="Ex: E-commerce"
+          />
         </div>
       </div>
 

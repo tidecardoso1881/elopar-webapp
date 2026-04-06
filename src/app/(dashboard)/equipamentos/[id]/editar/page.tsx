@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { EquipmentForm } from '@/components/profissionais/equipment-form'
-import { updateEquipment } from '@/actions/equipment'
+import { updateEquipment, type ActionResult } from '@/actions/equipment'
 
 interface EditEquipmentPageProps {
   params: Promise<{ id: string }>
@@ -22,7 +22,7 @@ export default async function EditEquipmentPage({ params }: EditEquipmentPagePro
     notFound()
   }
 
-  const boundUpdateEquipment = (prevState, formData) => updateEquipment(id, prevState, formData)
+  const boundUpdateEquipment = (prevState: ActionResult, formData: FormData) => updateEquipment(id, prevState, formData)
 
   return (
     <div className="space-y-6 max-w-3xl">
