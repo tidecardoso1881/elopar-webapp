@@ -88,7 +88,7 @@ export async function createVacation(
 
 // ─── UPDATE ───────────────────────────────────────────────────────────────────
 
-export function updateVacation(id: string) {
+export async function updateVacation(id: string) {
   return async function (_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
     const supabase = await createClient()
 

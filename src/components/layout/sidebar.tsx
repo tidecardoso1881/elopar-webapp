@@ -2,11 +2,11 @@
 
 import { usePathname } from 'next/navigation'
 import { SignOutButton } from '@/components/auth/sign-out-button'
-import { RenewalBadge } from '@/components/renovacoes/renewal-badge'
 
 interface SidebarProps {
   user: { email: string }
   profile: { full_name: string | null; role: string } | null
+  renewalBadge?: React.ReactNode
 }
 
 const menuItems = [
@@ -66,7 +66,7 @@ const menuItems = [
   },
 ]
 
-export function Sidebar({ user, profile }: SidebarProps) {
+export function Sidebar({ user, profile, renewalBadge }: SidebarProps) {
   const pathname = usePathname()
 
   const displayName = profile?.full_name ?? user.email ?? 'Usuário'
@@ -113,7 +113,7 @@ export function Sidebar({ user, profile }: SidebarProps) {
                 <span className={isActive ? 'text-blue-600' : 'text-gray-500'}>{item.icon}</span>
                 <span className="flex items-center gap-1">
                   {item.label}
-                  {item.label === 'Renovações' && <RenewalBadge />}
+                  {item.label === 'Renovações' && renewalBadge}
                 </span>
               </a>
             </div>

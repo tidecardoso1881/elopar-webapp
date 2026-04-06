@@ -31,7 +31,7 @@ export default async function EditFeriasPage({ params }: EditFeriasPageProps) {
       </div>
 
       <VacationForm
-        action={updateVacation(id)}
+        action={await updateVacation(id)}
         defaultValues={vacation}
         submitLabel="Atualizar Registro"
         cancelHref={`/ferias/${id}`}
