@@ -5,9 +5,16 @@ import path from 'path'
 export default defineConfig({
   plugins: [react()],
   test: {
+    // Simula o ambiente do browser (DOM)
     environment: 'jsdom',
+
+    // Arquivo de setup global (jest-dom matchers, mocks globais)
     setupFiles: ['./src/tests/setup.ts'],
+
+    // Glob para encontrar todos os testes
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
+
+    // Coverage com provider nativo do Vitest (V8)
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -16,7 +23,7 @@ export default defineConfig({
         'src/tests/**',
         'src/**/*.d.ts',
         'src/lib/types/**',
-        'src/app/**',
+        'src/app/**', // Server Components são testados via E2E (Sprint 6)
       ],
       thresholds: {
         lines: 80,
@@ -27,6 +34,7 @@ export default defineConfig({
     },
   },
   resolve: {
+    // Replica o path alias @/* do tsconfig.json
     alias: {
       '@': path.resolve(__dirname, './src'),
     },

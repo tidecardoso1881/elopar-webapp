@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import { SignOutButton } from '@/components/auth/sign-out-button'
+import { RenewalBadge } from '@/components/renovacoes/renewal-badge'
 
 interface SidebarProps {
   user: { email: string }
@@ -100,19 +101,22 @@ export function Sidebar({ user, profile }: SidebarProps) {
         {menuItems.map((item) => {
           const isActive = pathname === item.href
           return (
-            <a
-              key={item.href}
-              href={item.href}
-              aria-current={isActive ? 'page' : undefined}
-              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                isActive
-                  ? 'bg-blue-50 text-blue-700 font-medium'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              <span className={isActive ? 'text-blue-600' : 'text-gray-500'} aria-hidden="true">{item.icon}</span>
-              {item.label}
-            </a>
+            <div key={item.href} className="relative">
+              <a
+                href={item.href}
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                  isActive
+                    ? 'bg-blue-50 text-blue-700 font-medium'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <span className={isActive ? 'text-blue-600' : 'text-gray-500'}>{item.icon}</span>
+                <span className="flex items-center gap-1">
+                  {item.label}
+                  {item.label === 'Renovações' && <RenewalBadge />}
+                </span>
+              </a>
+            </div>
           )
         })}
       </nav>

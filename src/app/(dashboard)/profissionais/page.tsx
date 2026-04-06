@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ProfessionalsFilters } from '@/components/profissionais/professionals-filters'
 import { ProfessionalsTable } from '@/components/profissionais/professionals-table'
 import { ExportCsvButton } from '@/components/profissionais/export-csv-button'
+import { getRenewalStatus } from '@/lib/utils/formatting'
 import { Suspense } from 'react'
 import Link from 'next/link'
 import type { Metadata } from 'next'
@@ -16,6 +17,10 @@ interface SearchParams {
   q?: string
   cliente?: string
   status?: string
+  position?: string
+  seniority?: string
+  contract_type?: string
+  renewal?: string
   page?: string
 }
 
@@ -28,6 +33,10 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
   const search = params.q?.trim() ?? ''
   const clienteId = params.cliente ?? ''
   const status = params.status ?? ''
+  const position = params.position?.trim() ?? ''
+  const seniority = params.seniority ?? ''
+  const contractType = params.contract_type ?? ''
+  const renewalFilter = params.renewal ?? ''
   const page = Math.max(1, parseInt(params.page ?? '1', 10))
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
@@ -56,8 +65,26 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
   if (status) {
     query = query.eq('status', status)
   }
+  if (position) {
+    query = query.ilike('position', `%${position}%`)
+  }
+  if (seniority) {
+    query = query.eq('seniority', seniority)
+  }
+  if (contractType) {
+    query = query.eq('contract_type', contractType)
+  }
 
-  const { data: professionals, count, error } = await query
+  let { data: professionals, count, error } = await query
+
+  // Filtro de renovação é aplicado em memória se necessário
+  if (renewalFilter && professionals) {
+    professionals = professionals.filter((p) => {
+      const status = getRenewalStatus(p.renewal_deadline)
+      return status === renewalFilter
+    })
+    count = professionals.length
+  }
 
   const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
   const totalCount = count ?? 0
@@ -67,6 +94,10 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
     if (search) p.set('q', search)
     if (clienteId) p.set('cliente', clienteId)
     if (status) p.set('status', status)
+    if (position) p.set('position', position)
+    if (seniority) p.set('seniority', seniority)
+    if (contractType) p.set('contract_type', contractType)
+    if (renewalFilter) p.set('renewal', renewalFilter)
     if (newPage > 1) p.set('page', String(newPage))
     const qs = p.toString()
     return `/profissionais${qs ? `?${qs}` : ''}`

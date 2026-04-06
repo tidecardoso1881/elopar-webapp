@@ -85,8 +85,9 @@ export default async function ClientesPage() {
                 : 0
 
             return (
-              <div
+              <Link
                 key={client.client_id}
+                href={`/clientes/${client.client_id}`}
                 className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col"
               >
                 {/* Card Header */}
@@ -173,7 +174,7 @@ export default async function ClientesPage() {
                     Ver profissionais
                   </Link>
                 </div>
-              </div>
+              </Link>
             )
           })}
         </div>
