@@ -140,11 +140,11 @@ export function RenovacoesClient({
               <tr className="bg-gray-50">
                 <SortableHeader col="name" label="Profissional" sortBy={sortCol} sortDir={sortDir} onClick={handleSort} />
                 <SortableHeader col="client_name" label="Cliente" sortBy={sortCol} sortDir={sortDir} onClick={handleSort} />
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">Sênioridade</th>
+                <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">Sênioridade</th>
                 <SortableHeader col="contract_end" label="Vencimento" sortBy={sortCol} sortDir={sortDir} onClick={handleSort} />
                 <SortableHeader col="days_until_expiry" label="Dias" sortBy={sortCol} sortDir={sortDir} onClick={handleSort} />
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Ações</th>
+                <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
+                <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 bg-white">
@@ -158,7 +158,7 @@ export function RenovacoesClient({
                     key={alert.id ?? idx}
                     className={`transition-colors hover:bg-gray-50 ${isRenewed ? 'bg-green-50/40' : ''}`}
                   >
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2.5">
                       <span className="text-sm font-medium text-gray-900">{alert.name ?? '—'}</span>
                       {isRenewed && (
                         <span className="ml-2 inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
@@ -166,19 +166,19 @@ export function RenovacoesClient({
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{alert.client_name ?? '—'}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600 hidden lg:table-cell">{alert.seniority ?? '—'}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-3 py-2.5 text-sm text-gray-600">{alert.client_name ?? '—'}</td>
+                    <td className="px-3 py-2.5 text-sm text-gray-600 hidden lg:table-cell">{alert.seniority ?? '—'}</td>
+                    <td className="px-3 py-2.5 text-sm text-gray-600">
                       {isRenewed
                         ? formatDate(renewedMap[alert.id ?? ''])
                         : alert.contract_end
                           ? formatDate(alert.contract_end)
                           : '—'}
                     </td>
-                    <td className="px-4 py-3 text-sm font-medium tabular-nums text-gray-900">
+                    <td className="px-3 py-2.5 text-sm font-medium tabular-nums text-gray-900">
                       {isRenewed ? '—' : days !== null && (days > 0 ? `+${days}` : days)}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2.5">
                       {!isRenewed && (
                         <span
                           className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${config.bg} ${config.textColor}`}
@@ -187,7 +187,7 @@ export function RenovacoesClient({
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2.5">
                       <div className="flex items-center gap-2">
                         {alert.id && (
                           <Link

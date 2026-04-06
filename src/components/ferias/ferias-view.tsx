@@ -260,12 +260,12 @@ export function FeriasView({ vacations }: FeriasViewProps) {
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr className="bg-gray-50">
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Profissional</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Área</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Período</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Saldo</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Dias</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                  <th scope="col" className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Profissional</th>
+                  <th scope="col" className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Área</th>
+                  <th scope="col" className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Período</th>
+                  <th scope="col" className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Saldo</th>
+                  <th scope="col" className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Dias</th>
+                  <th scope="col" className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">
@@ -273,14 +273,14 @@ export function FeriasView({ vacations }: FeriasViewProps) {
                   const status = getVacationStatus(v.vacation_start, v.vacation_end)
                   return (
                     <tr key={v.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-2.5">
                         <span className="text-sm font-medium text-gray-900">{v.professional_name}</span>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{v.client_area ?? '—'}</td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{formatDateRange(v.vacation_start, v.vacation_end)}</td>
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900">{v.days_balance}</td>
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900">{v.total_days}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-2.5 text-sm text-gray-600">{v.client_area ?? '—'}</td>
+                      <td className="px-3 py-2.5 text-sm text-gray-600">{formatDateRange(v.vacation_start, v.vacation_end)}</td>
+                      <td className="px-3 py-2.5 text-sm font-medium text-gray-900">{v.days_balance}</td>
+                      <td className="px-3 py-2.5 text-sm font-medium text-gray-900">{v.total_days}</td>
+                      <td className="px-3 py-2.5">
                         <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeColor(status)}`} aria-label={`Status: ${status}`}>
                           {status}
                         </span>

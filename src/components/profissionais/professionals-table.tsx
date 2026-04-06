@@ -68,10 +68,10 @@ export function ProfessionalsTable({ professionals, sortBy, sortDir, buildSortUr
         <thead>
           <tr className="bg-gray-50">
             <SortableHeader col="name" label="Nome" sortBy={sortBy} sortDir={sortDir} buildSortUrl={buildSortUrl} />
-            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Cargo / Senioridade</th>
-            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Cliente</th>
+            <th scope="col" className="px-2 sm:px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Cargo / Senioridade</th>
+            <th scope="col" className="px-2 sm:px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Cliente</th>
             <SortableHeader col="status" label="Status" sortBy={sortBy} sortDir={sortDir} buildSortUrl={buildSortUrl} />
-            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Tipo</th>
+            <th scope="col" className="px-2 sm:px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Tipo</th>
             <SortableHeader col="renewal_deadline" label="Renovação" sortBy={sortBy} sortDir={sortDir} buildSortUrl={buildSortUrl} />
           </tr>
         </thead>
@@ -81,7 +81,7 @@ export function ProfessionalsTable({ professionals, sortBy, sortDir, buildSortUr
             const renewalStyle = RENEWAL_STYLES[renewal]
             return (
               <tr key={p.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-2 sm:px-4 py-3">
+                <td className="px-2 sm:px-3 py-2.5">
                   <Link
                     href={`/profissionais/${p.id}`}
                     className="text-xs sm:text-sm font-medium text-gray-900 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded px-1 transition-colors"
@@ -90,7 +90,7 @@ export function ProfessionalsTable({ professionals, sortBy, sortDir, buildSortUr
                     {p.name}
                   </Link>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-3 py-2.5">
                   <div className="flex flex-col gap-1">
                     <span className="text-sm text-gray-700">{p.position ?? '—'}</span>
                     {p.seniority && (
@@ -98,15 +98,15 @@ export function ProfessionalsTable({ professionals, sortBy, sortDir, buildSortUr
                     )}
                   </div>
                 </td>
-                <td className="px-2 sm:px-4 py-3 text-xs sm:text-sm text-gray-600 hidden md:table-cell">
+                <td className="px-2 sm:px-3 py-2.5 text-xs sm:text-sm text-gray-600 hidden md:table-cell">
                   {p.client?.name ?? '—'}
                 </td>
-                <td className="px-2 sm:px-4 py-3">
+                <td className="px-2 sm:px-3 py-2.5">
                   <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[p.status] ?? 'bg-gray-100 text-gray-500'}`} aria-label={`Status: ${p.status}`}>
                     {p.status}
                   </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-3 py-2.5">
                   {p.contract_type ? (
                     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${CONTRACT_TYPE_STYLES[p.contract_type] ?? 'bg-gray-100 text-gray-500'}`}>
                       {p.contract_type === 'CLT_ESTRATEGICO' ? 'CLT Estratégico' : p.contract_type === 'CLT_ILAED' ? 'CLT ILAED' : p.contract_type}
@@ -115,7 +115,7 @@ export function ProfessionalsTable({ professionals, sortBy, sortDir, buildSortUr
                     <span className="text-sm text-gray-400">—</span>
                   )}
                 </td>
-                <td className="px-2 sm:px-4 py-3">
+                <td className="px-2 sm:px-3 py-2.5">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs text-gray-500">{formatDate(p.renewal_deadline)}</span>
                     <span className={`inline-flex w-fit items-center rounded px-1.5 py-0.5 text-xs font-medium ${renewalStyle.bg}`} aria-label={`Situação de renovação: ${renewalStyle.label}`}>

@@ -131,7 +131,7 @@ export function UsuariosTable({ users, currentUserId }: Props) {
 
       {/* Table card */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+        <div className="flex items-center justify-between px-3 py-2.5 border-b border-gray-100">
           <span className="text-sm font-semibold text-gray-900">Usuários do sistema</span>
           <input
             type="text"
@@ -150,7 +150,7 @@ export function UsuariosTable({ users, currentUserId }: Props) {
               <thead>
                 <tr className="bg-gray-50">
                   {['Usuário', 'Perfil', 'Status', 'Criado em', 'Último acesso', 'Ações'].map(h => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    <th key={h} className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
                       {h}
                     </th>
                   ))}
@@ -162,7 +162,7 @@ export function UsuariosTable({ users, currentUserId }: Props) {
                   const isLoading = pendingAction === u.id
                   return (
                     <tr key={u.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-2.5">
                         <div className="flex items-center gap-2.5">
                           <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center text-xs font-bold flex-shrink-0">
                             {initials(u.full_name, u.email)}
@@ -173,22 +173,22 @@ export function UsuariosTable({ users, currentUserId }: Props) {
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-2.5">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${ROLE_BADGE[u.role] ?? 'bg-gray-100 text-gray-500'}`}>
                           {u.role === 'admin' ? 'Admin' : 'Manager'}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-2.5">
                         <span className="flex items-center gap-1.5 text-sm text-gray-600">
                           <span className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[u.status]}`} />
                           {STATUS_LABEL[u.status]}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{formatDate(u.created_at)}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">
+                      <td className="px-3 py-2.5 text-sm text-gray-500">{formatDate(u.created_at)}</td>
+                      <td className="px-3 py-2.5 text-sm text-gray-500">
                         {u.last_sign_in_at ? formatDate(u.last_sign_in_at) : '—'}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-2.5">
                         <div className="flex gap-1.5">
                           {u.status === 'pendente' && (
                             <button

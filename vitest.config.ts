@@ -7,6 +7,7 @@ export default defineConfig({
   test: {
     // Simula o ambiente do browser (DOM)
     environment: 'jsdom',
+    globals: true,
 
     // Arquivo de setup global (jest-dom matchers, mocks globais)
     setupFiles: ['./src/tests/setup.ts'],
