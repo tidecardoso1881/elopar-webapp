@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { logAudit } from '@/lib/audit'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -74,13 +75,21 @@ export async function createVacation(
   const { data: created, error } = await supabase
     .from('vacations')
     .insert(payload)
-    .select('id')
+    .select()
     .single()
 
   if (error) {
     console.error('[createVacation]', error)
     return { error: `Erro ao criar férias: ${error.message}` }
   }
+
+  await logAudit({
+    entidade: 'vacation',
+    entidade_id: created.id,
+    acao: 'CREATE',
+    dados_antes: null,
+    dados_depois: created as Record<string, unknown>,
+  })
 
   revalidatePath('/ferias')
   redirect(`/ferias/${created.id}`)
@@ -128,6 +137,12 @@ export async function updateVacation(id: string) {
       client_area: data.client_area?.trim() || null,
     }
 
+    const { data: antes } = await supabase
+      .from('vacations')
+      .select()
+      .eq('id', id)
+      .single()
+
     const { error } = await supabase
       .from('vacations')
       .update(payload)
@@ -137,6 +152,14 @@ export async function updateVacation(id: string) {
       console.error('[updateVacation]', error)
       return { error: `Erro ao atualizar: ${error.message}` }
     }
+
+    await logAudit({
+      entidade: 'vacation',
+      entidade_id: id,
+      acao: 'UPDATE',
+      dados_antes: antes as Record<string, unknown> | null,
+      dados_depois: { ...payload, id } as Record<string, unknown>,
+    })
 
     revalidatePath('/ferias')
     revalidatePath(`/ferias/${id}`)
@@ -149,6 +172,12 @@ export async function updateVacation(id: string) {
 export async function deleteVacation(id: string): Promise<ActionResult> {
   const supabase = await createClient()
 
+  const { data: antes } = await supabase
+    .from('vacations')
+    .select()
+    .eq('id', id)
+    .single()
+
   const { error } = await supabase
     .from('vacations')
     .delete()
@@ -158,6 +187,14 @@ export async function deleteVacation(id: string): Promise<ActionResult> {
     console.error('[deleteVacation]', error)
     return { error: `Erro ao excluir férias: ${error.message}` }
   }
+
+  await logAudit({
+    entidade: 'vacation',
+    entidade_id: id,
+    acao: 'DELETE',
+    dados_antes: antes as Record<string, unknown> | null,
+    dados_depois: null,
+  })
 
   revalidatePath('/ferias')
   return { success: true }

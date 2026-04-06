@@ -53,7 +53,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Rotas exclusivas para admin — verificar role no banco
-  const adminOnlyRoutes = ['/area-usuario/gerenciar-usuarios']
+  const adminOnlyRoutes = ['/area-usuario/gerenciar-usuarios', '/area-usuario/audit-log']
   if (user && adminOnlyRoutes.some(r => pathname.startsWith(r))) {
     const { data: profile } = await supabase
       .from('profiles')

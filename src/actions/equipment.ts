@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { logAudit } from '@/lib/audit'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -53,13 +54,21 @@ export async function createEquipment(
   const { data: created, error } = await supabase
     .from('equipment')
     .insert(payload)
-    .select('id')
+    .select()
     .single()
 
   if (error) {
     console.error('[createEquipment]', error)
     return { error: `Erro ao criar equipamento: ${error.message}` }
   }
+
+  await logAudit({
+    entidade: 'equipment',
+    entidade_id: created.id,
+    acao: 'CREATE',
+    dados_antes: null,
+    dados_depois: created as Record<string, unknown>,
+  })
 
   revalidatePath('/equipamentos')
   redirect(`/equipamentos/${created.id}`)
@@ -96,6 +105,12 @@ export async function updateEquipment(
     software_details: data.software_details?.trim() || null,
   }
 
+  const { data: antes } = await supabase
+    .from('equipment')
+    .select()
+    .eq('id', id)
+    .single()
+
   const { error } = await supabase
     .from('equipment')
     .update(payload)
@@ -105,6 +120,14 @@ export async function updateEquipment(
     console.error('[updateEquipment]', error)
     return { error: `Erro ao atualizar: ${error.message}` }
   }
+
+  await logAudit({
+    entidade: 'equipment',
+    entidade_id: id,
+    acao: 'UPDATE',
+    dados_antes: antes as Record<string, unknown> | null,
+    dados_depois: { ...payload, id } as Record<string, unknown>,
+  })
 
   revalidatePath('/equipamentos')
   revalidatePath(`/equipamentos/${id}`)
@@ -116,6 +139,12 @@ export async function updateEquipment(
 export async function deleteEquipment(id: string): Promise<ActionResult> {
   const supabase = await createClient()
 
+  const { data: antes } = await supabase
+    .from('equipment')
+    .select()
+    .eq('id', id)
+    .single()
+
   const { error } = await supabase
     .from('equipment')
     .delete()
@@ -125,6 +154,14 @@ export async function deleteEquipment(id: string): Promise<ActionResult> {
     console.error('[deleteEquipment]', error)
     return { error: `Erro ao excluir equipamento: ${error.message}` }
   }
+
+  await logAudit({
+    entidade: 'equipment',
+    entidade_id: id,
+    acao: 'DELETE',
+    dados_antes: antes as Record<string, unknown> | null,
+    dados_depois: null,
+  })
 
   revalidatePath('/equipamentos')
   return { success: true }
