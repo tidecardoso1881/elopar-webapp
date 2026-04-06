@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PM-014 — Typography Redesign | Elopar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .badge-red {
+            @apply inline-flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full;
+        }
+
+        .badge-green {
+            @apply inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full;
+        }
+
+        .table-current {
+            font-size: 16px;
+        }
+
+        .table-current thead th {
+            padding: 16px;
+        }
+
+        .table-current tbody td {
+            padding: 16px;
+        }
+
+        .table-proposed {
+            font-size: 14px;
+        }
+
+        .table-proposed thead th {
+            padding: 10px 12px;
+        }
+
+        .table-proposed tbody td {
+            padding: 10px 12px;
+        }
+
+        .panel-container {
+            height: 700px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            flex-shrink: 0;
+            height: 120px;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .table-wrapper {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .status-active {
+            @apply inline-flex items-center gap-1 px-2.5 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full;
+        }
+
+        .status-days-yellow {
+            @apply inline-flex items-center gap-1 px-2.5 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full;
+        }
+
+        .status-days-red {
+            @apply inline-flex items-center gap-1 px-2.5 py-0.5 bg-red-100 text-red-700 text-xs font-medium rounded-full;
+        }
+
+        .status-days-gray {
+            @apply inline-flex items-center gap-1 px-2.5 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-full;
+        }
+
+        .icon-btn {
+            @apply inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors;
+        }
+
+        .annotation-bar {
+            @apply bg-gradient-to-r from-blue-50 to-blue-50 border-l-4 border-blue-500 px-6 py-4;
+        }
+
+        .description-card {
+            @apply bg-blue-50 border border-blue-200 rounded-lg px-6 py-4 text-sm text-gray-700;
+        }
+
+        .metrics-table td, .metrics-table th {
+            @apply px-4 py-3 text-sm;
+        }
+
+        .metrics-table th {
+            @apply bg-gray-50 font-semibold text-gray-700;
+        }
+
+        .metrics-table td {
+            @apply border-b border-gray-200;
+        }
+
+        .metrics-table tbody tr:hover {
+            @apply bg-gray-25;
+        }
+
+        .improvement-value {
+            @apply font-semibold text-green-600;
+        }
+
+        .scroll-indicator {
+            @apply absolute bottom-4 left-4 text-xs font-medium;
+        }
+
+        .no-scroll-indicator {
+            @apply absolute bottom-4 left-4 text-xs font-medium;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen py-8 px-4">
+        <div class="max-w-7xl mx-auto">
+
+            <!-- Annotation Bar -->
+            <div class="annotation-bar mb-8 rounded-lg shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">PM-014 — Redesign de Tipografia e Densidade Visual</h1>
+                        <p class="text-xs text-gray-600 mt-1">Mockup v1.0 | Mockup de Comparação Antes/Depois</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-flex items-center gap-1.5 px-4 py-2 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-lg">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            Aguardando validação de Tide
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description Card -->
+            <div class="description-card mb-8 rounded-lg shadow-sm">
+                <h2 class="font-semibold text-gray-900 mb-2">Objetivo da Mudança</h2>
+                <p class="text-gray-700">
+                    Redução do tamanho base de <strong>16px → 14px</strong> em tabelas e formulários. A mesma tela exibe mais linhas sem scroll vertical, melhorando a densidade visual e permitindo visualização mais eficiente de grandes volumes de dados.
+                </p>
+            </div>
+
+            <!-- Comparison Panels -->
+            <div class="grid grid-cols-2 gap-6 mb-8">
+
+                <!-- LEFT PANEL: Atual (Current) -->
+                <div class="border border-gray-300 rounded-lg shadow-md overflow-hidden bg-white">
+                    <!-- Panel Badge -->
+                    <div class="flex items-center justify-between bg-red-50 px-6 py-3 border-b border-gray-200">
+                        <h3 class="font-semibold text-gray-900">Atual (Current)</h3>
+                        <span class="badge-red">16px</span>
+                    </div>
+
+                    <!-- Panel Container -->
+                    <div class="panel-container">
+                        <!-- Mini Header -->
+                        <div class="panel-header bg-white border-b border-gray-200 px-6 pt-4 pb-2">
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="text-xl font-bold text-gray-900">Profissionais</h2>
+                                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
+                                    <span class="text-white text-sm font-semibold">T</span>
+                                </div>
+                            </div>
+                            <!-- Filter Bar -->
+                            <div class="flex gap-2 items-center">
+                                <input type="text" placeholder="Buscar profissional..." class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <button class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Filtros</button>
+                            </div>
+                        </div>
+
+                        <!-- Table Content -->
+                        <div class="panel-content">
+                            <div class="table-wrapper">
+                                <table class="w-full table-current text-left">
+                                    <thead class="bg-gray-50 border-b border-gray-200 sticky top-0">
+                                        <tr>
+                                            <th class="font-semibold text-gray-700">Nome</th>
+                                            <th class="font-semibold text-gray-700">Cliente</th>
+                                            <th class="font-semibold text-gray-700">Cargo</th>
+                                            <th class="font-semibold text-gray-700">Status</th>
+                                            <th class="font-semibold text-gray-700">Vencimento</th>
+                                            <th class="font-semibold text-gray-700 w-20">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 text-gray-800">
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="font-medium">Ana Silva</td>
+                                            <td>Alelo</td>
+                                            <td>Desenvolvedora Sênior</td>
+                                            <td><span class="status-active">Ativa</span></td>
+                                            <td><span class="status-days-yellow">45 dias</span></td>
+                                            <td class="flex gap-1">
+                                                <button class="icon-btn" title="Editar">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></path></svg>
+                                                </button>
+                                                <button class="icon-btn" title="Visualizar">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></path></svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="font-medium">Carlos Melo</td>
+                                            <td>Livelo</td>
+                                            <td>Analista de Dados</td>
+                                            <td><span class="status-active">Ativo</span></td>
+                                            <td><span class="status-days-red">12 dias</span></td>
+                                            <td class="flex gap-1">
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></path></svg></button>
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></path></svg></button>
+                                            </td>
+                                        </tr>
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="font-medium">Beatriz Santos</td>
+                                            <td>Veloe</td>
+                                            <td>Product Manager</td>
+                                            <td><span class="status-active">Ativa</span></td>
+                                            <td><span class="status-days-gray">78 dias</span></td>
+                                            <td class="flex gap-1">
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></path></svg></button>
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></path></svg></button>
+                                            </td>
+                                        </tr>
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="font-medium">Pedro Lima</td>
+                                            <td>Pede Pronto</td>
+                                            <td>Dev Backend</td>
+                                            <td><span class="status-active">Ativo</span></td>
+                                            <td><span class="status-days-red">6 dias</span></td>
+                                            <td class="flex gap-1">
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></path></svg></button>
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></path></svg></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Scroll Indicator -->
+                        <div class="absolute bottom-0 right-0 bg-red-50 border-t border-red-200 w-full px-6 py-3">
+                            <div class="flex items-center gap-2 text-red-700 text-xs font-medium">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/></path></svg>
+                                precisa rolar para ver mais linhas
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT PANEL: Proposto (Proposed) -->
+                <div class="border border-gray-300 rounded-lg shadow-md overflow-hidden bg-white">
+                    <!-- Panel Badge -->
+                    <div class="flex items-center justify-between bg-green-50 px-6 py-3 border-b border-gray-200">
+                        <h3 class="font-semibold text-gray-900">Proposto (Proposed)</h3>
+                        <span class="badge-green">14px</span>
+                    </div>
+
+                    <!-- Panel Container -->
+                    <div class="panel-container">
+                        <!-- Mini Header -->
+                        <div class="panel-header bg-white border-b border-gray-200 px-6 pt-4 pb-2">
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="text-lg font-bold text-gray-900">Profissionais</h2>
+                                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
+                                    <span class="text-white text-sm font-semibold">T</span>
+                                </div>
+                            </div>
+                            <!-- Filter Bar -->
+                            <div class="flex gap-2 items-center">
+                                <input type="text" placeholder="Buscar profissional..." class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <button class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Filtros</button>
+                            </div>
+                        </div>
+
+                        <!-- Table Content -->
+                        <div class="panel-content">
+                            <div class="table-wrapper">
+                                <table class="w-full table-proposed text-left">
+                                    <thead class="bg-gray-50 border-b border-gray-200 sticky top-0">
+                                        <tr>
+                                            <th class="font-semibold text-gray-700">Nome</th>
+                                            <th class="font-semibold text-gray-700">Cliente</th>
+                                            <th class="font-semibold text-gray-700">Cargo</th>
+                                            <th class="font-semibold text-gray-700">Status</th>
+                                            <th class="font-semibold text-gray-700">Vencimento</th>
+                                            <th class="font-semibold text-gray-700 w-20">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 text-gray-800">
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="font-medium">Ana Silva</td>
+                                            <td>Alelo</td>
+                                            <td>Desenvolvedora Sênior</td>
+                                            <td><span class="status-active">Ativa</span></td>
+                                            <td><span class="status-days-yellow">45 dias</span></td>
+                                            <td class="flex gap-1">
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></path></svg></button>
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></path></svg></button>
+                                            </td>
+                                        </tr>
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="font-medium">Carlos Melo</td>
+                                            <td>Livelo</td>
+                                            <td>Analista de Dados</td>
+                                            <td><span class="status-active">Ativo</span></td>
+                                            <td><span class="status-days-red">12 dias</span></td>
+                                            <td class="flex gap-1">
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></path></svg></button>
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></path></svg></button>
+                                            </td>
+                                        </tr>
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="font-medium">Beatriz Santos</td>
+                                            <td>Veloe</td>
+                                            <td>Product Manager</td>
+                                            <td><span class="status-active">Ativa</span></td>
+                                            <td><span class="status-days-gray">78 dias</span></td>
+                                            <td class="flex gap-1">
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></path></svg></button>
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></path></svg></button>
+                                            </td>
+                                        </tr>
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="font-medium">Pedro Lima</td>
+                                            <td>Pede Pronto</td>
+                                            <td>Dev Backend</td>
+                                            <td><span class="status-active">Ativo</span></td>
+                                            <td><span class="status-days-red">6 dias</span></td>
+                                            <td class="flex gap-1">
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></path></svg></button>
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></path></svg></button>
+                                            </td>
+                                        </tr>
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="font-medium">Mariana Costa</td>
+                                            <td>Zamp</td>
+                                            <td>UX Designer</td>
+                                            <td><span class="status-active">Ativa</span></td>
+                                            <td><span class="status-days-gray">90 dias</span></td>
+                                            <td class="flex gap-1">
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></path></svg></button>
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></path></svg></button>
+                                            </td>
+                                        </tr>
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="font-medium">João Ferreira</td>
+                                            <td>Alelo</td>
+                                            <td>DevOps Engineer</td>
+                                            <td><span class="status-active">Ativo</span></td>
+                                            <td><span class="status-days-yellow">23 dias</span></td>
+                                            <td class="flex gap-1">
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></path></svg></button>
+                                                <button class="icon-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></path></svg></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- No Scroll Indicator -->
+                        <div class="absolute bottom-0 right-0 bg-green-50 border-t border-green-200 w-full px-6 py-3">
+                            <div class="flex items-center gap-2 text-green-700 text-xs font-medium">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></path></svg>
+                                6+ linhas visíveis sem scroll
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metrics Comparison Table -->
+            <div class="bg-white border border-gray-300 rounded-lg shadow-md overflow-hidden">
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-bold text-gray-900">Métricas de Impacto</h2>
+                </div>
+
+                <table class="metrics-table w-full">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Métrica</th>
+                            <th class="text-center">Atual</th>
+                            <th class="text-center">Proposto</th>
+                            <th class="text-center">Diferença</th>
+                            <th class="text-center">% Melhoria</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-semibold text-gray-900">Tamanho Base de Fonte</td>
+                            <td class="text-center text-gray-700">16px</td>
+                            <td class="text-center text-gray-700">14px</td>
+                            <td class="text-center text-gray-700">-2px</td>
+                            <td class="text-center"><span class="improvement-value">-12.5%</span></td>
+                        </tr>
+                        <tr class="bg-gray-25">
+                            <td class="font-semibold text-gray-900">Altura da Linha (célula)</td>
+                            <td class="text-center text-gray-700">64px</td>
+                            <td class="text-center text-gray-700">44px</td>
+                            <td class="text-center text-gray-700">-20px</td>
+                            <td class="text-center"><span class="improvement-value">-31%</span></td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-gray-900">Linhas Visíveis (viewport 1080p)</td>
+                            <td class="text-center text-gray-700">8 linhas</td>
+                            <td class="text-center text-gray-700">13 linhas</td>
+                            <td class="text-center text-gray-700">+5 linhas</td>
+                            <td class="text-center"><span class="improvement-value">+62%</span></td>
+                        </tr>
+                        <tr class="bg-gray-25">
+                            <td class="font-semibold text-gray-900">Padding da Célula (vertical)</td>
+                            <td class="text-center text-gray-700">16px</td>
+                            <td class="text-center text-gray-700">10px</td>
+                            <td class="text-center text-gray-700">-6px</td>
+                            <td class="text-center"><span class="improvement-value">-37%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer Notes -->
+            <div class="mt-8 bg-gray-50 border border-gray-300 rounded-lg px-6 py-4">
+                <h3 class="text-sm font-semibold text-gray-900 mb-2">Notas Técnicas</h3>
+                <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside">
+                    <li>Ambos os painéis possuem altura idêntica (700px) para demonstrar visualmente o ganho de densidade</li>
+                    <li>Os dados e estrutura são idênticos em ambas versões — apenas a tipografia e espaçamento mudam</li>
+                    <li>A cor dos badges (status, vencimento) permanece igual para garantir contraste de acessibilidade</li>
+                    <li>Fonte utilizada: Inter (padrão do projeto Elopar)</li>
+                    <li>Validação visual completa esperada do PM/UX antes de implementação</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

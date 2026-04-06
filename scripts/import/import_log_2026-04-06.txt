@@ -1,0 +1,27 @@
+============================================================
+  Elopar — Importação de Base via Excel
+  Data: 06/04/2026 14:23
+  Projeto: https://pzqxbiutlnssnlthlyay.supabase.co
+============================================================
+
+📂 Lendo templates de: D:\01-Projetos\elopar-webapp\docs\importacao
+  ✅  1_template_clientes.xlsx
+  ✅  2_template_profissionais.xlsx
+  ✅  3_template_equipamentos.xlsx
+  ✅  4_template_ferias.xlsx
+
+📥 [1/4] Importando Clientes...
+   ℹ️  Nenhum dado encontrado.
+
+📥 [2/4] Importando Profissionais...
+   ℹ️  Nenhum dado encontrado.
+
+📥 [3/4] Importando Equipamentos...
+   ℹ️  Nenhum dado encontrado.
+
+📥 [4/4] Importando Férias...
+   ℹ️  Nenhum dado encontrado.
+
+============================================================
+  ✅ Importação concluída!
+============================================================

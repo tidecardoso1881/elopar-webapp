@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PM-013 — Busca Global Command Palette — Mockup v1.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .blur-bg {
+            filter: blur(3px) brightness(0.95);
+        }
+        .command-palette-overlay {
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        .command-palette-modal {
+            animation: slideDown 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .result-item {
+            transition: all 0.15s ease;
+        }
+        .result-item.active {
+            background-color: rgb(239, 246, 255);
+            border-left: 3px solid rgb(37, 99, 235);
+            padding-left: calc(1rem - 3px);
+        }
+        .result-item:hover {
+            background-color: rgb(245, 245, 245);
+        }
+        .result-item.active:hover {
+            background-color: rgb(239, 246, 255);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans antialiased">
+    <!-- Annotation Bar -->
+    <div class="bg-amber-50 border-b border-amber-200 px-4 py-2">
+        <p class="text-sm text-amber-900">
+            <i class="fas fa-lightbulb text-amber-600 mr-2"></i>
+            <strong>PM-013</strong> — Busca Global Command Palette | <strong>Mockup v1.0</strong> | Aguardando validação de Tide
+        </p>
+    </div>
+
+    <!-- Main Dashboard Container -->
+    <div class="flex h-screen bg-gray-100" id="mainDashboard">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white border-r border-gray-200 shadow-sm">
+            <!-- Logo Area -->
+            <div class="h-16 flex items-center px-6 border-b border-gray-200">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
+                        E
+                    </div>
+                    <span class="font-semibold text-gray-900">Elopar</span>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="p-4 space-y-2">
+                <div class="px-3 py-2 rounded-lg bg-blue-50 border-l-3 border-blue-600 text-blue-600 font-medium flex items-center gap-3">
+                    <i class="fas fa-users w-5"></i>
+                    <span>Profissionais</span>
+                </div>
+                <div class="px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 cursor-pointer flex items-center gap-3 transition">
+                    <i class="fas fa-building w-5 text-gray-500"></i>
+                    <span>Clientes</span>
+                </div>
+                <div class="px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 cursor-pointer flex items-center gap-3 transition">
+                    <i class="fas fa-chart-bar w-5 text-gray-500"></i>
+                    <span>Relatórios</span>
+                </div>
+                <div class="px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 cursor-pointer flex items-center gap-3 transition">
+                    <i class="fas fa-cog w-5 text-gray-500"></i>
+                    <span>Configurações</span>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+            <!-- Header -->
+            <div class="h-16 bg-white border-b border-gray-200 shadow-sm flex items-center justify-between px-8">
+                <h1 class="text-2xl font-semibold text-gray-900">Profissionais</h1>
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold cursor-pointer hover:shadow-lg transition">
+                    TC
+                </div>
+            </div>
+
+            <!-- Content Area with Table (Blurred) -->
+            <div class="flex-1 overflow-auto p-8 blur-bg">
+                <div class="bg-white rounded-lg shadow">
+                    <div class="p-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Listagem de Profissionais</h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="border-b border-gray-200 bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Nome</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Empresa</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Cargo</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                        <td class="px-4 py-3 text-gray-900">Ana Silva</td>
+                                        <td class="px-4 py-3 text-gray-600">Alelo</td>
+                                        <td class="px-4 py-3 text-gray-600">Desenvolvedora</td>
+                                        <td class="px-4 py-3"><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Ativa</span></td>
+                                    </tr>
+                                    <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                        <td class="px-4 py-3 text-gray-900">Carlos Souza</td>
+                                        <td class="px-4 py-3 text-gray-600">Livelo</td>
+                                        <td class="px-4 py-3 text-gray-600">Gerente</td>
+                                        <td class="px-4 py-3"><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Ativo</span></td>
+                                    </tr>
+                                    <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                        <td class="px-4 py-3 text-gray-900">Marina Costa</td>
+                                        <td class="px-4 py-3 text-gray-600">Nubank</td>
+                                        <td class="px-4 py-3 text-gray-600">Analista</td>
+                                        <td class="px-4 py-3"><span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Inativa</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Command Palette Overlay -->
+    <div class="fixed inset-0 bg-black/50 command-palette-overlay flex items-start justify-center pt-24 z-50">
+        <!-- Command Palette Modal -->
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-xl command-palette-modal">
+            <!-- Search Input Area -->
+            <div class="border-b border-gray-200 p-4">
+                <div class="relative">
+                    <i class="fas fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+                    <input
+                        type="text"
+                        placeholder="Buscar profissionais, clientes, páginas..."
+                        value="ana"
+                        class="w-full pl-12 pr-16 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900"
+                        autofocus
+                    >
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded font-mono">
+                        Ctrl K
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Container -->
+            <div class="max-h-96 overflow-y-auto">
+                <!-- Profissionais Section -->
+                <div>
+                    <div class="px-4 pt-4 pb-2">
+                        <div class="flex items-center gap-2 text-gray-600 text-xs font-semibold uppercase tracking-wide">
+                            <i class="fas fa-person text-gray-400"></i>
+                            <span>Profissionais</span>
+                        </div>
+                    </div>
+
+                    <div class="px-2">
+                        <!-- Ana Silva - Active/Highlighted -->
+                        <div class="result-item active px-4 py-3 rounded cursor-pointer flex items-center justify-between gap-3 group">
+                            <div class="flex items-center gap-3 flex-1 min-w-0">
+                                <div class="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center text-blue-700 font-semibold flex-shrink-0">
+                                    AS
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="font-medium text-gray-900">Ana Silva</div>
+                                    <div class="text-sm text-gray-500 truncate">Alelo · Desenvolvedora · Ativa</div>
+                                </div>
+                            </div>
+                            <i class="fas fa-arrow-right text-gray-400 group-hover:text-blue-600 transition flex-shrink-0 opacity-0 group-hover:opacity-100"></i>
+                        </div>
+
+                        <!-- Ana Beatriz -->
+                        <div class="result-item px-4 py-3 rounded cursor-pointer flex items-center justify-between gap-3 group">
+                            <div class="flex items-center gap-3 flex-1 min-w-0">
+                                <div class="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center text-purple-700 font-semibold flex-shrink-0">
+                                    AB
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="font-medium text-gray-900">Ana Beatriz</div>
+                                    <div class="text-sm text-gray-500 truncate">Livelo · Analista · Ativa</div>
+                                </div>
+                            </div>
+                            <i class="fas fa-arrow-right text-gray-400 group-hover:text-blue-600 transition flex-shrink-0 opacity-0 group-hover:opacity-100"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clientes Section -->
+                <div class="border-t border-gray-200">
+                    <div class="px-4 pt-4 pb-2">
+                        <div class="flex items-center gap-2 text-gray-600 text-xs font-semibold uppercase tracking-wide">
+                            <i class="fas fa-building text-gray-400"></i>
+                            <span>Clientes</span>
+                        </div>
+                    </div>
+
+                    <div class="px-4 py-3 text-sm text-gray-500 italic">
+                        Nenhum resultado para "ana"
+                    </div>
+                </div>
+
+                <!-- Páginas Section -->
+                <div class="border-t border-gray-200">
+                    <div class="px-4 pt-4 pb-2">
+                        <div class="flex items-center gap-2 text-gray-600 text-xs font-semibold uppercase tracking-wide">
+                            <i class="fas fa-layout-grid text-gray-400"></i>
+                            <span>Páginas</span>
+                        </div>
+                    </div>
+
+                    <div class="px-4 py-3 text-sm text-gray-500 italic">
+                        Não aplicável
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer with Keyboard Shortcuts -->
+            <div class="border-t border-gray-200 bg-gray-50 px-4 py-3 rounded-b-xl">
+                <div class="flex items-center justify-center gap-4 text-xs text-gray-600 font-medium">
+                    <span><span class="inline-block mr-1">↑↓</span> navegar</span>
+                    <span class="text-gray-300">·</span>
+                    <span><span class="inline-block font-mono">Enter</span> abrir</span>
+                    <span class="text-gray-300">·</span>
+                    <span><span class="inline-block font-mono">Esc</span> fechar</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Footer -->
+    <div class="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-xs z-40">
+        <p class="text-xs text-gray-600 mb-2">
+            <strong class="text-gray-900">Instruções:</strong>
+        </p>
+        <ul class="text-xs text-gray-600 space-y-1">
+            <li>• Pressione <kbd class="bg-gray-100 px-2 py-1 rounded font-mono">Ctrl+K</kbd> (ou <kbd class="bg-gray-100 px-2 py-1 rounded font-mono">Cmd+K</kbd> no Mac) para abrir</li>
+            <li>• Use <kbd class="bg-gray-100 px-2 py-1 rounded font-mono">↑↓</kbd> para navegar entre resultados</li>
+            <li>• Pressione <kbd class="bg-gray-100 px-2 py-1 rounded font-mono">Enter</kbd> para abrir seleção</li>
+            <li>• Pressione <kbd class="bg-gray-100 px-2 py-1 rounded font-mono">Esc</kbd> para fechar</li>
+        </ul>
+    </div>
+
+    <script>
+        // Keyboard shortcut to toggle command palette (for demo purposes)
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                console.log('Command Palette toggled (in real implementation)');
+            }
+        });
+
+        // Navigation with arrow keys
+        const results = document.querySelectorAll('.result-item');
+        let currentIndex = 0;
+
+        document.addEventListener('keydown', (e) => {
+            const overlay = document.querySelector('.command-palette-overlay');
+            if (!overlay) return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                results[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % results.length;
+                results[currentIndex].classList.add('active');
+                results[currentIndex].scrollIntoView({ block: 'nearest' });
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                results[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex - 1 + results.length) % results.length;
+                results[currentIndex].classList.add('active');
+                results[currentIndex].scrollIntoView({ block: 'nearest' });
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                const active = results[currentIndex];
+                if (active) {
+                    const name = active.querySelector('.font-medium').textContent;
+                    alert(`Abrindo: ${name}`);
+                }
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                console.log('Command Palette closed');
+            }
+        });
+    </script>
+</body>
+</html>
