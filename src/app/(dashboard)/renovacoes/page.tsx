@@ -1,19 +1,20 @@
 import { createClient } from '@/lib/supabase/server'
 import { formatDate } from '@/lib/utils/formatting'
 
+// Alinhado com v_renewal_alerts view — views não têm NOT NULL no Supabase
 interface RenewalAlert {
-  id: string
-  name: string
+  id: string | null
+  name: string | null
   email: string | null
   profile: string | null
   seniority: string | null
-  status: string
-  contract_end: string
+  status: string | null
+  contract_end: string | null
   renewal_deadline: string | null
-  client_name: string
-  client_id: string
-  days_until_expiry: number
-  renewal_status: 'expired' | 'critical' | 'warning' | 'attention' | 'ok'
+  client_name: string | null
+  client_id: string | null
+  days_until_expiry: number | null
+  renewal_status: string | null
 }
 
 const RENEWAL_STATUS_CONFIG: Record<string, { bg: string; textColor: string; label: string; bgLight: string }> = {
@@ -121,6 +122,9 @@ export default async function RenovacoesPage(_props: RenovacoesPageProps) {
     attention: alerts.filter((a) => a.renewal_status === 'attention').length,
   }
 
+  const getRenewalConfig = (status: string | null) =>
+    RENEWAL_STATUS_CONFIG[status ?? 'ok'] ?? RENEWAL_STATUS_CONFIG['ok']
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -176,30 +180,28 @@ export default async function RenovacoesPage(_props: RenovacoesPageProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white">
-                {alerts.map((alert) => {
-                  const config = RENEWAL_STATUS_CONFIG[alert.renewal_status]
-                  const daysDisplay = alert.days_until_expiry < 0
-                    ? alert.days_until_expiry
-                    : alert.days_until_expiry
+                {alerts.map((alert, idx) => {
+                  const config = getRenewalConfig(alert.renewal_status)
+                  const days = alert.days_until_expiry ?? 0
 
                   return (
-                    <tr key={alert.id} className="transition-colors hover:bg-gray-50">
+                    <tr key={alert.id ?? idx} className="transition-colors hover:bg-gray-50">
                       <td className="px-4 py-3">
                         <span className="text-sm font-medium text-gray-900">
-                          {alert.name}
+                          {alert.name ?? '—'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
-                        {alert.client_name}
+                        {alert.client_name ?? '—'}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
                         {alert.seniority ?? '—'}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
-                        {formatDate(alert.contract_end)}
+                        {alert.contract_end ? formatDate(alert.contract_end) : '—'}
                       </td>
                       <td className="px-4 py-3 text-sm font-medium tabular-nums text-gray-900">
-                        {daysDisplay > 0 ? `+${daysDisplay}` : daysDisplay}
+                        {days > 0 ? `+${days}` : days}
                       </td>
                       <td className="px-4 py-3">
                         <span
