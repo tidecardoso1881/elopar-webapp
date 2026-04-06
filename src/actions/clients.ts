@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { logAudit } from '@/lib/audit'
 
 export interface ClientActionResult {
   error?: string
@@ -23,9 +24,11 @@ export async function createClientAction(
     return { error: 'Nome do cliente é obrigatório.' }
   }
 
-  const { error } = await supabase
+  const { data: created, error } = await supabase
     .from('clients')
     .insert({ name })
+    .select()
+    .single()
 
   if (error) {
     if (error.code === '23505') {
@@ -33,6 +36,14 @@ export async function createClientAction(
     }
     return { error: `Erro ao criar cliente: ${error.message}` }
   }
+
+  await logAudit({
+    entidade: 'client',
+    entidade_id: created.id,
+    acao: 'CREATE',
+    dados_antes: null,
+    dados_depois: created as Record<string, unknown>,
+  })
 
   revalidatePath('/clientes')
   redirect('/clientes')
@@ -53,6 +64,12 @@ export async function updateClientAction(
     return { error: 'Nome do cliente é obrigatório.' }
   }
 
+  const { data: antes } = await supabase
+    .from('clients')
+    .select()
+    .eq('id', id)
+    .single()
+
   const { error } = await supabase
     .from('clients')
     .update({ name, updated_at: new Date().toISOString() })
@@ -64,6 +81,14 @@ export async function updateClientAction(
     }
     return { error: `Erro ao atualizar cliente: ${error.message}` }
   }
+
+  await logAudit({
+    entidade: 'client',
+    entidade_id: id,
+    acao: 'UPDATE',
+    dados_antes: antes as Record<string, unknown> | null,
+    dados_depois: { id, name } as Record<string, unknown>,
+  })
 
   revalidatePath('/clientes')
   redirect('/clientes')
@@ -86,6 +111,12 @@ export async function deleteClientAction(id: string): Promise<ClientActionResult
     }
   }
 
+  const { data: antes } = await supabase
+    .from('clients')
+    .select()
+    .eq('id', id)
+    .single()
+
   const { error } = await supabase
     .from('clients')
     .delete()
@@ -94,6 +125,14 @@ export async function deleteClientAction(id: string): Promise<ClientActionResult
   if (error) {
     return { error: `Erro ao excluir cliente: ${error.message}` }
   }
+
+  await logAudit({
+    entidade: 'client',
+    entidade_id: id,
+    acao: 'DELETE',
+    dados_antes: antes as Record<string, unknown> | null,
+    dados_depois: null,
+  })
 
   revalidatePath('/clientes')
   return { success: true }

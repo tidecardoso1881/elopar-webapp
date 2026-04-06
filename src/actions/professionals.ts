@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { logAudit } from '@/lib/audit'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -174,13 +175,21 @@ export async function createProfessional(
   const { data: created, error } = await supabase
     .from('professionals')
     .insert(payload)
-    .select('id')
+    .select()
     .single()
 
   if (error) {
     console.error('[createProfessional]', error)
     return { error: `Erro ao criar profissional: ${error.message}` }
   }
+
+  await logAudit({
+    entidade: 'professional',
+    entidade_id: created.id,
+    acao: 'CREATE',
+    dados_antes: null,
+    dados_depois: created as Record<string, unknown>,
+  })
 
   revalidatePath('/profissionais')
   redirect(`/profissionais/${created.id}`)
@@ -231,6 +240,13 @@ export async function updateProfessional(
 
   const payload = buildProfessionalPayload(data)
 
+  // Captura estado anterior para o audit log
+  const { data: antes } = await supabase
+    .from('professionals')
+    .select()
+    .eq('id', id)
+    .single()
+
   const { error } = await supabase
     .from('professionals')
     .update({ ...payload, updated_at: new Date().toISOString() })
@@ -240,6 +256,14 @@ export async function updateProfessional(
     console.error('[updateProfessional]', error)
     return { error: `Erro ao atualizar: ${error.message}` }
   }
+
+  await logAudit({
+    entidade: 'professional',
+    entidade_id: id,
+    acao: 'UPDATE',
+    dados_antes: antes as Record<string, unknown> | null,
+    dados_depois: { ...payload, id } as Record<string, unknown>,
+  })
 
   revalidatePath('/profissionais')
   revalidatePath(`/profissionais/${id}`)
@@ -251,6 +275,12 @@ export async function updateProfessional(
 export async function deleteProfessional(id: string): Promise<ActionResult> {
   const supabase = await createClient()
 
+  const { data: antes } = await supabase
+    .from('professionals')
+    .select()
+    .eq('id', id)
+    .single()
+
   const { error } = await supabase
     .from('professionals')
     .update({ status: 'DESLIGADO', updated_at: new Date().toISOString() })
@@ -260,6 +290,14 @@ export async function deleteProfessional(id: string): Promise<ActionResult> {
     console.error('[deleteProfessional]', error)
     return { error: `Erro ao desligar profissional: ${error.message}` }
   }
+
+  await logAudit({
+    entidade: 'professional',
+    entidade_id: id,
+    acao: 'DELETE',
+    dados_antes: antes as Record<string, unknown> | null,
+    dados_depois: null,
+  })
 
   revalidatePath('/profissionais')
   revalidatePath(`/profissionais/${id}`)

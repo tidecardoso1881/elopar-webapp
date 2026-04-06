@@ -67,6 +67,26 @@ export default async function AreaUsuarioPage() {
             </div>
           </Link>
         )}
+
+        {isAdmin && (
+          <Link
+            href="/area-usuario/audit-log"
+            className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">🔍 Logs de Auditoria</h3>
+                <p className="text-sm text-gray-600 mt-2">
+                  Histórico de todas as operações de criação, edição e exclusão no sistema.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+              <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">Admin</span>
+              <span className="text-blue-600 font-semibold text-sm">Acessar →</span>
+            </div>
+          </Link>
+        )}
       </div>
     </div>
   )
