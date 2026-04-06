@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
+import { formatDate } from '@/lib/utils/formatting'
+import { SortableHeader } from '@/components/ui/sortable-header'
 import { RenovarModal } from './renovar-modal'
 
 interface RenewalAlert {
@@ -21,16 +23,16 @@ interface RenovacoesClientProps {
   alerts: RenewalAlert[]
   totalOriginal: number
   renewalStatusConfig: Record<string, { bg: string; textColor: string; label: string; bgLight: string }>
-  formatDateFn: (d: string | null | undefined) => string
 }
 
 export function RenovacoesClient({
   alerts,
   totalOriginal,
   renewalStatusConfig,
-  formatDateFn,
 }: RenovacoesClientProps) {
   const [search, setSearch] = useState('')
+  const [sortCol, setSortCol] = useState<string>('days_until_expiry')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
   const [activeModal, setActiveModal] = useState<{
     id: string
     name: string
@@ -38,15 +40,59 @@ export function RenovacoesClient({
   } | null>(null)
   const [renewedMap, setRenewedMap] = useState<Record<string, string>>({})
 
+  const handleSort = (col: string) => {
+    if (sortCol === col) {
+      setSortDir(sortDir === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortCol(col)
+      setSortDir('asc')
+    }
+  }
+
   const filtered = useMemo(() => {
-    if (!search.trim()) return alerts
-    const q = search.trim().toLowerCase()
-    return alerts.filter(
-      (a) =>
-        a.name?.toLowerCase().includes(q) ||
-        a.client_name?.toLowerCase().includes(q)
-    )
-  }, [alerts, search])
+    let result = alerts
+    if (search.trim()) {
+      const q = search.trim().toLowerCase()
+      result = alerts.filter(
+        (a) =>
+          a.name?.toLowerCase().includes(q) ||
+          a.client_name?.toLowerCase().includes(q)
+      )
+    }
+
+    // Apply sorting
+    const sorted = [...result].sort((a, b) => {
+      let aVal: any
+      let bVal: any
+
+      switch (sortCol) {
+        case 'name':
+          aVal = a.name ?? ''
+          bVal = b.name ?? ''
+          break
+        case 'client_name':
+          aVal = a.client_name ?? ''
+          bVal = b.client_name ?? ''
+          break
+        case 'contract_end':
+          aVal = a.contract_end ? new Date(a.contract_end).getTime() : 0
+          bVal = b.contract_end ? new Date(b.contract_end).getTime() : 0
+          break
+        case 'days_until_expiry':
+          aVal = a.days_until_expiry ?? 999999
+          bVal = b.days_until_expiry ?? 999999
+          break
+        default:
+          return 0
+      }
+
+      if (aVal < bVal) return sortDir === 'asc' ? -1 : 1
+      if (aVal > bVal) return sortDir === 'asc' ? 1 : -1
+      return 0
+    })
+
+    return sorted
+  }, [alerts, search, sortCol, sortDir])
 
   const getRenewalConfig = (status: string | null) =>
     renewalStatusConfig[status ?? 'ok'] ?? renewalStatusConfig['ok']
@@ -92,11 +138,11 @@ export function RenovacoesClient({
           <table className="min-w-full divide-y divide-gray-200 text-xs sm:text-sm">
             <thead>
               <tr className="bg-gray-50">
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Profissional</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Cliente</th>
+                <SortableHeader col="name" label="Profissional" sortBy={sortCol} sortDir={sortDir} onClick={handleSort} />
+                <SortableHeader col="client_name" label="Cliente" sortBy={sortCol} sortDir={sortDir} onClick={handleSort} />
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">Sênioridade</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Vencimento</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Dias</th>
+                <SortableHeader col="contract_end" label="Vencimento" sortBy={sortCol} sortDir={sortDir} onClick={handleSort} />
+                <SortableHeader col="days_until_expiry" label="Dias" sortBy={sortCol} sortDir={sortDir} onClick={handleSort} />
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Ações</th>
               </tr>
@@ -124,9 +170,9 @@ export function RenovacoesClient({
                     <td className="px-4 py-3 text-sm text-gray-600 hidden lg:table-cell">{alert.seniority ?? '—'}</td>
                     <td className="px-4 py-3 text-sm text-gray-600">
                       {isRenewed
-                        ? formatDateFn(renewedMap[alert.id ?? ''])
+                        ? formatDate(renewedMap[alert.id ?? ''])
                         : alert.contract_end
-                          ? formatDateFn(alert.contract_end)
+                          ? formatDate(alert.contract_end)
                           : '—'}
                     </td>
                     <td className="px-4 py-3 text-sm font-medium tabular-nums text-gray-900">

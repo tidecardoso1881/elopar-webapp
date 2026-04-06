@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { formatDate, getRenewalStatus } from '@/lib/utils/formatting'
+import { SortableHeader } from '@/components/ui/sortable-header'
 
 interface Professional {
   id: string
@@ -15,6 +16,9 @@ interface Professional {
 
 interface ProfessionalsTableProps {
   professionals: Professional[]
+  sortBy?: string
+  sortDir?: 'asc' | 'desc'
+  buildSortUrl?: (col: string, dir: 'asc' | 'desc') => string
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -45,7 +49,7 @@ const RENEWAL_STYLES: Record<string, { bg: string; label: string }> = {
   invalid:   { bg: 'bg-gray-100 text-gray-400',   label: 'Data não informada' },
 }
 
-export function ProfessionalsTable({ professionals }: ProfessionalsTableProps) {
+export function ProfessionalsTable({ professionals, sortBy, sortDir, buildSortUrl }: ProfessionalsTableProps) {
   if (professionals.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -63,12 +67,12 @@ export function ProfessionalsTable({ professionals }: ProfessionalsTableProps) {
       <table className="min-w-full divide-y divide-gray-200 text-xs sm:text-sm" aria-label="Lista de profissionais">
         <thead>
           <tr className="bg-gray-50">
-            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome</th>
+            <SortableHeader col="name" label="Nome" sortBy={sortBy} sortDir={sortDir} buildSortUrl={buildSortUrl} />
             <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Cargo / Senioridade</th>
             <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Cliente</th>
-            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+            <SortableHeader col="status" label="Status" sortBy={sortBy} sortDir={sortDir} buildSortUrl={buildSortUrl} />
             <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Tipo</th>
-            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Renovação</th>
+            <SortableHeader col="renewal_deadline" label="Renovação" sortBy={sortBy} sortDir={sortDir} buildSortUrl={buildSortUrl} />
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-100">

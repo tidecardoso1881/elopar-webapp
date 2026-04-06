@@ -22,6 +22,8 @@ interface SearchParams {
   contract_type?: string
   renewal?: string
   page?: string
+  sortBy?: string
+  sortDir?: string
 }
 
 interface ProfissionaisPageProps {
@@ -38,6 +40,12 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
   const contractType = params.contract_type ?? ''
   const renewalFilter = params.renewal ?? ''
   const page = Math.max(1, parseInt(params.page ?? '1', 10))
+  const validSortCols = ['name', 'renewal_deadline', 'status'] as const
+  type SortCol = typeof validSortCols[number]
+  const sortBy: SortCol = (validSortCols as readonly string[]).includes(params.sortBy ?? '')
+    ? (params.sortBy as SortCol)
+    : 'name'
+  const sortDir = params.sortDir === 'desc' ? 'desc' : 'asc'
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
 
@@ -53,7 +61,7 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
   let query = supabase
     .from('professionals')
     .select('id, os, name, position, seniority, status, contract_type, renewal_deadline, client:clients(name)', { count: 'exact' })
-    .order('name')
+    .order(sortBy, { ascending: sortDir === 'asc' })
     .range(from, to)
 
   if (search) {
@@ -98,7 +106,24 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
     if (seniority) p.set('seniority', seniority)
     if (contractType) p.set('contract_type', contractType)
     if (renewalFilter) p.set('renewal', renewalFilter)
+    if (sortBy !== 'name') p.set('sortBy', sortBy)
+    if (sortDir !== 'asc') p.set('sortDir', sortDir)
     if (newPage > 1) p.set('page', String(newPage))
+    const qs = p.toString()
+    return `/profissionais${qs ? `?${qs}` : ''}`
+  }
+
+  const buildSortUrl = (col: string, dir: 'asc' | 'desc') => {
+    const p = new URLSearchParams()
+    if (search) p.set('q', search)
+    if (clienteId) p.set('cliente', clienteId)
+    if (status) p.set('status', status)
+    if (position) p.set('position', position)
+    if (seniority) p.set('seniority', seniority)
+    if (contractType) p.set('contract_type', contractType)
+    if (renewalFilter) p.set('renewal', renewalFilter)
+    p.set('sortBy', col)
+    if (dir !== 'asc') p.set('sortDir', dir)
     const qs = p.toString()
     return `/profissionais${qs ? `?${qs}` : ''}`
   }
@@ -150,7 +175,12 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
 
         {/* Tabela */}
         <div className="overflow-x-auto">
-          <ProfessionalsTable professionals={professionals ?? []} />
+          <ProfessionalsTable
+            professionals={professionals ?? []}
+            sortBy={sortBy}
+            sortDir={sortDir}
+            buildSortUrl={buildSortUrl}
+          />
         </div>
 
         {/* Paginação */}

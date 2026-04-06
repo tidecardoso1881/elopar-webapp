@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { SortableHeader } from '@/components/ui/sortable-header'
 
 interface Equipment {
   id: string
@@ -11,9 +12,12 @@ interface Equipment {
 
 interface EquipmentTableProps {
   equipments: Equipment[]
+  sortBy?: string
+  sortDir?: 'asc' | 'desc'
+  buildSortUrl?: (col: string, dir: 'asc' | 'desc') => string
 }
 
-export function EquipmentTable({ equipments }: EquipmentTableProps) {
+export function EquipmentTable({ equipments, sortBy, sortDir, buildSortUrl }: EquipmentTableProps) {
   if (equipments.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -31,9 +35,9 @@ export function EquipmentTable({ equipments }: EquipmentTableProps) {
       <table className="min-w-full divide-y divide-gray-200">
         <thead>
           <tr className="bg-gray-50">
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Profissional</th>
+            <SortableHeader col="professional_name" label="Profissional" sortBy={sortBy} sortDir={sortDir} buildSortUrl={buildSortUrl} />
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Empresa</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tipo</th>
+            <SortableHeader col="machine_type" label="Tipo" sortBy={sortBy} sortDir={sortDir} buildSortUrl={buildSortUrl} />
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Modelo</th>
             <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Office</th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Ações</th>

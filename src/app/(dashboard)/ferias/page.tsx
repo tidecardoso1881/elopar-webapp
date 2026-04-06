@@ -10,6 +10,8 @@ interface SearchParams {
   q?: string
   client_area?: string
   page?: string
+  sortBy?: string
+  sortDir?: string
 }
 
 interface FeriasPageProps {
@@ -21,6 +23,12 @@ export default async function FeriasPage({ searchParams }: FeriasPageProps) {
   const search = params.q?.trim() ?? ''
   const clientArea = params.client_area ?? ''
   const page = Math.max(1, parseInt(params.page ?? '1', 10))
+  const validSortCols = ['professional_name', 'vacation_start', 'vacation_end', 'created_at'] as const
+  type SortCol = typeof validSortCols[number]
+  const sortBy: SortCol = (validSortCols as readonly string[]).includes(params.sortBy ?? '')
+    ? (params.sortBy as SortCol)
+    : 'professional_name'
+  const sortDir = params.sortDir === 'desc' ? 'desc' : 'asc'
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
 
@@ -30,7 +38,7 @@ export default async function FeriasPage({ searchParams }: FeriasPageProps) {
   let query = supabase
     .from('vacations')
     .select('id, professional_name, acquisition_start, acquisition_end, vacation_start, vacation_end, total_days, days_balance, leadership, client_area, created_at', { count: 'exact' })
-    .order('created_at', { ascending: false })
+    .order(sortBy, { ascending: sortDir === 'asc' })
     .range(from, to)
 
   if (search) {
@@ -49,7 +57,19 @@ export default async function FeriasPage({ searchParams }: FeriasPageProps) {
     const p = new URLSearchParams()
     if (search) p.set('q', search)
     if (clientArea) p.set('client_area', clientArea)
+    if (sortBy !== 'professional_name') p.set('sortBy', sortBy)
+    if (sortDir !== 'asc') p.set('sortDir', sortDir)
     if (newPage > 1) p.set('page', String(newPage))
+    const qs = p.toString()
+    return `/ferias${qs ? `?${qs}` : ''}`
+  }
+
+  const buildSortUrl = (col: string, dir: 'asc' | 'desc') => {
+    const p = new URLSearchParams()
+    if (search) p.set('q', search)
+    if (clientArea) p.set('client_area', clientArea)
+    p.set('sortBy', col)
+    if (dir !== 'asc') p.set('sortDir', dir)
     const qs = p.toString()
     return `/ferias${qs ? `?${qs}` : ''}`
   }
@@ -95,7 +115,12 @@ export default async function FeriasPage({ searchParams }: FeriasPageProps) {
         )}
 
         {/* Tabela */}
-        <VacationTable vacations={vacations ?? []} />
+        <VacationTable
+          vacations={vacations ?? []}
+          sortBy={sortBy}
+          sortDir={sortDir}
+          buildSortUrl={buildSortUrl}
+        />
 
         {/* Paginação */}
         {totalPages > 1 && (

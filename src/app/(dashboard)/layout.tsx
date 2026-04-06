@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/layout/sidebar'
 import { Header } from '@/components/layout/header'
+import { RenewalBadge } from '@/components/renovacoes/renewal-badge'
 
 export default async function DashboardLayout({
   children,
@@ -28,7 +29,7 @@ export default async function DashboardLayout({
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar - Hidden on mobile, visible on md+ */}
       <div className="hidden md:flex">
-        <Sidebar user={{ email: user.email ?? '' }} profile={profile} />
+        <Sidebar user={{ email: user.email ?? '' }} profile={profile} renewalBadge={<RenewalBadge />} />
       </div>
 
       <main className="flex-1 flex flex-col overflow-hidden">

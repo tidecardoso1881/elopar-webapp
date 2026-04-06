@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import { formatDate } from '@/lib/utils/formatting'
 import { RenovacoesClient } from '@/components/renovacoes/renovacoes-client'
+import { RenovacoesFilters } from '@/components/renovacoes/renovacoes-filters'
 
 // Alinhado com v_renewal_alerts view — views não têm NOT NULL no Supabase
 interface RenewalAlert {
@@ -200,71 +200,12 @@ export default async function RenovacoesPage(props: RenovacoesPageProps) {
         </div>
       )}
 
-      {/* Filters */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between bg-white rounded-lg border border-gray-200 p-4">
-        <div className="flex flex-col gap-3 md:flex-row md:gap-4">
-          {/* Status Filter */}
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Status
-            </label>
-            <select
-              defaultValue={filterStatus || 'all'}
-              onChange={(e) => {
-                const newStatus = e.target.value
-                const params = new URLSearchParams()
-                if (newStatus !== 'all') params.set('status', newStatus)
-                if (filterClient !== 'all') params.set('client', filterClient)
-                window.location.href = `/renovacoes${params.size > 0 ? '?' + params : ''}`
-              }}
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            >
-              <option value="all">Todos</option>
-              <option value="expired">Vencidos</option>
-              <option value="critical">Críticos (≤30d)</option>
-              <option value="warning">Atenção (≤60d)</option>
-              <option value="attention">Pendentes (≤90d)</option>
-            </select>
-          </div>
-
-          {/* Client Filter */}
-          {uniqueClients.length > 0 && (
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Cliente
-              </label>
-              <select
-                defaultValue={filterClient || 'all'}
-                onChange={(e) => {
-                  const newClient = e.target.value
-                  const params = new URLSearchParams()
-                  if (filterStatus !== 'all') params.set('status', filterStatus)
-                  if (newClient !== 'all') params.set('client', newClient)
-                  window.location.href = `/renovacoes${params.size > 0 ? '?' + params : ''}`
-                }}
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              >
-                <option value="all">Todos</option>
-                {uniqueClients.map((client) => (
-                  <option key={client.id} value={client.id || ''}>
-                    {client.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-        </div>
-
-        {/* Clear Filters */}
-        {(filterStatus !== 'all' || filterClient !== 'all') && (
-          <a
-            href="/renovacoes"
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium self-start md:self-auto"
-          >
-            Limpar filtros
-          </a>
-        )}
-      </div>
+      {/* Filters — Client Component (usa onChange + window) */}
+      <RenovacoesFilters
+        filterStatus={filterStatus}
+        filterClient={filterClient}
+        uniqueClients={uniqueClients}
+      />
 
       {/* Table — Client Component com busca + modal de renovar */}
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden p-4 space-y-4">
@@ -275,7 +216,6 @@ export default async function RenovacoesPage(props: RenovacoesPageProps) {
             alerts={alerts}
             totalOriginal={alerts.length}
             renewalStatusConfig={RENEWAL_STATUS_CONFIG}
-            formatDateFn={formatDate}
           />
         )}
       </div>

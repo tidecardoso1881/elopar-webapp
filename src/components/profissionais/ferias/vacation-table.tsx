@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { formatDate } from '@/lib/utils/formatting'
+import { SortableHeader } from '@/components/ui/sortable-header'
 import { VacationActions } from './vacation-actions'
 
 interface Vacation {
@@ -17,6 +18,9 @@ interface Vacation {
 
 interface VacationTableProps {
   vacations: Vacation[]
+  sortBy?: string
+  sortDir?: 'asc' | 'desc'
+  buildSortUrl?: (col: string, dir: 'asc' | 'desc') => string
 }
 
 function getVacationStatus(vacationStart: string | null) {
@@ -33,7 +37,7 @@ function getVacationStatus(vacationStart: string | null) {
   }
 }
 
-export function VacationTable({ vacations }: VacationTableProps) {
+export function VacationTable({ vacations, sortBy, sortDir, buildSortUrl }: VacationTableProps) {
   if (vacations.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -51,9 +55,9 @@ export function VacationTable({ vacations }: VacationTableProps) {
       <table className="min-w-full divide-y divide-gray-200">
         <thead>
           <tr className="bg-gray-50">
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Profissional</th>
+            <SortableHeader col="professional_name" label="Profissional" sortBy={sortBy} sortDir={sortDir} buildSortUrl={buildSortUrl} />
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Período Aquisitivo</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Férias</th>
+            <SortableHeader col="vacation_start" label="Férias" sortBy={sortBy} sortDir={sortDir} buildSortUrl={buildSortUrl} />
             <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Dias</th>
             <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Saldo</th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>

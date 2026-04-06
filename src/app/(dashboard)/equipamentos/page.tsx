@@ -9,6 +9,8 @@ interface SearchParams {
   q?: string
   machine_type?: string
   page?: string
+  sortBy?: string
+  sortDir?: string
 }
 
 interface EquipamentosPageProps {
@@ -20,6 +22,12 @@ export default async function EquipamentosPage({ searchParams }: EquipamentosPag
   const search = params.q?.trim() ?? ''
   const machineType = params.machine_type ?? ''
   const page = Math.max(1, parseInt(params.page ?? '1', 10))
+  const validSortCols = ['professional_name', 'machine_type', 'created_at'] as const
+  type SortCol = typeof validSortCols[number]
+  const sortBy: SortCol = (validSortCols as readonly string[]).includes(params.sortBy ?? '')
+    ? (params.sortBy as SortCol)
+    : 'professional_name'
+  const sortDir = params.sortDir === 'desc' ? 'desc' : 'asc'
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
 
@@ -29,7 +37,7 @@ export default async function EquipamentosPage({ searchParams }: EquipamentosPag
   let query = supabase
     .from('equipment')
     .select('id, professional_name, company, machine_type, machine_model, office_package, created_at', { count: 'exact' })
-    .order('created_at', { ascending: false })
+    .order(sortBy, { ascending: sortDir === 'asc' })
     .range(from, to)
 
   if (search) {
@@ -48,7 +56,19 @@ export default async function EquipamentosPage({ searchParams }: EquipamentosPag
     const p = new URLSearchParams()
     if (search) p.set('q', search)
     if (machineType) p.set('machine_type', machineType)
+    if (sortBy !== 'professional_name') p.set('sortBy', sortBy)
+    if (sortDir !== 'asc') p.set('sortDir', sortDir)
     if (newPage > 1) p.set('page', String(newPage))
+    const qs = p.toString()
+    return `/equipamentos${qs ? `?${qs}` : ''}`
+  }
+
+  const buildSortUrl = (col: string, dir: 'asc' | 'desc') => {
+    const p = new URLSearchParams()
+    if (search) p.set('q', search)
+    if (machineType) p.set('machine_type', machineType)
+    p.set('sortBy', col)
+    if (dir !== 'asc') p.set('sortDir', dir)
     const qs = p.toString()
     return `/equipamentos${qs ? `?${qs}` : ''}`
   }
@@ -94,7 +114,12 @@ export default async function EquipamentosPage({ searchParams }: EquipamentosPag
         )}
 
         {/* Tabela */}
-        <EquipmentTable equipments={equipments ?? []} />
+        <EquipmentTable
+          equipments={equipments ?? []}
+          sortBy={sortBy}
+          sortDir={sortDir}
+          buildSortUrl={buildSortUrl}
+        />
 
         {/* Paginação */}
         {totalPages > 1 && (
