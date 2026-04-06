@@ -26,12 +26,15 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar user={{ email: user.email ?? '' }} profile={profile} />
+      {/* Sidebar - Hidden on mobile, visible on md+ */}
+      <div className="hidden md:flex">
+        <Sidebar user={{ email: user.email ?? '' }} profile={profile} />
+      </div>
 
       <main className="flex-1 flex flex-col overflow-hidden">
         <Header user={{ email: user.email ?? '' }} profile={profile} />
 
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-4 sm:p-6">
           {children}
         </div>
       </main>
