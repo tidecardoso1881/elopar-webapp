@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { ProfessionalsFilters } from '@/components/profissionais/professionals-filters'
 import { ProfessionalsTable } from '@/components/profissionais/professionals-table'
-import { ExportCsvButton } from '@/components/profissionais/export-csv-button'
+import { ExportButton } from '@/components/profissionais/export-button'
 import { getRenewalStatus } from '@/lib/utils/formatting'
 import { Suspense } from 'react'
 import Link from 'next/link'
@@ -142,7 +142,7 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-2">
           <Suspense>
-            <ExportCsvButton />
+            <ExportButton />
           </Suspense>
           <Link
             href="/profissionais/novo"
