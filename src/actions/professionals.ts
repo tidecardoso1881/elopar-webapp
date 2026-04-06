@@ -88,6 +88,45 @@ function buildProfessionalPayload(data: ProfessionalFormData) {
   }
 }
 
+// ─── Validation Helper ───────────────────────────────────────────────────────
+
+function validateProfessionalData(data: ProfessionalFormData): string | null {
+  const nameTrimed = data.name?.trim() || ''
+
+  // Validação: nome obrigatório com mínimo 3 caracteres
+  if (!nameTrimed) {
+    return 'Nome é obrigatório.'
+  }
+  if (nameTrimed.length < 3) {
+    return 'Nome deve ter no mínimo 3 caracteres.'
+  }
+
+  // Validação: cliente obrigatório
+  if (!data.client_id) {
+    return 'Cliente é obrigatório.'
+  }
+
+  // Validação: status válido
+  const validStatuses = ['ATIVO', 'DESLIGADO']
+  if (data.status && !validStatuses.includes(data.status)) {
+    return `Status inválido. Deve ser um de: ${validStatuses.join(', ')}.`
+  }
+
+  // Validação: renewal_deadline deve ser data válida se fornecida
+  if (data.renewal_deadline?.trim()) {
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+    if (!dateRegex.test(data.renewal_deadline)) {
+      return 'Prazo de Renovação deve estar no formato YYYY-MM-DD.'
+    }
+    const date = new Date(data.renewal_deadline)
+    if (isNaN(date.getTime())) {
+      return 'Prazo de Renovação é uma data inválida.'
+    }
+  }
+
+  return null
+}
+
 // ─── CREATE ───────────────────────────────────────────────────────────────────
 
 export async function createProfessional(
@@ -124,11 +163,10 @@ export async function createProfessional(
     total_billing: formData.get('total_billing') as string,
   }
 
-  if (!data.name?.trim()) {
-    return { error: 'Nome é obrigatório.' }
-  }
-  if (!data.client_id) {
-    return { error: 'Cliente é obrigatório.' }
+  // Validação completa
+  const validationError = validateProfessionalData(data)
+  if (validationError) {
+    return { error: validationError }
   }
 
   const payload = buildProfessionalPayload(data)
@@ -185,11 +223,10 @@ export async function updateProfessional(
     total_billing: formData.get('total_billing') as string,
   }
 
-  if (!data.name?.trim()) {
-    return { error: 'Nome é obrigatório.' }
-  }
-  if (!data.client_id) {
-    return { error: 'Cliente é obrigatório.' }
+  // Validação completa
+  const validationError = validateProfessionalData(data)
+  if (validationError) {
+    return { error: validationError }
   }
 
   const payload = buildProfessionalPayload(data)
