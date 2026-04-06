@@ -1,7 +1,7 @@
 # KANBAN.md — Estado do Projeto Elopar
 
 > Fonte da verdade compartilhada entre Claude Cowork e Claude Code.
-> Atualizado em: 2026-04-06 | Modelo: Kanban contínuo (migrado de Scrum)
+> Atualizado em: 2026-04-06 v3 | Modelo: Kanban contínuo (migrado de Scrum)
 
 ---
 
@@ -23,21 +23,24 @@
 ## 📍 Estado Atual (06/04/2026)
 
 ### 🔴 Em Dev / Pendente
-_(nenhum EP em andamento no momento — aguardando novas requisições)_
+
+_(nenhum EP em andamento no momento)_
 
 ### 🟡 Backlog Priorizado
 
 | Prioridade | EP | Título | Bloqueio |
 |---|---|---|---|
-| Must Have | EP-NEW-001 | — | Aguarda mockup |
-| Must Have | EP-NEW-003 | — | Aguarda mockup |
-| Must Have | EP-NEW-004 | — | Aguarda mockup |
-| Must Have | EP-NEW-005A | — | Aguarda PM-TASK-001 |
+| Must Have | EP-NEW-005A | Criação de Usuários (Admin) | Aguarda EP-NEW-005 (Área do Usuário) |
+| Should Have | EP-NEW-005 | Área de Usuário Unificada | — |
+| Should Have | EP-NEW-006 | Exportação CSV/Excel/PDF | — |
 
-### ✅ Últimas entregas
-- **SP6 completa**: EP-050 + EP-044 + todos os EPs da sprint entregues
-- **EP-NEW-002**: entregue ✅
-- **Deploy Vercel**: EP-040 antecipado de SP6, em produção
+### ✅ Últimas entregas (06/04/2026)
+- **EP-NEW-001**: Esqueci Minha Senha ✅ — proxy.ts rotas públicas + fix login link + middleware.ts removido
+- **EP-NEW-002**: Templates Excel + importador Python ✅
+- **EP-NEW-003**: Dashboard de Saúde dos Testes ✅ — RLS aplicado, build ok, em produção (Vercel)
+- **EP-NEW-004**: Alertas de Renovação de Contrato ✅ — tabela contract_notifications, cron diário, /notificacoes, sino no header
+- **PM-TASK-001**: DoR de Perfis & Permissões entregue em `docs/00-projeto/`
+- **fix(build)**: tsconfig.json exclui e2e/scripts, middleware.ts duplicado removido
 
 ---
 
