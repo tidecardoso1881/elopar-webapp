@@ -32,10 +32,11 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const isLoginPage = request.nextUrl.pathname === '/login'
-  const isAuthCallback = request.nextUrl.pathname.startsWith('/auth/')
-  const isPasswordReset = request.nextUrl.pathname === '/reset-password'
-  const isPasswordUpdate = request.nextUrl.pathname === '/update-password'
+  const { pathname } = request.nextUrl
+  const isLoginPage = pathname === '/login'
+  const isAuthCallback = pathname.startsWith('/auth/')
+  const isPasswordReset = pathname === '/reset-password'
+  const isPasswordUpdate = pathname === '/update-password'
 
   // Usuário não autenticado tentando acessar página protegida → redirecionar para login
   if (!user && !isLoginPage && !isAuthCallback && !isPasswordReset && !isPasswordUpdate) {
@@ -49,6 +50,22 @@ export async function proxy(request: NextRequest) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
+  }
+
+  // Rotas exclusivas para admin — verificar role no banco
+  const adminOnlyRoutes = ['/area-usuario/gerenciar-usuarios']
+  if (user && adminOnlyRoutes.some(r => pathname.startsWith(r))) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.role !== 'admin') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/area-usuario'
+      return NextResponse.redirect(url)
+    }
   }
 
   // IMPORTANTE: Retornar supabaseResponse para que os cookies de sessão

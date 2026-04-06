@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
@@ -9,18 +10,16 @@ export const metadata: Metadata = {
 export default async function AreaUsuarioPage() {
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
 
-  if (!user) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <p className="text-red-600 font-semibold">Acesso negado</p>
-        <p className="text-gray-500 text-sm mt-2">Você precisa estar autenticado para acessar esta página.</p>
-      </div>
-    )
-  }
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  const isAdmin = profile?.role === 'admin'
 
   return (
     <div className="space-y-6">
@@ -30,7 +29,6 @@ export default async function AreaUsuarioPage() {
         <p className="text-xs sm:text-sm text-gray-500 mt-2">Acesso a ferramentas e dashboards administrativos.</p>
       </div>
 
-      {/* Admin Only Links */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <Link
           href="/area-usuario/saude-testes"
@@ -49,6 +47,26 @@ export default async function AreaUsuarioPage() {
             <span className="text-blue-600 font-semibold text-sm">Acessar →</span>
           </div>
         </Link>
+
+        {isAdmin && (
+          <Link
+            href="/area-usuario/gerenciar-usuarios"
+            className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">👤 Gerenciar Usuários</h3>
+                <p className="text-sm text-gray-600 mt-2">
+                  Crie novos usuários, gerencie acessos e perfis do sistema.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+              <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">Admin</span>
+              <span className="text-blue-600 font-semibold text-sm">Acessar →</span>
+            </div>
+          </Link>
+        )}
       </div>
     </div>
   )
