@@ -58,17 +58,17 @@ export function ProfessionalsTable({ professionals }: ProfessionalsTableProps) {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
+    <div className="overflow-x-auto -mx-4 sm:mx-0">
+      <table className="min-w-full divide-y divide-gray-200 text-xs sm:text-sm" aria-label="Lista de profissionais">
         <thead>
           <tr className="bg-gray-50">
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">OS</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Cargo / Senioridade</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Cliente</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tipo</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Renovação</th>
+            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">OS</th>
+            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome</th>
+            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Cargo / Senioridade</th>
+            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Cliente</th>
+            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Tipo</th>
+            <th scope="col" className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Renovação</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-100">
@@ -77,13 +77,14 @@ export function ProfessionalsTable({ professionals }: ProfessionalsTableProps) {
             const renewalStyle = RENEWAL_STYLES[renewal]
             return (
               <tr key={p.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-4 py-3 text-sm text-gray-400 tabular-nums">
+                <td className="px-2 sm:px-4 py-3 text-xs sm:text-sm text-gray-400 tabular-nums">
                   {p.os ?? '—'}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-2 sm:px-4 py-3">
                   <Link
                     href={`/profissionais/${p.id}`}
-                    className="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors"
+                    className="text-xs sm:text-sm font-medium text-gray-900 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded px-1 transition-colors"
+                    aria-label={`${p.name} - ver detalhes`}
                   >
                     {p.name}
                   </Link>
@@ -96,11 +97,11 @@ export function ProfessionalsTable({ professionals }: ProfessionalsTableProps) {
                     )}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-600">
+                <td className="px-2 sm:px-4 py-3 text-xs sm:text-sm text-gray-600 hidden md:table-cell">
                   {p.client?.name ?? '—'}
                 </td>
-                <td className="px-4 py-3">
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[p.status] ?? 'bg-gray-100 text-gray-500'}`}>
+                <td className="px-2 sm:px-4 py-3">
+                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[p.status] ?? 'bg-gray-100 text-gray-500'}`} aria-label={`Status: ${p.status}`}>
                     {p.status}
                   </span>
                 </td>
@@ -113,10 +114,10 @@ export function ProfessionalsTable({ professionals }: ProfessionalsTableProps) {
                     <span className="text-sm text-gray-400">—</span>
                   )}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-2 sm:px-4 py-3">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs text-gray-500">{formatDate(p.renewal_deadline)}</span>
-                    <span className={`inline-flex w-fit items-center rounded px-1.5 py-0.5 text-xs font-medium ${renewalStyle.bg}`}>
+                    <span className={`inline-flex w-fit items-center rounded px-1.5 py-0.5 text-xs font-medium ${renewalStyle.bg}`} aria-label={`Situação de renovação: ${renewalStyle.label}`}>
                       {renewalStyle.label}
                     </span>
                   </div>

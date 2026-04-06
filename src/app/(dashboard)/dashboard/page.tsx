@@ -133,24 +133,24 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">Visão geral da operação de profissionais</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-xs sm:text-sm text-gray-500 mt-1">Visão geral da operação de profissionais</p>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {/* Card 1: Total Profissionais */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-600">Total Profissionais</p>
-              <p className="text-4xl font-bold text-gray-900 mt-2">{kpis.total_all}</p>
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-4 sm:p-6">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Total Profissionais</p>
+              <p className="text-2xl sm:text-4xl font-bold text-gray-900 mt-2">{kpis.total_all}</p>
             </div>
-            <div className="ml-3">
-              <svg className="h-10 w-10 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="flex-shrink-0">
+              <svg className="h-8 w-8 sm:h-10 sm:w-10 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 12H9m6 0a6 6 0 11-12 0 6 6 0 0112 0z" />
               </svg>
             </div>
@@ -158,14 +158,14 @@ export default async function DashboardPage() {
         </div>
 
         {/* Card 2: Ativos */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-600">Ativos</p>
-              <p className="text-4xl font-bold text-gray-900 mt-2">{kpis.total_active}</p>
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-4 sm:p-6">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Ativos</p>
+              <p className="text-2xl sm:text-4xl font-bold text-gray-900 mt-2">{kpis.total_active}</p>
             </div>
-            <div className="ml-3">
-              <svg className="h-10 w-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="flex-shrink-0">
+              <svg className="h-8 w-8 sm:h-10 sm:w-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m7.5-1.75a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
@@ -173,14 +173,14 @@ export default async function DashboardPage() {
         </div>
 
         {/* Card 3: Desligados */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-600">Desligados</p>
-              <p className="text-4xl font-bold text-gray-900 mt-2">{kpis.total_terminated}</p>
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-4 sm:p-6">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Desligados</p>
+              <p className="text-2xl sm:text-4xl font-bold text-gray-900 mt-2">{kpis.total_terminated}</p>
             </div>
-            <div className="ml-3">
-              <svg className="h-10 w-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="flex-shrink-0">
+              <svg className="h-8 w-8 sm:h-10 sm:w-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12a1 1 0 100-2 1 1 0 000 2z" />
               </svg>
             </div>
@@ -285,7 +285,7 @@ export default async function DashboardPage() {
         <h2 className="text-lg font-semibold text-gray-900 mb-6">Distribuição por Cliente</h2>
 
         {clients.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {clients.map((client, index) => {
               const percentage = (client.total_count / maxCount) * 100
               const color = getColorForIndex(index)
@@ -300,7 +300,7 @@ export default async function DashboardPage() {
                   </div>
 
                   {/* Bar */}
-                  <div className="flex-1 h-8 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="flex-1 h-6 sm:h-8 bg-gray-100 rounded-full overflow-hidden">
                     <div
                       className={`h-full ${color} transition-all duration-300`}
                       style={{ width: `${percentage}%` }}
@@ -318,7 +318,7 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div className="flex items-center justify-center py-12 text-gray-400">
-            <p className="text-sm">Nenhum dado de cliente encontrado.</p>
+            <p className="text-xs sm:text-sm">Nenhum dado de cliente encontrado.</p>
           </div>
         )}
       </div>

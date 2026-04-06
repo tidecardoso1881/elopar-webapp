@@ -62,7 +62,7 @@ function SummaryCard({
 }) {
   const config = RENEWAL_STATUS_CONFIG[statusKey]
   return (
-    <div className={`rounded-lg border ${config.bgLight} p-4`}>
+    <div className={`rounded-lg border ${config.bgLight} p-4 hover:shadow-md transition-shadow`}>
       <div className="flex items-center gap-3">
         <div className={`rounded-full ${config.bg} p-3`}>
           <span className={`text-lg font-bold ${config.textColor}`}>{count}</span>
@@ -167,14 +167,14 @@ export default async function RenovacoesPage(props: RenovacoesPageProps) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900">Renovações</h1>
-        <p className="mt-0.5 text-sm text-gray-500">
+        <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Renovações</h1>
+        <p className="mt-0.5 text-xs sm:text-sm text-gray-500">
           Contratos vencendo nos próximos 90 dias
         </p>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <SummaryCard label="Vencidos" count={summary.expired} statusKey="expired" />
         <SummaryCard label="Crítico ≤30d" count={summary.critical} statusKey="critical" />
         <SummaryCard label="Atenção ≤60d" count={summary.warning} statusKey="warning" />
@@ -259,8 +259,8 @@ export default async function RenovacoesPage(props: RenovacoesPageProps) {
         {alerts.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <table className="min-w-full divide-y divide-gray-200 text-xs sm:text-sm">
               <thead>
                 <tr className="bg-gray-50">
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
