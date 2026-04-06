@@ -261,6 +261,45 @@ export type Database = {
         }
         Relationships: []
       }
+      contract_notifications: {
+        Row: {
+          id: string
+          professional_id: string | null
+          professional_name: string
+          client_name: string | null
+          days_until_expiry: number
+          renewal_deadline: string | null
+          urgency: 'expired' | 'critical' | 'warning' | 'attention'
+          read_at: string | null
+          sent_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          professional_id?: string | null
+          professional_name: string
+          client_name?: string | null
+          days_until_expiry: number
+          renewal_deadline?: string | null
+          urgency: 'expired' | 'critical' | 'warning' | 'attention'
+          read_at?: string | null
+          sent_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          professional_id?: string | null
+          professional_name?: string
+          client_name?: string | null
+          days_until_expiry?: number
+          renewal_deadline?: string | null
+          urgency?: 'expired' | 'critical' | 'warning' | 'attention'
+          read_at?: string | null
+          sent_at?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       test_health_logs: {
         Row: {
           id: string

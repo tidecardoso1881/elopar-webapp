@@ -6,6 +6,7 @@ import { MobileMenu } from './mobile-menu'
 interface HeaderProps {
   user: { email: string }
   profile: { full_name: string | null; role: string } | null
+  notificationBell?: React.ReactNode
 }
 
 const pageLabels: Record<string, string> = {
@@ -15,9 +16,10 @@ const pageLabels: Record<string, string> = {
   '/renovacoes': 'Renovações',
   '/equipamentos': 'Equipamentos',
   '/ferias': 'Férias',
+  '/notificacoes': 'Notificações',
 }
 
-export function Header({ user, profile }: HeaderProps) {
+export function Header({ user, profile, notificationBell }: HeaderProps) {
   const pathname = usePathname()
   const pageTitle = pageLabels[pathname] || 'Página'
   const displayName = profile?.full_name ?? user.email ?? 'Usuário'
@@ -42,6 +44,7 @@ export function Header({ user, profile }: HeaderProps) {
 
       {/* User Info */}
       <div className="flex items-center gap-2 sm:gap-3">
+        {notificationBell}
         <div className="hidden sm:flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
             <span className="text-xs font-semibold text-blue-700" aria-hidden="true">{initials}</span>
