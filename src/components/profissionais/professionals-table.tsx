@@ -22,6 +22,19 @@ const STATUS_STYLES: Record<string, string> = {
   INATIVO: 'bg-gray-100 text-gray-500',
 }
 
+const CONTRACT_TYPE_STYLES: Record<string, string> = {
+  CLT_ESTRATEGICO: 'bg-purple-100 text-purple-700',
+  CLT_ILAED: 'bg-blue-100 text-blue-700',
+  PJ: 'bg-orange-100 text-orange-700',
+}
+
+const SENIORITY_LABELS: Record<string, string> = {
+  JUNIOR: 'Júnior',
+  PLENO: 'Pleno',
+  SENIOR: 'Sênior',
+  ESPECIALISTA: 'Especialista',
+}
+
 const RENEWAL_STYLES: Record<string, { bg: string; label: string }> = {
   expired:   { bg: 'bg-red-100 text-red-700',    label: 'Vencido' },
   critical:  { bg: 'bg-red-50 text-red-600',     label: '≤30d' },
@@ -76,11 +89,13 @@ export function ProfessionalsTable({ professionals }: ProfessionalsTableProps) {
                     {p.name}
                   </Link>
                 </td>
-                <td className="px-2 sm:px-4 py-3 hidden lg:table-cell">
-                  <span className="text-xs sm:text-sm text-gray-700">{p.position ?? '—'}</span>
-                  {p.seniority && (
-                    <span className="ml-1.5 text-xs text-gray-400">{p.seniority}</span>
-                  )}
+                <td className="px-4 py-3">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm text-gray-700">{p.position ?? '—'}</span>
+                    {p.seniority && (
+                      <span className="text-xs text-gray-500">{SENIORITY_LABELS[p.seniority] ?? p.seniority}</span>
+                    )}
+                  </div>
                 </td>
                 <td className="px-2 sm:px-4 py-3 text-xs sm:text-sm text-gray-600 hidden md:table-cell">
                   {p.client?.name ?? '—'}
@@ -90,8 +105,14 @@ export function ProfessionalsTable({ professionals }: ProfessionalsTableProps) {
                     {p.status}
                   </span>
                 </td>
-                <td className="px-2 sm:px-4 py-3 text-xs sm:text-sm text-gray-600 hidden lg:table-cell">
-                  {p.contract_type ?? '—'}
+                <td className="px-4 py-3">
+                  {p.contract_type ? (
+                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${CONTRACT_TYPE_STYLES[p.contract_type] ?? 'bg-gray-100 text-gray-500'}`}>
+                      {p.contract_type === 'CLT_ESTRATEGICO' ? 'CLT Estratégico' : p.contract_type === 'CLT_ILAED' ? 'CLT ILAED' : p.contract_type}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-gray-400">—</span>
+                  )}
                 </td>
                 <td className="px-2 sm:px-4 py-3">
                   <div className="flex flex-col gap-0.5">

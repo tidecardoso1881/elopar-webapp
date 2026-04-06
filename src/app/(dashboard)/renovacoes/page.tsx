@@ -1,24 +1,21 @@
 import { createClient } from '@/lib/supabase/server'
 import { formatDate } from '@/lib/utils/formatting'
-import type { Metadata } from 'next'
+import Link from 'next/link'
 
-export const metadata: Metadata = {
-  title: 'Renovações',
-}
-
+// Alinhado com v_renewal_alerts view — views não têm NOT NULL no Supabase
 interface RenewalAlert {
-  id: string
-  name: string
+  id: string | null
+  name: string | null
   email: string | null
   profile: string | null
   seniority: string | null
-  status: string
-  contract_end: string
+  status: string | null
+  contract_end: string | null
   renewal_deadline: string | null
-  client_name: string
-  client_id: string
-  days_until_expiry: number
-  renewal_status: 'expired' | 'critical' | 'warning' | 'attention' | 'ok'
+  client_name: string | null
+  client_id: string | null
+  days_until_expiry: number | null
+  renewal_status: string | null
 }
 
 const RENEWAL_STATUS_CONFIG: Record<string, { bg: string; textColor: string; label: string; bgLight: string }> = {
@@ -109,16 +106,51 @@ interface RenovacoesPageProps {
   searchParams?: Promise<Record<string, unknown>>
 }
 
-export default async function RenovacoesPage(_props: RenovacoesPageProps) {
+export default async function RenovacoesPage(props: RenovacoesPageProps) {
   const supabase = await createClient()
+  const searchParams = await props.searchParams
 
+  // Extrair parâmetros de filtro
+  const filterStatus = (searchParams?.status as string) || 'all'
+  const filterClient = (searchParams?.client as string) || 'all'
+
+  // Buscar dados da view
   const { data: renewalAlerts, error } = await supabase
     .from('v_renewal_alerts')
     .select('*')
 
-  const alerts: RenewalAlert[] = (renewalAlerts ?? []).filter(
-    (a): a is RenewalAlert => a.id !== null
+  let alerts: RenewalAlert[] = renewalAlerts ?? []
+
+  // Filtrar apenas profissionais ATIVOS com days_until_expiry não nulo
+  alerts = alerts.filter(
+    (a) => a.status === 'ATIVO' && a.days_until_expiry !== null
   )
+
+  // Aplicar filtro de status de renovação
+  if (filterStatus !== 'all') {
+    alerts = alerts.filter((a) => a.renewal_status === filterStatus)
+  }
+
+  // Aplicar filtro de cliente
+  if (filterClient !== 'all') {
+    alerts = alerts.filter((a) => a.client_id === filterClient)
+  }
+
+  // Ordenar por days_until_expiry ASC (mais urgentes primeiro)
+  alerts.sort((a, b) => {
+    const daysA = a.days_until_expiry ?? Infinity
+    const daysB = b.days_until_expiry ?? Infinity
+    return daysA - daysB
+  })
+
+  // Obter lista única de clientes para filtro
+  const uniqueClients = Array.from(
+    new Map(
+      (renewalAlerts ?? [])
+        .filter((a) => a.client_id && a.client_name)
+        .map((a) => [a.client_id, { id: a.client_id, name: a.client_name }])
+    ).values()
+  ).sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
 
   // Calculate summary counts
   const summary = {
@@ -127,6 +159,9 @@ export default async function RenovacoesPage(_props: RenovacoesPageProps) {
     warning: alerts.filter((a) => a.renewal_status === 'warning').length,
     attention: alerts.filter((a) => a.renewal_status === 'attention').length,
   }
+
+  const getRenewalConfig = (status: string | null) =>
+    RENEWAL_STATUS_CONFIG[status ?? 'ok'] ?? RENEWAL_STATUS_CONFIG['ok']
 
   return (
     <div className="space-y-6">
@@ -152,6 +187,72 @@ export default async function RenovacoesPage(_props: RenovacoesPageProps) {
           Erro ao carregar renovações: {error.message}
         </div>
       )}
+
+      {/* Filters */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between bg-white rounded-lg border border-gray-200 p-4">
+        <div className="flex flex-col gap-3 md:flex-row md:gap-4">
+          {/* Status Filter */}
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Status
+            </label>
+            <select
+              defaultValue={filterStatus || 'all'}
+              onChange={(e) => {
+                const newStatus = e.target.value
+                const params = new URLSearchParams()
+                if (newStatus !== 'all') params.set('status', newStatus)
+                if (filterClient !== 'all') params.set('client', filterClient)
+                window.location.href = `/renovacoes${params.size > 0 ? '?' + params : ''}`
+              }}
+              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="all">Todos</option>
+              <option value="expired">Vencidos</option>
+              <option value="critical">Críticos (≤30d)</option>
+              <option value="warning">Atenção (≤60d)</option>
+              <option value="attention">Pendentes (≤90d)</option>
+            </select>
+          </div>
+
+          {/* Client Filter */}
+          {uniqueClients.length > 0 && (
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Cliente
+              </label>
+              <select
+                defaultValue={filterClient || 'all'}
+                onChange={(e) => {
+                  const newClient = e.target.value
+                  const params = new URLSearchParams()
+                  if (filterStatus !== 'all') params.set('status', filterStatus)
+                  if (newClient !== 'all') params.set('client', newClient)
+                  window.location.href = `/renovacoes${params.size > 0 ? '?' + params : ''}`
+                }}
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="all">Todos</option>
+                {uniqueClients.map((client) => (
+                  <option key={client.id} value={client.id || ''}>
+                    {client.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
+
+        {/* Clear Filters */}
+        {(filterStatus !== 'all' || filterClient !== 'all') && (
+          <a
+            href="/renovacoes"
+            className="text-sm text-blue-600 hover:text-blue-700 font-medium self-start md:self-auto"
+          >
+            Limpar filtros
+          </a>
+        )}
+      </div>
 
       {/* Table or Empty State */}
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
@@ -180,33 +281,34 @@ export default async function RenovacoesPage(_props: RenovacoesPageProps) {
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                     Status
                   </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    Ação
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white">
-                {alerts.map((alert) => {
-                  const config = RENEWAL_STATUS_CONFIG[alert.renewal_status]
-                  const daysDisplay = alert.days_until_expiry < 0
-                    ? alert.days_until_expiry
-                    : alert.days_until_expiry
+                {alerts.map((alert, idx) => {
+                  const config = getRenewalConfig(alert.renewal_status)
+                  const days = alert.days_until_expiry ?? 0
 
                   return (
-                    <tr key={alert.id} className="transition-colors hover:bg-gray-50">
+                    <tr key={alert.id ?? idx} className="transition-colors hover:bg-gray-50">
                       <td className="px-4 py-3">
                         <span className="text-sm font-medium text-gray-900">
-                          {alert.name}
+                          {alert.name ?? '—'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
-                        {alert.client_name}
+                        {alert.client_name ?? '—'}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
                         {alert.seniority ?? '—'}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
-                        {formatDate(alert.contract_end)}
+                        {alert.contract_end ? formatDate(alert.contract_end) : '—'}
                       </td>
                       <td className="px-4 py-3 text-sm font-medium tabular-nums text-gray-900">
-                        {daysDisplay > 0 ? `+${daysDisplay}` : daysDisplay}
+                        {days > 0 ? `+${days}` : days}
                       </td>
                       <td className="px-4 py-3">
                         <span
@@ -214,6 +316,16 @@ export default async function RenovacoesPage(_props: RenovacoesPageProps) {
                         >
                           {config.label}
                         </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        {alert.id && (
+                          <Link
+                            href={`/profissionais/${alert.id}`}
+                            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                          >
+                            Ver
+                          </Link>
+                        )}
                       </td>
                     </tr>
                   )
@@ -223,6 +335,13 @@ export default async function RenovacoesPage(_props: RenovacoesPageProps) {
           </div>
         )}
       </div>
+
+      {/* Results Info */}
+      {alerts.length > 0 && (
+        <div className="text-sm text-gray-500 text-right">
+          Exibindo {alerts.length} renovação{alerts.length !== 1 ? 'ões' : ''}
+        </div>
+      )}
     </div>
   )
 }
