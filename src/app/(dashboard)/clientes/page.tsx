@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import { canWrite } from '@/types/roles'
 import { ClientDeleteButton } from '@/components/clientes/client-delete-button'
 import type { Metadata } from 'next'
 
@@ -19,6 +20,14 @@ interface ClientSummary {
 export default async function ClientesPage() {
   const supabase = await createClient()
 
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data: userProfile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user?.id ?? '')
+    .single()
+  const userCanWrite = canWrite(userProfile?.role)
+
   const { data: clients, error } = await supabase
     .from('v_client_summary')
     .select('*')
@@ -37,15 +46,17 @@ export default async function ClientesPage() {
               : 'Nenhum cliente cadastrado'}
           </p>
         </div>
-        <Link
-          href="/clientes/novo"
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-xs sm:text-sm font-medium text-white hover:bg-indigo-700 active:scale-95 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all min-h-10"
-        >
-          <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          <span>Novo</span>
-        </Link>
+        {userCanWrite && (
+          <Link
+            href="/clientes/novo"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-xs sm:text-sm font-medium text-white hover:bg-indigo-700 active:scale-95 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all min-h-10"
+          >
+            <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span>Novo</span>
+          </Link>
+        )}
       </div>
 
       {/* Erro */}
@@ -98,16 +109,20 @@ export default async function ClientesPage() {
                     {client.client_name}
                   </Link>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <Link
-                      href={`/clientes/${client.client_id}/editar`}
-                      title="Editar cliente"
-                      className="inline-flex items-center justify-center h-8 w-8 sm:h-8 sm:w-8 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors min-h-10"
-                    >
-                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
-                      </svg>
-                    </Link>
-                    <ClientDeleteButton id={client.client_id} name={client.client_name} />
+                    {userCanWrite && (
+                      <>
+                        <Link
+                          href={`/clientes/${client.client_id}/editar`}
+                          title="Editar cliente"
+                          className="inline-flex items-center justify-center h-8 w-8 sm:h-8 sm:w-8 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors min-h-10"
+                        >
+                          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                          </svg>
+                        </Link>
+                        <ClientDeleteButton id={client.client_id} name={client.client_name} />
+                      </>
+                    )}
                   </div>
                 </div>
 

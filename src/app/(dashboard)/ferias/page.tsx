@@ -3,6 +3,7 @@ import { VacationTable } from '@/components/profissionais/ferias/vacation-table'
 import { Suspense } from 'react'
 import Link from 'next/link'
 import { VacationFilters } from './filters'
+import { canWrite } from '@/types/roles'
 
 const PAGE_SIZE = 20
 
@@ -33,6 +34,14 @@ export default async function FeriasPage({ searchParams }: FeriasPageProps) {
   const to = from + PAGE_SIZE - 1
 
   const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data: userProfile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user?.id ?? '')
+    .single()
+  const userCanWrite = canWrite(userProfile?.role)
 
   // Query base para férias
   let query = supabase
@@ -86,15 +95,17 @@ export default async function FeriasPage({ searchParams }: FeriasPageProps) {
               : 'Nenhuma férias cadastrada'}
           </p>
         </div>
-        <Link
-          href="/ferias/novo"
-          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
-        >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          Novo Registro
-        </Link>
+        {userCanWrite && (
+          <Link
+            href="/ferias/novo"
+            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Novo Registro
+          </Link>
+        )}
       </div>
 
       {/* Card com filtros + tabela */}
