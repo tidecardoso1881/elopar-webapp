@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EP-NEW-003 — Dashboard de Saúde dos Testes | Elopar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .annotation-bar {
+            @apply bg-gray-200 text-gray-800 px-4 py-3 text-sm font-medium border-b border-gray-300;
+        }
+
+        .callout {
+            @apply border-l-4 px-4 py-3 mb-4 bg-gray-50 rounded-r text-sm;
+        }
+
+        .callout.novo {
+            @apply border-l-green-500 bg-green-50;
+        }
+
+        .callout.removido {
+            @apply border-l-red-500 bg-red-50;
+        }
+
+        .callout.info {
+            @apply border-l-blue-500 bg-blue-50;
+        }
+
+        .admin-badge {
+            @apply inline-block px-3 py-1 bg-red-100 text-red-800 text-xs font-bold rounded-full;
+        }
+
+        .health-badge-healthy {
+            @apply inline-block px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full;
+        }
+
+        .health-badge-warning {
+            @apply inline-block px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full;
+        }
+
+        .health-badge-error {
+            @apply inline-block px-3 py-1 bg-red-100 text-red-800 text-xs font-bold rounded-full;
+        }
+
+        .status-success {
+            @apply text-green-600 font-semibold;
+        }
+
+        .status-warning {
+            @apply text-yellow-600 font-semibold;
+        }
+
+        .status-error {
+            @apply text-red-600 font-semibold;
+        }
+
+        /* Dropdown styling */
+        .dropdown-open {
+            @apply block;
+        }
+
+        .dropdown-hidden {
+            @apply hidden;
+        }
+
+        /* Simple SVG chart styling */
+        .chart-container {
+            @apply bg-white p-6 rounded-lg border border-gray-200;
+        }
+
+        .table-striped tbody tr:nth-child(even) {
+            @apply bg-gray-50;
+        }
+
+        .sidebar {
+            @apply w-64 bg-gray-900 text-white h-screen flex flex-col;
+        }
+
+        .menu-item {
+            @apply px-6 py-3 hover:bg-gray-800 cursor-pointer transition;
+        }
+
+        .menu-item.disabled {
+            @apply opacity-40 cursor-not-allowed hover:bg-gray-900;
+        }
+
+        .header {
+            @apply bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center;
+        }
+
+        .avatar-btn {
+            @apply flex items-center gap-2 hover:bg-gray-100 px-4 py-2 rounded-lg cursor-pointer transition;
+        }
+
+        .dropdown-menu {
+            @apply absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50;
+        }
+
+        .dropdown-item {
+            @apply px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0 text-gray-800 text-sm;
+        }
+
+        .dropdown-item.selected {
+            @apply bg-blue-50 text-blue-700 font-semibold;
+        }
+
+        .dropdown-item.danger {
+            @apply text-red-600 hover:bg-red-50;
+        }
+
+        .content-wrapper {
+            @apply flex-1 overflow-auto;
+        }
+
+        .main-container {
+            @apply p-8;
+        }
+
+        .card-health {
+            @apply bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition;
+        }
+
+        .card-title {
+            @apply text-sm font-semibold text-gray-600 mb-2;
+        }
+
+        .card-value {
+            @apply text-3xl font-bold text-gray-900 mb-4;
+        }
+
+        .card-meta {
+            @apply text-xs text-gray-500;
+        }
+
+        .icon-circle {
+            @apply inline-flex items-center justify-center w-10 h-10 rounded-full mr-3;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Annotation Bar -->
+    <div class="annotation-bar">
+        EP-NEW-003 — Dashboard de Saúde dos Testes | Acesso: Área do Usuário → admin only | Complexidade: M
+    </div>
+
+    <!-- Main Layout -->
+    <div class="flex h-screen overflow-hidden" style="height: calc(100vh - 44px);">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="px-6 py-6 border-b border-gray-800">
+                <h1 class="text-2xl font-bold">Elopar</h1>
+            </div>
+            <nav class="flex-1">
+                <div class="menu-item">Dashboard</div>
+                <div class="menu-item">Profissionais</div>
+                <div class="menu-item">Clientes</div>
+                <div class="menu-item disabled">Métricas</div>
+            </nav>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col">
+            <!-- Header -->
+            <div class="header">
+                <h2 class="text-xl font-semibold text-gray-900">Elopar</h2>
+                <div class="relative">
+                    <div class="avatar-btn" onclick="toggleDropdown()">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            AD
+                        </div>
+                        <span class="text-gray-700 text-sm">admin@elopar.com</span>
+                        <span class="admin-badge">Admin</span>
+                    </div>
+
+                    <!-- Dropdown Menu -->
+                    <div id="dropdownMenu" class="dropdown-menu dropdown-hidden" style="position: absolute; right: 0; top: 100%; margin-top: 8px;">
+                        <div class="dropdown-item">Dados do Usuário</div>
+                        <div class="dropdown-item">Gerenciar Usuários</div>
+                        <div class="dropdown-item selected">
+                            <span>🏥</span> Saúde dos Testes
+                        </div>
+                        <div class="dropdown-item danger">Sair</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="content-wrapper">
+                <div class="main-container">
+                    <!-- Callouts -->
+                    <div class="callout info">
+                        <strong>ℹ️ Visível SOMENTE para perfil admin:</strong> Este dashboard é acessível através do menu dropdown "Área do Usuário" (canto superior direito). Não existe como rota direta na navegação principal.
+                    </div>
+
+                    <div class="callout novo">
+                        <strong>✓ Acessado via Área do Usuário:</strong> Menu dropdown do avatar do usuário admin → "Saúde dos Testes" (selecionado).
+                    </div>
+
+                    <div class="callout novo">
+                        <strong>✓ Fonte de dados:</strong> Tabela <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">test_health_logs</code> do Supabase com histórico de execuções de testes.
+                    </div>
+
+                    <div class="callout novo">
+                        <strong>✓ Visualização de gráfico:</strong> Componente Recharts (React) para renderizar histórico semanal de cobertura de testes com dados em tempo real.
+                    </div>
+
+                    <!-- Dashboard Title -->
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                        🏥 Saúde dos Testes
+                        <span class="admin-badge">Admin Only</span>
+                    </h1>
+                    <p class="text-gray-600 mb-8">Acompanhe a saúde e cobertura dos testes da aplicação Elopar em tempo real.</p>
+
+                    <!-- Health Status Cards -->
+                    <div class="grid grid-cols-3 gap-6 mb-8">
+                        <!-- Card 1: Unit Tests -->
+                        <div class="card-health">
+                            <div class="flex items-start justify-between mb-4">
+                                <div>
+                                    <div class="card-title">Testes Unitários</div>
+                                    <div class="card-value">87%</div>
+                                </div>
+                                <span style="font-size: 2rem;">🔵</span>
+                            </div>
+                            <div class="mb-3">
+                                <span class="health-badge-healthy">Saudável</span>
+                            </div>
+                            <div class="card-meta">Cobertura de código | Última atualização: 05/04/2026 14:32</div>
+                        </div>
+
+                        <!-- Card 2: Integration Tests -->
+                        <div class="card-health">
+                            <div class="flex items-start justify-between mb-4">
+                                <div>
+                                    <div class="card-title">Testes de Integração</div>
+                                    <div class="card-value">Passou ✅</div>
+                                </div>
+                                <span style="font-size: 2rem;">🟠</span>
+                            </div>
+                            <div class="mb-3">
+                                <span class="health-badge-warning">Aviso</span>
+                            </div>
+                            <div class="card-meta">Último run: 05/04/2026 14:32 | 42 testes</div>
+                        </div>
+
+                        <!-- Card 3: E2E Tests -->
+                        <div class="card-health">
+                            <div class="flex items-start justify-between mb-4">
+                                <div>
+                                    <div class="card-title">Testes E2E (Playwright)</div>
+                                    <div class="card-value">Passou ✅</div>
+                                </div>
+                                <span style="font-size: 2rem;">🟢</span>
+                            </div>
+                            <div class="mb-3">
+                                <span class="health-badge-healthy">Saudável</span>
+                            </div>
+                            <div class="card-meta">Último run: 05/04/2026 18:00 | 28 testes</div>
+                        </div>
+                    </div>
+
+                    <!-- Coverage Trend Chart -->
+                    <div class="chart-container mb-8">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Histórico de Cobertura (7 dias)</h3>
+                        <svg viewBox="0 0 800 300" class="w-full" style="min-height: 300px;">
+                            <!-- Grid -->
+                            <line x1="60" y1="30" x2="60" y2="250" stroke="#e5e7eb" stroke-width="2"/>
+                            <line x1="60" y1="250" x2="780" y2="250" stroke="#e5e7eb" stroke-width="2"/>
+
+                            <!-- Y-axis labels -->
+                            <text x="40" y="255" font-size="12" fill="#6b7280" text-anchor="end">0%</text>
+                            <text x="40" y="175" font-size="12" fill="#6b7280" text-anchor="end">50%</text>
+                            <text x="40" y="95" font-size="12" fill="#6b7280" text-anchor="end">100%</text>
+
+                            <!-- Grid lines -->
+                            <line x1="60" y1="170" x2="780" y2="170" stroke="#f0f0f0" stroke-width="1" stroke-dasharray="4"/>
+
+                            <!-- Data line (coverage trend) -->
+                            <polyline points="80,180 180,160 280,175 380,140 480,135 580,125 680,110" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+                            <!-- Data points -->
+                            <circle cx="80" cy="180" r="4" fill="#3b82f6"/>
+                            <circle cx="180" cy="160" r="4" fill="#3b82f6"/>
+                            <circle cx="280" cy="175" r="4" fill="#3b82f6"/>
+                            <circle cx="380" cy="140" r="4" fill="#3b82f6"/>
+                            <circle cx="480" cy="135" r="4" fill="#3b82f6"/>
+                            <circle cx="580" cy="125" r="4" fill="#3b82f6"/>
+                            <circle cx="680" cy="110" r="4" fill="#3b82f6"/>
+
+                            <!-- X-axis labels (days) -->
+                            <text x="80" y="270" font-size="12" fill="#6b7280" text-anchor="middle">30/03</text>
+                            <text x="180" y="270" font-size="12" fill="#6b7280" text-anchor="middle">31/03</text>
+                            <text x="280" y="270" font-size="12" fill="#6b7280" text-anchor="middle">01/04</text>
+                            <text x="380" y="270" font-size="12" fill="#6b7280" text-anchor="middle">02/04</text>
+                            <text x="480" y="270" font-size="12" fill="#6b7280" text-anchor="middle">03/04</text>
+                            <text x="580" y="270" font-size="12" fill="#6b7280" text-anchor="middle">04/04</text>
+                            <text x="680" y="270" font-size="12" fill="#6b7280" text-anchor="middle">05/04</text>
+                        </svg>
+                        <p class="text-gray-600 text-sm mt-4">Tendência: Cobertura aumentando. Objetivo: 90% até fim do mês.</p>
+                    </div>
+
+                    <!-- Recent Executions Table -->
+                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h3 class="text-lg font-bold text-gray-900">Últimas 5 Execuções</h3>
+                        </div>
+                        <table class="w-full table-striped">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Data/Hora</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Tipo</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Cobertura</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Duração</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="px-6 py-4 text-sm text-gray-900">05/04/2026 18:00</td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">E2E (Playwright)</td>
+                                    <td class="px-6 py-4 text-sm"><span class="status-success">✅ Passou</span></td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">88%</td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">2m 15s</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 text-sm text-gray-900">05/04/2026 14:32</td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">Unitários</td>
+                                    <td class="px-6 py-4 text-sm"><span class="status-success">✅ Passou</span></td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">87%</td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">1m 42s</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 text-sm text-gray-900">05/04/2026 10:15</td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">Integração</td>
+                                    <td class="px-6 py-4 text-sm"><span class="status-success">✅ Passou</span></td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">85%</td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">3m 08s</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 text-sm text-gray-900">04/04/2026 22:45</td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">E2E (Playwright)</td>
+                                    <td class="px-6 py-4 text-sm"><span class="status-warning">⚠️ Falha em 1 teste</span></td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">82%</td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">2m 34s</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 text-sm text-gray-900">04/04/2026 18:20</td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">Unitários</td>
+                                    <td class="px-6 py-4 text-sm"><span class="status-success">✅ Passou</span></td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">84%</td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">1m 55s</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleDropdown() {
+            const menu = document.getElementById('dropdownMenu');
+            menu.classList.toggle('dropdown-hidden');
+            menu.classList.toggle('dropdown-open');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('dropdownMenu');
+            const btn = event.target.closest('.avatar-btn');
+            if (!btn && !dropdown.contains(event.target)) {
+                dropdown.classList.add('dropdown-hidden');
+                dropdown.classList.remove('dropdown-open');
+            }
+        });
+    </script>
+</body>
+</html>

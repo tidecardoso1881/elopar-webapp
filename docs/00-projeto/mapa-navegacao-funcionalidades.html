@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapa de Navegação — Funcionalidades Elopar</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.5;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      color: white;
+      padding: 36px 48px;
+    }
+    .page-header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 6px; }
+    .page-header p  { font-size: 0.95rem; opacity: 0.85; }
+    .meta { display: flex; gap: 24px; margin-top: 16px; font-size: 0.8rem; opacity: 0.75; }
+
+    /* ── Tabs ── */
+    .tabs {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0 48px;
+      display: flex;
+      gap: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .tab {
+      padding: 14px 20px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #64748b;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .tab:hover  { color: #1e40af; }
+    .tab.active { color: #1e40af; border-bottom-color: #1e40af; }
+
+    /* ── Content ── */
+    .content { padding: 40px 48px; max-width: 1300px; margin: 0 auto; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+    .section-sub {
+      font-size: 0.875rem;
+      color: #64748b;
+      margin-bottom: 28px;
+    }
+
+    /* ── Legend ── */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 36px;
+      padding: 16px 20px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #475569; }
+    .legend-dot  { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+    /* ── Feature card ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .feat-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: box-shadow 0.15s;
+    }
+    .feat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+
+    .feat-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .feat-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    .feat-card-title { font-size: 0.9rem; font-weight: 600; color: #0f172a; }
+    .feat-card-ep    { font-size: 0.75rem; color: #94a3b8; margin-top: 2px; }
+
+    .feat-card-body { padding: 16px 20px; }
+
+    .info-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: 0.8rem;
+    }
+    .info-label {
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      min-width: 110px;
+      flex-shrink: 0;
+    }
+    .info-value { color: #334155; }
+
+    .path-pill {
+      display: inline-block;
+      background: #f1f5f9;
+      color: #1e40af;
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      word-break: break-all;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+    .status-ok       { background: #dcfce7; color: #15803d; }
+    .status-hidden   { background: #fef9c3; color: #92400e; }
+    .status-buried   { background: #fee2e2; color: #b91c1c; }
+    .status-partial  { background: #e0f2fe; color: #0369a1; }
+
+    .problem-box {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.8rem;
+      color: #9a3412;
+      margin-top: 10px;
+    }
+    .problem-box strong { color: #7c2d12; }
+
+    .rec-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.8rem;
+      color: #166534;
+      margin-top: 8px;
+    }
+
+    /* ── Nav diagram ── */
+    .nav-diagram {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 32px;
+      margin-bottom: 32px;
+    }
+    .nav-diagram h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .nav-tree { display: flex; gap: 0; }
+
+    .nav-col {
+      flex: 1;
+      min-width: 0;
+    }
+    .nav-col-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+      margin-bottom: 10px;
+      padding: 0 4px;
+    }
+
+    .nav-node {
+      position: relative;
+      margin-bottom: 6px;
+    }
+    .nav-node-inner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: default;
+      border: 1px solid transparent;
+    }
+    .nav-node-inner:hover { filter: brightness(0.97); }
+
+    .nav-node.level-0 .nav-node-inner { background: #1e40af; color: white; font-weight: 600; }
+    .nav-node.level-1 .nav-node-inner { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+    .nav-node.level-2 .nav-node-inner { background: #f8fafc; color: #475569; border-color: #e2e8f0; margin-left: 16px; }
+
+    .nav-connector {
+      width: 1px;
+      background: #e2e8f0;
+      margin: 0 auto;
+      height: 6px;
+    }
+
+    .feat-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 999px;
+    }
+    .tag-ok      { background: #dcfce7; color: #15803d; }
+    .tag-issue   { background: #fef3c7; color: #92400e; }
+    .tag-admin   { background: #ede9fe; color: #6d28d9; }
+    .tag-role    { background: #e0f2fe; color: #0369a1; }
+
+    /* ── Summary table ── */
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.83rem;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .summary-table thead tr { background: #f8fafc; }
+    .summary-table th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .summary-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      vertical-align: middle;
+    }
+    .summary-table tr:last-child td { border-bottom: none; }
+    .summary-table tr:hover td { background: #fafbff; }
+
+    /* ── Action items ── */
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    .action-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .action-priority {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .prio-critical { background: #fee2e2; color: #b91c1c; }
+    .prio-high     { background: #fef3c7; color: #92400e; }
+    .prio-medium   { background: #e0f2fe; color: #0369a1; }
+    .prio-low      { background: #f0fdf4; color: #166534; }
+
+    .action-title { font-size: 0.9rem; font-weight: 600; color: #0f172a; margin-bottom: 6px; }
+    .action-desc  { font-size: 0.8rem; color: #64748b; }
+
+    /* ── Sidebar mockup ── */
+    .mockup-wrap {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .sidebar-mock {
+      width: 220px;
+      flex-shrink: 0;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .sidebar-logo {
+      padding: 16px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sidebar-logo-icon {
+      width: 32px; height: 32px;
+      background: #1e40af;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 0.9rem;
+    }
+    .sidebar-logo-text { font-size: 0.8rem; font-weight: 600; color: #0f172a; }
+    .sidebar-logo-sub  { font-size: 0.65rem; color: #94a3b8; }
+
+    .sidebar-section-label {
+      padding: 10px 14px 4px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+    }
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      font-size: 0.78rem;
+      color: #475569;
+      cursor: default;
+      transition: background 0.1s;
+    }
+    .sidebar-item:hover { background: #f8fafc; }
+    .sidebar-item.active { background: #eff6ff; color: #1d4ed8; font-weight: 600; }
+    .sidebar-item.admin-only { color: #7c3aed; }
+    .sidebar-item .item-icon { font-size: 0.9rem; }
+    .sidebar-item .badge {
+      margin-left: auto;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 999px;
+    }
+    .badge-admin  { background: #ede9fe; color: #6d28d9; }
+    .badge-mgr    { background: #e0f2fe; color: #0369a1; }
+    .badge-new    { background: #dcfce7; color: #15803d; }
+
+    .sidebar-divider { height: 1px; background: #f1f5f9; margin: 6px 0; }
+
+    .sidebar-note {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      flex: 1;
+      min-width: 300px;
+    }
+    .sidebar-note h4 { font-size: 0.8rem; font-weight: 700; color: #334155; margin-bottom: 10px; }
+    .sidebar-note li { margin-bottom: 8px; }
+    .sidebar-note ul { list-style: none; padding: 0; }
+    .sidebar-note .dot-ok     { color: #16a34a; }
+    .sidebar-note .dot-warn   { color: #d97706; }
+    .sidebar-note .dot-crit   { color: #dc2626; }
+
+    /* Detail mockup */
+    .detail-mock {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      max-width: 560px;
+    }
+    .detail-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .detail-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: #e0e7ff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 700; color: #4338ca;
+    }
+    .detail-name { font-size: 0.9rem; font-weight: 600; color: #0f172a; }
+    .detail-role { font-size: 0.75rem; color: #64748b; }
+
+    .tab-bar {
+      display: flex;
+      border-bottom: 1px solid #f1f5f9;
+      padding: 0 20px;
+      overflow-x: auto;
+    }
+    .tab-bar-item {
+      padding: 10px 14px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #94a3b8;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      cursor: default;
+    }
+    .tab-bar-item.active { color: #1d4ed8; border-bottom-color: #1d4ed8; }
+    .tab-bar-item.highlight { color: #7c3aed; }
+
+    .detail-content { padding: 16px 20px; }
+    .detail-placeholder {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      font-size: 0.78rem;
+      color: #94a3b8;
+    }
+
+    @media (max-width: 768px) {
+      .page-header { padding: 24px; }
+      .tabs { padding: 0 16px; overflow-x: auto; }
+      .content { padding: 24px 16px; }
+      .feature-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ HEADER ══ -->
+<header class="page-header">
+  <h1>🗺️ Mapa de Navegação — Funcionalidades Elopar</h1>
+  <p>Análise de visibilidade e posicionamento das 7 funcionalidades implementadas na plataforma</p>
+  <div class="meta">
+    <span>📅 07/04/2026</span>
+    <span>🔧 7 funcionalidades mapeadas</span>
+    <span>📍 Stack: Next.js 14+ App Router</span>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════ TABS ══ -->
+<nav class="tabs" id="tabs">
+  <div class="tab active" onclick="showPanel('overview')">Visão Geral</div>
+  <div class="tab" onclick="showPanel('nav-map')">Mapa de Navegação</div>
+  <div class="tab" onclick="showPanel('sidebar')">Sidebar Proposta</div>
+  <div class="tab" onclick="showPanel('detail')">Detalhe do Profissional</div>
+  <div class="tab" onclick="showPanel('actions')">Ações Recomendadas</div>
+</nav>
+
+<main class="content">
+
+  <!-- ═══════════════ PANEL 1 — VISÃO GERAL ══ -->
+  <section class="panel active" id="panel-overview">
+    <p class="section-title">Diagnóstico de Visibilidade</p>
+    <p class="section-sub">Onde cada funcionalidade está hoje e qual é o problema de descobrimento</p>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#dcfce7;border:1px solid #86efac"></div> Bem posicionada — fácil de encontrar</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fef9c3;border:1px solid #fde047"></div> Semi-oculta — acessível mas não óbvia</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fee2e2;border:1px solid #fca5a5"></div> Enterrada — difícil de descobrir</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#e0f2fe;border:1px solid #7dd3fc"></div> Contextual — aparece dentro de outra página</div>
+    </div>
+
+    <div class="feature-grid">
+
+      <!-- 1 — Dashboard de Saúde dos Testes -->
+      <div class="feat-card">
+        <div class="feat-card-header">
+          <div class="feat-icon" style="background:#fef3c7">🧪</div>
+          <div>
+            <div class="feat-card-title">Dashboard de Saúde dos Testes</div>
+            <div class="feat-card-ep">EP-NEW-003 · ✅ Implementado</div>
+          </div>
+        </div>
+        <div class="feat-card-body">
+          <div class="info-row">
+            <span class="info-label">Rota atual</span>
+            <span class="info-value"><span class="path-pill">/area-usuario/saude-testes</span></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Acesso via</span>
+            <span class="info-value">Card dentro de Área do Usuário</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Visível para</span>
+            <span class="status-badge status-hidden">⚠️ Semi-oculta</span>
+          </div>
+          <div class="problem-box">
+            <strong>Problema:</strong> Só aparece como card dentro de /area-usuario. Usuário precisa saber que deve entrar na Área do Usuário para encontrá-la. Não está na sidebar principal.
+          </div>
+          <div class="rec-box">
+            💡 <strong>Recomendação:</strong> Adicionar na sidebar, seção "Admin", visível para roles <em>admin</em> e <em>gerente</em>.
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 — Gerenciamento de Usuários -->
+      <div class="feat-card">
+        <div class="feat-card-header">
+          <div class="feat-icon" style="background:#ede9fe">👥</div>
+          <div>
+            <div class="feat-card-title">Gerenciamento de Usuários (Admin)</div>
+            <div class="feat-card-ep">EP-NEW-005A · ✅ Implementado</div>
+          </div>
+        </div>
+        <div class="feat-card-body">
+          <div class="info-row">
+            <span class="info-label">Rota atual</span>
+            <span class="info-value"><span class="path-pill">/area-usuario/gerenciar-usuarios</span></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Acesso via</span>
+            <span class="info-value">Card dentro de Área do Usuário</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Visível para</span>
+            <span class="status-badge status-buried">🔴 Enterrada</span>
+          </div>
+          <div class="problem-box">
+            <strong>Problema:</strong> Uma das funcionalidades mais críticas para admin está enterrada 2 níveis abaixo (/area-usuario → card → /gerenciar-usuarios). Não aparece na sidebar.
+          </div>
+          <div class="rec-box">
+            💡 <strong>Recomendação:</strong> Adicionar diretamente na sidebar, seção "Administração", visível apenas para role <em>admin</em>.
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 — Audit Log -->
+      <div class="feat-card">
+        <div class="feat-card-header">
+          <div class="feat-icon" style="background:#fee2e2">📋</div>
+          <div>
+            <div class="feat-card-title">Audit Log</div>
+            <div class="feat-card-ep">EP-NEW-007 · ✅ Implementado</div>
+          </div>
+        </div>
+        <div class="feat-card-body">
+          <div class="info-row">
+            <span class="info-label">Rota atual</span>
+            <span class="info-value"><span class="path-pill">/area-usuario/audit-log</span></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Acesso via</span>
+            <span class="info-value">Card dentro de Área do Usuário</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Visível para</span>
+            <span class="status-badge status-buried">🔴 Enterrada</span>
+          </div>
+          <div class="problem-box">
+            <strong>Problema:</strong> Enterrada dentro de Área do Usuário. Para um audit log — ferramenta que requer acesso rápido em incidentes — isso é crítico. Não está na sidebar.
+          </div>
+          <div class="rec-box">
+            💡 <strong>Recomendação:</strong> Adicionar na sidebar, seção "Administração", visível para <em>admin</em> e <em>gerente</em>.
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 — Filtros Avançados com Favoritos -->
+      <div class="feat-card">
+        <div class="feat-card-header">
+          <div class="feat-icon" style="background:#e0f2fe">🔍</div>
+          <div>
+            <div class="feat-card-title">Filtros Avançados com Favoritos</div>
+            <div class="feat-card-ep">EP-NEW-008 · ✅ Implementado</div>
+          </div>
+        </div>
+        <div class="feat-card-body">
+          <div class="info-row">
+            <span class="info-label">Rota atual</span>
+            <span class="info-value"><span class="path-pill">/profissionais</span> (painel embutido)</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Acesso via</span>
+            <span class="info-value">Painel de filtros na lista de profissionais</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Visível para</span>
+            <span class="status-badge status-partial">🔵 Contextual</span>
+          </div>
+          <div class="problem-box">
+            <strong>Problema de descoberta:</strong> A funcionalidade de <em>salvar filtros favoritos</em> existe dentro do painel de filtros, mas não é óbvia. Muitos usuários usam filtros sem perceber que podem salvá-los com um nome.
+          </div>
+          <div class="rec-box">
+            💡 <strong>Recomendação:</strong> Está no lugar correto. Melhorar visibilidade do botão "Salvar filtro" no painel — talvez com tooltip ou destaque na primeira vez.
+          </div>
+        </div>
+      </div>
+
+      <!-- 5 — Dashboard de Métricas -->
+      <div class="feat-card">
+        <div class="feat-card-header">
+          <div class="feat-icon" style="background:#dcfce7">📊</div>
+          <div>
+            <div class="feat-card-title">Dashboard de Métricas</div>
+            <div class="feat-card-ep">EP-NEW-012 · ✅ Implementado</div>
+          </div>
+        </div>
+        <div class="feat-card-body">
+          <div class="info-row">
+            <span class="info-label">Rota atual</span>
+            <span class="info-value"><span class="path-pill">/area-usuario/metricas</span></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Acesso via</span>
+            <span class="info-value">Sidebar (condicional por e-mail!)</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Visível para</span>
+            <span class="status-badge status-buried">🔴 Crítico</span>
+          </div>
+          <div class="problem-box">
+            <strong>Problema CRÍTICO:</strong> A sidebar só mostra o link de Métricas se <code>user.email === process.env.METRICS_ALLOWED_EMAIL</code>. Ou seja, apenas <strong>1 usuário específico</strong> vê o item na sidebar. Todos os outros precisam conhecer a URL de cor.
+          </div>
+          <div class="rec-box">
+            💡 <strong>Recomendação:</strong> Substituir a lógica por email pela verificação de role (<em>admin</em> / <em>gerente</em>). Adicionar como item fixo na sidebar nessa seção.
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 — Histórico de Alterações -->
+      <div class="feat-card">
+        <div class="feat-card-header">
+          <div class="feat-icon" style="background:#f0fdf4">🕐</div>
+          <div>
+            <div class="feat-card-title">Histórico de Alterações por Profissional</div>
+            <div class="feat-card-ep">EP-NEW-013 · ✅ Implementado</div>
+          </div>
+        </div>
+        <div class="feat-card-body">
+          <div class="info-row">
+            <span class="info-label">Rota atual</span>
+            <span class="info-value"><span class="path-pill">/profissionais/[id]</span> (seção na página)</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Acesso via</span>
+            <span class="info-value">Componente <code>ProfessionalHistorico</code> na página de detalhe</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Visível para</span>
+            <span class="status-badge status-ok">✅ Correto</span>
+          </div>
+          <div class="rec-box">
+            ✅ <strong>Está bem posicionado.</strong> O histórico de alterações faz sentido estar na página do profissional. Sugestão: expor como aba dedicada no detalhe em vez de seção rolável.
+          </div>
+        </div>
+      </div>
+
+      <!-- 7 — Notas Internas -->
+      <div class="feat-card">
+        <div class="feat-card-header">
+          <div class="feat-icon" style="background:#fdf4ff">📝</div>
+          <div>
+            <div class="feat-card-title">Notas Internas</div>
+            <div class="feat-card-ep">EP-NEW-014 · ✅ Implementado</div>
+          </div>
+        </div>
+        <div class="feat-card-body">
+          <div class="info-row">
+            <span class="info-label">Rota atual</span>
+            <span class="info-value"><span class="path-pill">/profissionais/[id]</span> (seção na página)</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Acesso via</span>
+            <span class="info-value">Componente <code>ProfessionalNotes</code> — só para admin/gerente via RLS</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Visível para</span>
+            <span class="status-badge status-partial">🔵 Contextual</span>
+          </div>
+          <div class="rec-box">
+            ✅ <strong>Posicionamento correto.</strong> Notas são contextuais ao profissional. O controle por role (admin/gerente) via RLS está adequado. Sugestão: exibir aba "Notas" com contador no cabeçalho para roles autorizados.
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /feature-grid -->
+  </section>
+
+  <!-- ═══════════════ PANEL 2 — MAPA DE NAVEGAÇÃO ══ -->
+  <section class="panel" id="panel-nav-map">
+    <p class="section-title">Mapa de Navegação Atual vs Recomendado</p>
+    <p class="section-sub">Hierarquia de páginas com localização de cada funcionalidade</p>
+
+    <!-- Atual -->
+    <div class="nav-diagram">
+      <h3>📍 Estado Atual — Como está hoje</h3>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Funcionalidade</th>
+            <th>Rota</th>
+            <th>Nível de acesso na UI</th>
+            <th>Visibilidade</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🧪 Dashboard de Saúde dos Testes</td>
+            <td><span class="path-pill">/area-usuario/saude-testes</span></td>
+            <td>2 cliques (Área Usuário → Card)</td>
+            <td><span class="status-badge status-hidden">Semi-oculta</span></td>
+          </tr>
+          <tr>
+            <td>👥 Gerenciamento de Usuários</td>
+            <td><span class="path-pill">/area-usuario/gerenciar-usuarios</span></td>
+            <td>2 cliques (Área Usuário → Card)</td>
+            <td><span class="status-badge status-buried">Enterrada</span></td>
+          </tr>
+          <tr>
+            <td>📋 Audit Log</td>
+            <td><span class="path-pill">/area-usuario/audit-log</span></td>
+            <td>2 cliques (Área Usuário → Card)</td>
+            <td><span class="status-badge status-buried">Enterrada</span></td>
+          </tr>
+          <tr>
+            <td>🔍 Filtros Avançados + Favoritos</td>
+            <td><span class="path-pill">/profissionais</span></td>
+            <td>Painel embutido na lista</td>
+            <td><span class="status-badge status-partial">Contextual</span></td>
+          </tr>
+          <tr>
+            <td>📊 Dashboard de Métricas</td>
+            <td><span class="path-pill">/area-usuario/metricas</span></td>
+            <td>Sidebar (só 1 email específico!)</td>
+            <td><span class="status-badge status-buried">⚠️ Crítico</span></td>
+          </tr>
+          <tr>
+            <td>🕐 Histórico de Alterações</td>
+            <td><span class="path-pill">/profissionais/[id]</span></td>
+            <td>Seção na página do profissional</td>
+            <td><span class="status-badge status-ok">Correto</span></td>
+          </tr>
+          <tr>
+            <td>📝 Notas Internas</td>
+            <td><span class="path-pill">/profissionais/[id]</span></td>
+            <td>Seção na página (admin/gerente)</td>
+            <td><span class="status-badge status-partial">Contextual</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recomendado -->
+    <div class="nav-diagram">
+      <h3>✅ Estado Recomendado — Estrutura de navegação proposta</h3>
+
+      <div style="font-size:0.82rem;color:#475569;margin-bottom:20px;">
+        A proposta mantém as rotas existentes e os componentes contextuais, mas <strong>expõe as funcionalidades enterradas na sidebar</strong> por role ao invés de e-mail.
+      </div>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+        <span class="feat-tag tag-ok">✅ Já correto</span>
+        <span class="feat-tag tag-issue">⚠️ Mover para sidebar</span>
+        <span class="feat-tag tag-admin">🔒 Apenas admin</span>
+        <span class="feat-tag tag-role">👤 Admin + Gerente</span>
+      </div>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Seção da Sidebar</th>
+            <th>Item</th>
+            <th>Rota</th>
+            <th>Quem vê</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td rowspan="6" style="vertical-align:top;padding-top:14px;font-weight:600;color:#1e40af;">🧭 Menu Principal<br><span style="font-size:0.72rem;font-weight:400;color:#94a3b8">(todos os roles)</span></td>
+            <td>🏠 Dashboard</td>
+            <td><span class="path-pill">/dashboard</span></td>
+            <td>Todos</td>
+            <td><span class="feat-tag tag-ok">já existe</span></td>
+          </tr>
+          <tr>
+            <td>👤 Profissionais</td>
+            <td><span class="path-pill">/profissionais</span></td>
+            <td>Todos</td>
+            <td><span class="feat-tag tag-ok">já existe</span></td>
+          </tr>
+          <tr>
+            <td>🏢 Clientes</td>
+            <td><span class="path-pill">/clientes</span></td>
+            <td>Todos</td>
+            <td><span class="feat-tag tag-ok">já existe</span></td>
+          </tr>
+          <tr>
+            <td>📅 Renovações</td>
+            <td><span class="path-pill">/renovacoes</span></td>
+            <td>Todos</td>
+            <td><span class="feat-tag tag-ok">já existe</span></td>
+          </tr>
+          <tr>
+            <td>💻 Equipamentos</td>
+            <td><span class="path-pill">/equipamentos</span></td>
+            <td>Todos</td>
+            <td><span class="feat-tag tag-ok">já existe</span></td>
+          </tr>
+          <tr>
+            <td>🏖️ Férias</td>
+            <td><span class="path-pill">/ferias</span></td>
+            <td>Todos</td>
+            <td><span class="feat-tag tag-ok">já existe</span></td>
+          </tr>
+          <tr>
+            <td rowspan="2" style="vertical-align:top;padding-top:14px;font-weight:600;color:#0369a1;">📊 Analytics<br><span style="font-size:0.72rem;font-weight:400;color:#94a3b8">(admin + gerente)</span></td>
+            <td>📊 Dashboard de Métricas</td>
+            <td><span class="path-pill">/area-usuario/metricas</span></td>
+            <td>Admin, Gerente</td>
+            <td><span class="feat-tag tag-issue">⚠️ mover</span></td>
+          </tr>
+          <tr>
+            <td>🧪 Saúde dos Testes</td>
+            <td><span class="path-pill">/area-usuario/saude-testes</span></td>
+            <td>Admin, Gerente</td>
+            <td><span class="feat-tag tag-issue">⚠️ mover</span></td>
+          </tr>
+          <tr>
+            <td rowspan="2" style="vertical-align:top;padding-top:14px;font-weight:600;color:#6d28d9;">🔒 Administração<br><span style="font-size:0.72rem;font-weight:400;color:#94a3b8">(admin + gerente)</span></td>
+            <td>👥 Gerenciar Usuários</td>
+            <td><span class="path-pill">/area-usuario/gerenciar-usuarios</span></td>
+            <td>Apenas Admin</td>
+            <td><span class="feat-tag tag-issue">⚠️ mover</span></td>
+          </tr>
+          <tr>
+            <td>📋 Audit Log</td>
+            <td><span class="path-pill">/area-usuario/audit-log</span></td>
+            <td>Admin, Gerente</td>
+            <td><span class="feat-tag tag-issue">⚠️ mover</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;color:#475569;">📄 Detalhe do Profissional<br><span style="font-size:0.72rem;font-weight:400;color:#94a3b8">(contextual)</span></td>
+            <td>🔍 Filtros Favoritos · 🕐 Histórico · 📝 Notas Internas</td>
+            <td><span class="path-pill">/profissionais/[id]</span></td>
+            <td>Variado por feature</td>
+            <td><span class="feat-tag tag-ok">correto</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════ PANEL 3 — SIDEBAR PROPOSTA ══ -->
+  <section class="panel" id="panel-sidebar">
+    <p class="section-title">Sidebar Proposta</p>
+    <p class="section-sub">Mockup visual da sidebar com as funcionalidades posicionadas corretamente</p>
+
+    <div class="mockup-wrap">
+      <!-- Sidebar visual -->
+      <div class="sidebar-mock">
+        <div class="sidebar-logo">
+          <div class="sidebar-logo-icon">👥</div>
+          <div>
+            <div class="sidebar-logo-text">Grupo Elopar</div>
+            <div class="sidebar-logo-sub">Gestão de Profissionais</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section-label">Menu</div>
+        <div class="sidebar-item active"><span class="item-icon">🏠</span> Dashboard</div>
+        <div class="sidebar-item"><span class="item-icon">👤</span> Profissionais</div>
+        <div class="sidebar-item"><span class="item-icon">🏢</span> Clientes</div>
+        <div class="sidebar-item"><span class="item-icon">📅</span> Renovações <span class="badge badge-new" style="margin-left:auto">3</span></div>
+        <div class="sidebar-item"><span class="item-icon">💻</span> Equipamentos</div>
+        <div class="sidebar-item"><span class="item-icon">🏖️</span> Férias</div>
+        <div class="sidebar-item"><span class="item-icon">🔔</span> Notificações</div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section-label">Analytics</div>
+        <div class="sidebar-item" style="color:#0369a1;"><span class="item-icon">📊</span> Métricas <span class="badge badge-mgr">Ger+</span></div>
+        <div class="sidebar-item" style="color:#0369a1;"><span class="item-icon">🧪</span> Saúde dos Testes <span class="badge badge-mgr">Ger+</span></div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section-label">Administração</div>
+        <div class="sidebar-item admin-only"><span class="item-icon">👥</span> Usuários <span class="badge badge-admin">Admin</span></div>
+        <div class="sidebar-item admin-only"><span class="item-icon">📋</span> Audit Log <span class="badge badge-mgr">Ger+</span></div>
+        <div class="sidebar-item admin-only"><span class="item-icon">🔑</span> Permissões <span class="badge badge-admin">Admin</span></div>
+
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-item"><span class="item-icon">⚙️</span> Área do Usuário</div>
+      </div>
+
+      <!-- Legenda da sidebar -->
+      <div class="sidebar-note">
+        <h4>Notas sobre a sidebar proposta</h4>
+        <ul>
+          <li>
+            <span class="dot-ok">●</span> <strong>Menu Principal</strong> — sem mudanças. Os 7 itens existentes continuam para todos os roles.
+          </li>
+          <li>
+            <span class="dot-warn">●</span> <strong>Seção Analytics</strong> — nova seção com <em>Dashboard de Métricas</em> e <em>Saúde dos Testes</em>.<br>
+            Visível para roles <code>admin</code> e <code>gerente</code>.<br>
+            <strong>Remove a lógica por e-mail</strong> (<code>METRICS_ALLOWED_EMAIL</code>) que só mostrava Métricas para 1 usuário.
+          </li>
+          <li>
+            <span class="dot-crit">●</span> <strong>Seção Administração</strong> — nova seção com <em>Gerenciar Usuários</em>, <em>Audit Log</em> e <em>Permissões</em>.<br>
+            Audit Log visível para <code>admin</code> + <code>gerente</code>.<br>
+            Usuários e Permissões: somente <code>admin</code>.
+          </li>
+          <li>
+            <span class="dot-ok">●</span> <strong>Área do Usuário</strong> — mantida como destino para perfil pessoal (foto, dados), mas deixa de ser o hub escondido das ferramentas admin.
+          </li>
+        </ul>
+
+        <br>
+        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;font-size:0.78rem;color:#9a3412;">
+          <strong>Implementação no código:</strong><br>
+          Substituir em <code>layout.tsx</code>:<br>
+          <code style="font-size:0.72rem">showMetrics={'{'}user.email === process.env.METRICS_ALLOWED_EMAIL{'}'}</code><br>
+          Por verificação de role no perfil do usuário (já disponível no layout via Supabase).
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ PANEL 4 — DETALHE DO PROFISSIONAL ══ -->
+  <section class="panel" id="panel-detail">
+    <p class="section-title">Detalhe do Profissional — Funcionalidades Contextuais</p>
+    <p class="section-sub">Histórico de Alterações e Notas Internas ficam bem nesta página — mas a experiência de navegação pode melhorar</p>
+
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;margin-bottom:32px;">
+      <!-- Mockup atual -->
+      <div>
+        <p style="font-size:0.8rem;font-weight:600;color:#64748b;margin-bottom:10px;">📍 Como está hoje (scroll vertical)</p>
+        <div class="detail-mock" style="max-width:400px;">
+          <div class="detail-header">
+            <div class="detail-avatar">JS</div>
+            <div>
+              <div class="detail-name">João Silva</div>
+              <div class="detail-role">Dev Sênior · Cliente ABC</div>
+            </div>
+          </div>
+          <div class="detail-content" style="padding:12px 20px;">
+            <div style="font-size:0.72rem;color:#94a3b8;margin-bottom:8px;font-weight:600;text-transform:uppercase;">Conteúdo em scroll ↓</div>
+            <div style="background:#f8fafc;border-radius:6px;padding:10px 12px;font-size:0.75rem;color:#475569;margin-bottom:8px;">📄 Dados do Contrato</div>
+            <div style="background:#f8fafc;border-radius:6px;padding:10px 12px;font-size:0.75rem;color:#475569;margin-bottom:8px;">💰 Dados Financeiros</div>
+            <div style="background:#f8fafc;border-radius:6px;padding:10px 12px;font-size:0.75rem;color:#475569;margin-bottom:8px;">🏖️ Férias</div>
+            <div style="background:#f8fafc;border-radius:6px;padding:10px 12px;font-size:0.75rem;color:#475569;margin-bottom:8px;">📞 Contato</div>
+            <div style="background:#f8fafc;border-radius:6px;padding:10px 12px;font-size:0.75rem;color:#475569;margin-bottom:8px;">💻 Equipamento</div>
+            <div style="background:#fef3c7;border-radius:6px;padding:10px 12px;font-size:0.75rem;color:#92400e;margin-bottom:8px;border:1px solid #fde68a;">🕐 Histórico de Alterações ← muito abaixo</div>
+            <div style="background:#fdf4ff;border-radius:6px;padding:10px 12px;font-size:0.75rem;color:#6b21a8;border:1px solid #e9d5ff;">📝 Notas Internas ← muito abaixo</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mockup proposto -->
+      <div>
+        <p style="font-size:0.8rem;font-weight:600;color:#64748b;margin-bottom:10px;">✅ Proposta com abas</p>
+        <div class="detail-mock" style="max-width:500px;">
+          <div class="detail-header">
+            <div class="detail-avatar">JS</div>
+            <div>
+              <div class="detail-name">João Silva</div>
+              <div class="detail-role">Dev Sênior · Cliente ABC</div>
+            </div>
+          </div>
+          <div class="tab-bar">
+            <div class="tab-bar-item active">Dados</div>
+            <div class="tab-bar-item">Financeiro</div>
+            <div class="tab-bar-item">Férias</div>
+            <div class="tab-bar-item highlight">🕐 Histórico</div>
+            <div class="tab-bar-item highlight">📝 Notas <span style="background:#ede9fe;color:#6d28d9;font-size:0.6rem;padding:1px 5px;border-radius:4px;margin-left:4px;">3</span></div>
+          </div>
+          <div class="detail-content">
+            <div class="detail-placeholder">
+              Conteúdo da aba selecionada<br>
+              <span style="font-size:0.7rem;margin-top:4px;display:block">Histórico e Notas ganham visibilidade imediata como abas</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-diagram">
+      <h3>Análise das funcionalidades contextuais</h3>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Funcionalidade</th>
+            <th>Posição atual</th>
+            <th>Problema</th>
+            <th>Solução proposta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🔍 Filtros Avançados + Favoritos</td>
+            <td>Painel lateral em /profissionais</td>
+            <td>Funcionalidade de <em>salvar</em> filtro não é visualmente destacada</td>
+            <td>Destacar botão "⭐ Salvar filtro" com tooltip na primeira interação</td>
+          </tr>
+          <tr>
+            <td>🕐 Histórico de Alterações</td>
+            <td>Seção ao final de /profissionais/[id]</td>
+            <td>Requer muito scroll para chegar. Usuário pode não saber que existe.</td>
+            <td>Transformar em aba no detalhe do profissional, acessível de imediato</td>
+          </tr>
+          <tr>
+            <td>📝 Notas Internas</td>
+            <td>Seção ao final de /profissionais/[id]</td>
+            <td>Só visível para admin/gerente, mas sequer aparece visualmente para outros roles</td>
+            <td>Aba com badge de contagem visível apenas para admin/gerente; oculta para outros</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════ PANEL 5 — AÇÕES RECOMENDADAS ══ -->
+  <section class="panel" id="panel-actions">
+    <p class="section-title">Ações Recomendadas</p>
+    <p class="section-sub">Ordenadas por impacto na descoberta das funcionalidades</p>
+
+    <div class="actions-grid">
+
+      <div class="action-card">
+        <div class="action-priority prio-critical">Crítico</div>
+        <div class="action-title">🔴 Corrigir lógica de exibição do Dashboard de Métricas</div>
+        <div class="action-desc">
+          Em <code>src/app/(dashboard)/layout.tsx</code>, substituir <code>showMetrics={'{'}user.email === process.env.METRICS_ALLOWED_EMAIL{'}'}</code> por verificação de role (<code>profile.role === 'admin' || profile.role === 'gerente'</code>). Hoje apenas 1 usuário vê o link.
+        </div>
+      </div>
+
+      <div class="action-card">
+        <div class="action-priority prio-high">Alta</div>
+        <div class="action-title">🟡 Adicionar seção "Administração" na Sidebar</div>
+        <div class="action-desc">
+          Criar nova seção na sidebar com links diretos para <em>Gerenciar Usuários</em>, <em>Audit Log</em> e <em>Permissões</em>. Controlar visibilidade por role no componente <code>Sidebar</code>, recebendo o role via prop do layout.
+        </div>
+      </div>
+
+      <div class="action-card">
+        <div class="action-priority prio-high">Alta</div>
+        <div class="action-title">🟡 Adicionar seção "Analytics" na Sidebar</div>
+        <div class="action-desc">
+          Criar seção "Analytics" com links para <em>Dashboard de Métricas</em> e <em>Saúde dos Testes</em>, visíveis para admin e gerente. Unificar com a correção do item anterior.
+        </div>
+      </div>
+
+      <div class="action-card">
+        <div class="action-priority prio-medium">Média</div>
+        <div class="action-title">🔵 Transformar Histórico e Notas em abas no detalhe</div>
+        <div class="action-desc">
+          Refatorar <code>/profissionais/[id]/page.tsx</code> para usar um sistema de abas. Histórico e Notas ganhariam acesso com 1 clique em vez de scroll. Notas mostrariam badge com contagem para admin/gerente.
+        </div>
+      </div>
+
+      <div class="action-card">
+        <div class="action-priority prio-medium">Média</div>
+        <div class="action-title">🔵 Destacar "Salvar Filtro" no painel de profissionais</div>
+        <div class="action-desc">
+          Adicionar destaque visual ou tooltip "Salve este filtro para usar depois ⭐" na primeira vez que o usuário aplica um filtro. A funcionalidade existe mas não é descobrível.
+        </div>
+      </div>
+
+      <div class="action-card">
+        <div class="action-priority prio-low">Baixa</div>
+        <div class="action-title">🟢 Revisar Área do Usuário como hub de ferramentas</div>
+        <div class="action-desc">
+          Após mover as ferramentas admin para a sidebar, a Área do Usuário pode focar apenas em <em>Perfil pessoal</em> e <em>Preferências</em>. Remover os cards de ferramentas admin de lá para evitar duplicidade.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Resumo esforço -->
+    <div class="nav-diagram" style="margin-top:32px;">
+      <h3>📐 Estimativa de esforço (referência)</h3>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Ação</th>
+            <th>Arquivos afetados</th>
+            <th>Esforço estimado</th>
+            <th>Impacto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Corrigir lógica Métricas (email→role)</td>
+            <td><code>layout.tsx</code>, <code>sidebar.tsx</code></td>
+            <td>~30 min</td>
+            <td>🔴 Alto — desbloqueia feature para toda equipe</td>
+          </tr>
+          <tr>
+            <td>Seção Administração na Sidebar</td>
+            <td><code>sidebar.tsx</code>, <code>layout.tsx</code></td>
+            <td>~2h</td>
+            <td>🟡 Alto — 3 features enterradas ganham visibilidade</td>
+          </tr>
+          <tr>
+            <td>Seção Analytics na Sidebar</td>
+            <td><code>sidebar.tsx</code> (junto com item acima)</td>
+            <td>~30 min extra</td>
+            <td>🟡 Alto — junto com correção Métricas</td>
+          </tr>
+          <tr>
+            <td>Abas no detalhe do profissional</td>
+            <td><code>profissionais/[id]/page.tsx</code></td>
+            <td>~3-4h</td>
+            <td>🔵 Médio — melhora UX de Histórico e Notas</td>
+          </tr>
+          <tr>
+            <td>Destaque Salvar Filtro</td>
+            <td><code>professionals-filters.tsx</code>, <code>saved-filters.tsx</code></td>
+            <td>~1h</td>
+            <td>🔵 Médio — melhora descoberta de filtros favoritos</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  function showPanel(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+    document.getElementById('panel-' + name).classList.add('active');
+    const tabs = document.querySelectorAll('.tab');
+    const map = { overview: 0, 'nav-map': 1, sidebar: 2, detail: 3, actions: 4 };
+    tabs[map[name]].classList.add('active');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
