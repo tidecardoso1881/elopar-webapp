@@ -21,7 +21,16 @@ export default async function MetricasPage({ searchParams }: PageProps) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user || user.email !== process.env.METRICS_ALLOWED_EMAIL) {
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user?.id ?? '')
+    .single()
+
+  const isAdminOrManager =
+    profile?.role === 'admin' || profile?.role === 'gerente' || profile?.role === 'manager'
+
+  if (!user || !isAdminOrManager) {
     redirect('/area-usuario')
   }
 
