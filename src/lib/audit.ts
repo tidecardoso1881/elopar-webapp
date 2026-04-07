@@ -46,14 +46,15 @@ export async function logAudit({
 
     const adminClient = createAdminClient()
 
+    // Cast necessário: overload do Supabase client não resolve corretamente com Database genérico
     const { error } = await adminClient.from('audit_log').insert({
       user_id: user.id,
       entidade,
       entidade_id,
       acao,
-      dados_antes: dados_antes ?? null,
-      dados_depois: dados_depois ?? null,
-    })
+      dados_antes: dados_antes as never,
+      dados_depois: dados_depois as never,
+    } as never)
 
     if (error) {
       // Log silencioso — não propaga o erro para não afetar a operação principal

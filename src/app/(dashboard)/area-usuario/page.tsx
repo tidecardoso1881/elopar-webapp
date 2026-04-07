@@ -20,6 +20,7 @@ export default async function AreaUsuarioPage() {
     .single()
 
   const isAdmin = profile?.role === 'admin'
+  const showMetrics = user.email === process.env.METRICS_ALLOWED_EMAIL
 
   return (
     <div className="space-y-6">
@@ -83,6 +84,25 @@ export default async function AreaUsuarioPage() {
             </div>
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
               <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">Admin</span>
+              <span className="text-blue-600 font-semibold text-sm">Acessar →</span>
+            </div>
+          </Link>
+        )}
+        {showMetrics && (
+          <Link
+            href="/area-usuario/metricas"
+            className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">📊 Métricas Kanban</h3>
+                <p className="text-sm text-gray-600 mt-2">
+                  Dashboard operacional do processo de desenvolvimento — Lead Time, Cycle Time, WIP e Throughput.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+              <span className="inline-block px-3 py-1 bg-purple-100 text-purple-800 text-xs font-bold rounded-full">Owner</span>
               <span className="text-blue-600 font-semibold text-sm">Acessar →</span>
             </div>
           </Link>

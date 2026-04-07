@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'Notificações',
 }
 
-const URGENCY_CONFIG = {
+const URGENCY_CONFIG: Record<string, { label: string; icon: string; bg: string; border: string; text: string }> = {
   expired: { label: 'Vencido',      icon: '🔴', bg: 'bg-red-50',    border: 'border-red-200',    text: 'text-red-700'    },
   critical: { label: '≤30 dias',    icon: '🔴', bg: 'bg-red-50',    border: 'border-red-200',    text: 'text-red-700'    },
   warning:  { label: '≤60 dias',    icon: '🟡', bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700' },
