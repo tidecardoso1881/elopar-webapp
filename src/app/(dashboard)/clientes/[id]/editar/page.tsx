@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
+import { canWrite } from '@/types/roles'
 import { ClientForm } from '@/components/clientes/client-form'
 import { updateClientAction, type ClientActionResult } from '@/actions/clients'
 
@@ -11,6 +12,11 @@ interface EditarClientePageProps {
 export default async function EditarClientePage({ params }: EditarClientePageProps) {
   const { id } = await params
   const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  if (!canWrite(profile?.role)) redirect('/clientes')
 
   const { data: client, error } = await supabase
     .from('clients')

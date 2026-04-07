@@ -1,8 +1,16 @@
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import { canWrite } from '@/types/roles'
 import { ClientForm } from '@/components/clientes/client-form'
 import { createClientAction } from '@/actions/clients'
 
-export default function NovoClientePage() {
+export default async function NovoClientePage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  if (!canWrite(profile?.role)) redirect('/clientes')
   return (
     <div className="space-y-6 max-w-xl">
       {/* Breadcrumb + Header */}
