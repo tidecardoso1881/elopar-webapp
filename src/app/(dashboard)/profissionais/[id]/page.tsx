@@ -1,8 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { formatDate, formatCurrency, getRenewalStatus, daysUntil } from '@/lib/utils/formatting'
 import { ProfessionalActions } from '@/components/profissionais/professional-actions'
+import { ProfessionalHistorico } from '@/components/profissionais/ProfessionalHistorico'
 import type { Metadata } from 'next'
 
 interface ProfissionalDetailPageProps {
@@ -394,6 +396,21 @@ export default async function ProfissionalDetailPage({ params }: ProfissionalDet
               <InfoField label="Atualizado em" value={formatDate(professional.updated_at)} />
             </div>
           </SectionCard>
+        </div>
+      </div>
+
+      {/* Histórico de Alterações */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-100">
+          <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h2 className="text-sm font-semibold text-gray-700">Histórico de Alterações</h2>
+        </div>
+        <div className="p-5">
+          <Suspense fallback={<p className="text-sm text-gray-400 text-center py-6">Carregando histórico...</p>}>
+            <ProfessionalHistorico profissionalId={professional.id} />
+          </Suspense>
         </div>
       </div>
     </div>
