@@ -15,6 +15,8 @@ export default async function PerfilPage() {
     .eq('id', user.id)
     .single()
 
+  // TODO: avatar_url será adicionado quando coluna for criada no schema
+
   return (
     <div className="max-w-lg mx-auto py-8 px-4">
       <div className="mb-6">
@@ -24,7 +26,7 @@ export default async function PerfilPage() {
 
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <AvatarUpload
-          currentUrl={profile?.avatar_url ?? null}
+          currentUrl={null}
           initials={(profile?.full_name ?? user.email ?? 'U').charAt(0).toUpperCase()}
         />
 
