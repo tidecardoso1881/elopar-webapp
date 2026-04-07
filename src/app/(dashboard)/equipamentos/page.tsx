@@ -102,7 +102,7 @@ export default async function EquipamentosPage({ searchParams }: EquipamentosPag
 
         {/* Filtros */}
         <div className="px-5 py-4 border-b border-gray-100">
-          <Suspense>
+          <Suspense fallback={<div className="h-10 rounded-lg bg-gray-100 animate-pulse" />}>
             <EquipmentFilters />
           </Suspense>
         </div>
