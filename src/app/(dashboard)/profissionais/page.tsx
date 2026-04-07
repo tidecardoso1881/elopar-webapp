@@ -3,6 +3,7 @@ import { ProfessionalsFilters } from '@/components/profissionais/professionals-f
 import { ProfessionalsTable } from '@/components/profissionais/professionals-table'
 import { ExportButton } from '@/components/profissionais/export-button'
 import { getRenewalStatus } from '@/lib/utils/formatting'
+import { canWrite } from '@/types/roles'
 import { Suspense } from 'react'
 import Link from 'next/link'
 import type { Metadata } from 'next'
@@ -50,6 +51,15 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
   const to = from + PAGE_SIZE - 1
 
   const supabase = await createClient()
+
+  // Busca role do usuário para controle de escrita
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data: userProfile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user?.id ?? '')
+    .single()
+  const userCanWrite = canWrite(userProfile?.role)
 
   // Busca clientes para o filtro
   const { data: clients } = await supabase
@@ -144,15 +154,17 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
           <Suspense>
             <ExportButton />
           </Suspense>
-          <Link
-            href="/profissionais/novo"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-xs sm:text-sm font-medium text-white hover:bg-indigo-700 active:scale-95 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all min-h-10"
-          >
-            <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            <span>Novo</span>
-          </Link>
+          {userCanWrite && (
+            <Link
+              href="/profissionais/novo"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-xs sm:text-sm font-medium text-white hover:bg-indigo-700 active:scale-95 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all min-h-10"
+            >
+              <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              <span>Novo</span>
+            </Link>
+          )}
         </div>
       </div>
 

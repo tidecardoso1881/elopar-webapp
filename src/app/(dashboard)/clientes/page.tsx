@@ -85,16 +85,18 @@ export default async function ClientesPage() {
                 : 0
 
             return (
-              <Link
+              <div
                 key={client.client_id}
-                href={`/clientes/${client.client_id}`}
                 className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col"
               >
                 {/* Card Header */}
                 <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-gray-100 flex items-center justify-between gap-2 min-h-16">
-                  <h2 className="text-base sm:text-lg font-bold text-gray-900 truncate">
+                  <Link
+                    href={`/clientes/${client.client_id}`}
+                    className="text-base sm:text-lg font-bold text-gray-900 truncate hover:text-indigo-600 transition-colors"
+                  >
                     {client.client_name}
-                  </h2>
+                  </Link>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <Link
                       href={`/clientes/${client.client_id}/editar`}
@@ -174,7 +176,7 @@ export default async function ClientesPage() {
                     Ver profissionais
                   </Link>
                 </div>
-              </Link>
+              </div>
             )
           })}
         </div>

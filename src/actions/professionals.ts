@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { logAudit } from '@/lib/audit'
+import { requireWriteAccess } from '@/lib/auth-check'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -134,10 +135,12 @@ export async function createProfessional(
   _prevState: ActionResult,
   formData: FormData
 ): Promise<ActionResult> {
+  const authResult = await requireWriteAccess()
+  if (authResult.error) return { error: authResult.error }
+
   const supabase = await createClient()
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (!user || authError) return { error: 'Não autorizado.' }
+  const { data: { user } } = await supabase.auth.getUser()
 
   const data: ProfessionalFormData = {
     name: formData.get('name') as string,
@@ -205,10 +208,12 @@ export async function updateProfessional(
   _prevState: ActionResult,
   formData: FormData
 ): Promise<ActionResult> {
+  const authResult = await requireWriteAccess()
+  if (authResult.error) return { error: authResult.error }
+
   const supabase = await createClient()
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (!user || authError) return { error: 'Não autorizado.' }
+  const { data: { user } } = await supabase.auth.getUser()
 
   const data: ProfessionalFormData = {
     name: formData.get('name') as string,
@@ -279,10 +284,12 @@ export async function updateProfessional(
 // ─── SOFT DELETE (status → DESLIGADO) ─────────────────────────────────────────
 
 export async function deleteProfessional(id: string): Promise<ActionResult> {
+  const authResult = await requireWriteAccess()
+  if (authResult.error) return { error: authResult.error }
+
   const supabase = await createClient()
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (!user || authError) return { error: 'Não autorizado.' }
+  const { data: { user } } = await supabase.auth.getUser()
 
   const { data: antes } = await supabase
     .from('professionals')
@@ -326,10 +333,12 @@ export async function renewProfessional(
     return { error: 'Data de renovação inválida. Use o formato YYYY-MM-DD.' }
   }
 
+  const authResult = await requireWriteAccess()
+  if (authResult.error) return { error: authResult.error }
+
   const supabase = await createClient()
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (!user || authError) return { error: 'Não autorizado.' }
+  const { data: { user } } = await supabase.auth.getUser()
 
   const { error } = await supabase
     .from('professionals')

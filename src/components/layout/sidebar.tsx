@@ -1,7 +1,9 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import Link from 'next/link'
 import { SignOutButton } from '@/components/auth/sign-out-button'
+import { getRoleLabel } from '@/types/roles'
 
 interface SidebarProps {
   user: { email: string }
@@ -80,7 +82,7 @@ export function Sidebar({ user, profile, renewalBadge, showMetrics = false }: Si
   const pathname = usePathname()
 
   const displayName = profile?.full_name ?? user.email ?? 'Usuário'
-  const roleDisplay = profile?.role === 'admin' ? 'Administrador' : 'Gerente'
+  const roleDisplay = getRoleLabel(profile?.role)
   const initials = displayName.charAt(0).toUpperCase()
 
   return (
@@ -112,7 +114,7 @@ export function Sidebar({ user, profile, renewalBadge, showMetrics = false }: Si
           const isActive = pathname === item.href
           return (
             <div key={item.href} className="relative">
-              <a
+              <Link
                 href={item.href}
                 className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                   isActive
@@ -125,14 +127,14 @@ export function Sidebar({ user, profile, renewalBadge, showMetrics = false }: Si
                   {item.label}
                   {item.label === 'Renovações' && renewalBadge}
                 </span>
-              </a>
+              </Link>
             </div>
           )
         })}
 
         {showMetrics && (
           <div className="relative">
-            <a
+            <Link
               href="/area-usuario/metricas"
               className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                 pathname === '/area-usuario/metricas'
@@ -146,7 +148,7 @@ export function Sidebar({ user, profile, renewalBadge, showMetrics = false }: Si
                 </svg>
               </span>
               <span>Métricas</span>
-            </a>
+            </Link>
           </div>
         )}
       </nav>

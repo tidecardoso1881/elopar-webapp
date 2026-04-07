@@ -141,7 +141,7 @@ export default async function ProfissionalDetailPage({ params }: ProfissionalDet
                   <>
                     <span className="mx-1.5 text-gray-300">·</span>
                     <Link
-                      href={`/clientes`}
+                      href={`/clientes/${professional.client.id}`}
                       className="text-indigo-600 hover:text-indigo-700 transition-colors"
                     >
                       {professional.client.name}
