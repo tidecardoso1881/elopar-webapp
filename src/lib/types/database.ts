@@ -196,33 +196,40 @@ export type Database = {
       }
       professional_notes: {
         Row: {
+          author_id: string
+          content: string
+          created_at: string | null
+          deleted_at: string | null
           id: string
           professional_id: string
-          author_id: string
-          content: string
-          created_at: string
-          updated_at: string
-          deleted_at: string | null
+          updated_at: string | null
         }
         Insert: {
-          id?: string
-          professional_id: string
           author_id: string
           content: string
-          created_at?: string
-          updated_at?: string
+          created_at?: string | null
           deleted_at?: string | null
+          id?: string
+          professional_id: string
+          updated_at?: string | null
         }
         Update: {
-          id?: string
-          professional_id?: string
           author_id?: string
           content?: string
-          created_at?: string
-          updated_at?: string
+          created_at?: string | null
           deleted_at?: string | null
+          id?: string
+          professional_id?: string
+          updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "professional_notes_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "professional_notes_professional_id_fkey"
             columns: ["professional_id"]
@@ -231,12 +238,12 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "professional_notes_author_id_fkey"
-            columns: ["author_id"]
+            foreignKeyName: "professional_notes_professional_id_fkey"
+            columns: ["professional_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "v_renewal_alerts"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       professionals: {
@@ -356,6 +363,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
           full_name: string | null
           id: string
@@ -364,6 +372,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           full_name?: string | null
           id: string
@@ -372,6 +381,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           full_name?: string | null
           id?: string

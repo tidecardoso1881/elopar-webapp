@@ -49,11 +49,12 @@ export async function uploadAvatar(formData: FormData): Promise<ActionResult & {
     .from('avatars')
     .getPublicUrl(path)
 
-  // TODO: avatar_url será atualizado quando coluna for criada no schema
-  // const { error: updateError } = await supabase
-  //   .from('profiles')
-  //   .update({ avatar_url: publicUrl })
-  //   .eq('id', user.id)
+  const { error: updateError } = await supabase
+    .from('profiles')
+    .update({ avatar_url: publicUrl })
+    .eq('id', user.id)
+
+  if (updateError) return { error: updateError.message }
 
   revalidatePath('/area-usuario/perfil')
   revalidatePath('/', 'layout')
