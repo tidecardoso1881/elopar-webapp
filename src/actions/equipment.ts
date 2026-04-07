@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { requireWriteAccess } from '@/lib/auth-check'
+import { handleActionError } from '@/lib/errors'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { logAudit } from '@/lib/audit'
@@ -63,7 +64,7 @@ export async function createEquipment(
 
   if (error) {
     console.error('[createEquipment]', error)
-    return { error: `Erro ao criar equipamento: ${error.message}` }
+    return { error: handleActionError(error) }
   }
 
   await logAudit({
@@ -125,7 +126,7 @@ export async function updateEquipment(
 
   if (error) {
     console.error('[updateEquipment]', error)
-    return { error: `Erro ao atualizar: ${error.message}` }
+    return { error: handleActionError(error) }
   }
 
   await logAudit({
@@ -162,7 +163,7 @@ export async function deleteEquipment(id: string): Promise<ActionResult> {
 
   if (error) {
     console.error('[deleteEquipment]', error)
-    return { error: `Erro ao excluir equipamento: ${error.message}` }
+    return { error: handleActionError(error) }
   }
 
   await logAudit({

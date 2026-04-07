@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { requireWriteAccess } from '@/lib/auth-check'
+import { handleActionError } from '@/lib/errors'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { logAudit } from '@/lib/audit'
@@ -38,7 +39,7 @@ export async function createClientAction(
     if (error.code === '23505') {
       return { error: 'Já existe um cliente com esse nome.' }
     }
-    return { error: `Erro ao criar cliente: ${error.message}` }
+    return { error: handleActionError(error) }
   }
 
   await logAudit({
@@ -86,7 +87,7 @@ export async function updateClientAction(
     if (error.code === '23505') {
       return { error: 'Já existe um cliente com esse nome.' }
     }
-    return { error: `Erro ao atualizar cliente: ${error.message}` }
+    return { error: handleActionError(error) }
   }
 
   await logAudit({
@@ -133,7 +134,7 @@ export async function deleteClientAction(id: string): Promise<ClientActionResult
     .eq('id', id)
 
   if (error) {
-    return { error: `Erro ao excluir cliente: ${error.message}` }
+    return { error: handleActionError(error) }
   }
 
   await logAudit({

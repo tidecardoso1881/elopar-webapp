@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { formatDate } from '@/lib/utils/formatting'
 import { NovoUsuarioModal } from './novo-usuario-modal'
 import { DesativarUsuarioModal } from './desativar-usuario-modal'
+import { PermissionsModal } from './permissions-modal'
 import { reactivateUserAction, resendInviteAction } from '@/app/(dashboard)/area-usuario/gerenciar-usuarios/actions'
+import type { UserPermissions } from '@/types/permissions'
 
 export type UserStatus = 'ativo' | 'pendente' | 'desativado'
 
@@ -16,6 +18,7 @@ export interface UserRow {
   status: UserStatus
   created_at: string
   last_sign_in_at: string | null
+  permissions?: UserPermissions | null
 }
 
 interface Props {
@@ -24,8 +27,17 @@ interface Props {
 }
 
 const ROLE_BADGE: Record<string, string> = {
-  admin: 'bg-blue-100 text-blue-800',
-  manager: 'bg-green-100 text-green-700',
+  admin:    'bg-blue-100 text-blue-800',
+  gerente:  'bg-green-100 text-green-700',
+  manager:  'bg-green-100 text-green-700',
+  consulta: 'bg-gray-100 text-gray-600',
+}
+
+const ROLE_LABEL: Record<string, string> = {
+  admin:    'Admin',
+  gerente:  'Gerente',
+  manager:  'Manager',
+  consulta: 'Consulta',
 }
 
 const STATUS_DOT: Record<UserStatus, string> = {
@@ -52,6 +64,7 @@ export function UsuariosTable({ users, currentUserId }: Props) {
   const [search, setSearch] = useState('')
   const [showNovo, setShowNovo] = useState(false)
   const [deactivating, setDeactivating] = useState<UserRow | null>(null)
+  const [editingPermissions, setEditingPermissions] = useState<UserRow | null>(null)
   const [pendingAction, setPendingAction] = useState<string | null>(null)
 
   const counts = {
@@ -175,7 +188,7 @@ export function UsuariosTable({ users, currentUserId }: Props) {
                       </td>
                       <td className="px-3 py-2.5">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${ROLE_BADGE[u.role] ?? 'bg-gray-100 text-gray-500'}`}>
-                          {u.role === 'admin' ? 'Admin' : 'Manager'}
+                          {ROLE_LABEL[u.role] ?? u.role}
                         </span>
                       </td>
                       <td className="px-3 py-2.5">
@@ -220,6 +233,13 @@ export function UsuariosTable({ users, currentUserId }: Props) {
                               🚫
                             </button>
                           )}
+                          <button
+                            onClick={() => setEditingPermissions(u)}
+                            title="Editar permissões"
+                            className="border border-gray-200 rounded-md px-2 py-1 text-xs text-gray-500 hover:border-indigo-400 hover:text-indigo-600 transition-colors"
+                          >
+                            🔑
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -237,6 +257,15 @@ export function UsuariosTable({ users, currentUserId }: Props) {
           userId={deactivating.id}
           userName={deactivating.full_name ?? deactivating.email}
           onClose={() => setDeactivating(null)}
+        />
+      )}
+      {editingPermissions && (
+        <PermissionsModal
+          userId={editingPermissions.id}
+          userName={editingPermissions.full_name ?? editingPermissions.email}
+          currentRole={editingPermissions.role}
+          currentPermissions={editingPermissions.permissions ?? null}
+          onClose={() => setEditingPermissions(null)}
         />
       )}
     </>

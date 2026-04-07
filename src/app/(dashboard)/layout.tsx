@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/header'
 import { RenewalBadge } from '@/components/renovacoes/renewal-badge'
 import { NotificationBell } from '@/components/layout/notification-bell'
 import { CommandPalette } from '@/components/GlobalSearch/CommandPalette'
+import { OfflineBanner } from '@/components/offline-banner'
 
 export default async function DashboardLayout({
   children,
@@ -31,7 +32,7 @@ export default async function DashboardLayout({
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar - Hidden on mobile, visible on md+ */}
       <div className="hidden md:flex">
-        <Sidebar user={{ email: user.email ?? '' }} profile={profile} renewalBadge={<RenewalBadge />} showMetrics={user.email === process.env.METRICS_ALLOWED_EMAIL} />
+        <Sidebar renewalBadge={<RenewalBadge />} showMetrics={user.email === process.env.METRICS_ALLOWED_EMAIL} />
       </div>
 
       <main className="flex-1 flex flex-col overflow-hidden">
@@ -43,6 +44,7 @@ export default async function DashboardLayout({
       </main>
 
       <CommandPalette />
+      <OfflineBanner />
     </div>
   )
 }

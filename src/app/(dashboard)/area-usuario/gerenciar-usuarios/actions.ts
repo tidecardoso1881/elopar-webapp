@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
+import type { UserPermissions } from '@/types/permissions'
 
 type ActionResult = { success: boolean; error?: string }
 
@@ -78,6 +79,38 @@ export async function resendInviteAction(email: string): Promise<ActionResult> {
 
   const admin = createAdminClient()
   const { error } = await admin.auth.admin.inviteUserByEmail(email)
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath('/area-usuario/gerenciar-usuarios')
+  return { success: true }
+}
+
+export async function updateUserPermissionsAction(
+  userId: string,
+  role: string,
+  permissions: UserPermissions
+): Promise<ActionResult> {
+  const adminId = await requireAdmin()
+  if (!adminId) return { success: false, error: 'Acesso negado' }
+
+  // Impede que o admin remova seu próprio acesso admin
+  if (adminId === userId && role !== 'admin') {
+    return { success: false, error: 'Não é possível remover seu próprio acesso admin' }
+  }
+
+  const validRoles = ['admin', 'gerente', 'consulta']
+  if (!validRoles.includes(role)) return { success: false, error: 'Perfil inválido' }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      role,
+      permissions: role === 'admin' ? {} : permissions,
+      updated_at: new Date().toISOString(),
+    } as never)
+    .eq('id', userId)
+
   if (error) return { success: false, error: error.message }
 
   revalidatePath('/area-usuario/gerenciar-usuarios')

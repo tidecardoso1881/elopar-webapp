@@ -6,18 +6,11 @@ import { Sidebar } from '../sidebar'
 const mockUsePathname = vi.fn()
 vi.mock('next/navigation', () => ({
   usePathname: () => mockUsePathname(),
+  // Link needs href mock
+  Link: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => (
+    <a href={href} {...rest}>{children}</a>
+  ),
 }))
-
-// Mock da Server Action usada pelo SignOutButton dentro do Sidebar
-vi.mock('@/app/(auth)/login/actions', () => ({
-  signOut: vi.fn().mockResolvedValue(undefined),
-}))
-
-// ─── Fixtures ──────────────────────────────────────────────────────────────
-
-const defaultUser = { email: 'tide@elopar.com' }
-const adminProfile = { full_name: 'Tide Cardoso', role: 'admin' }
-const managerProfile = { full_name: 'Gerente Silva', role: 'manager' }
 
 // ─── Testes ────────────────────────────────────────────────────────────────
 
@@ -29,64 +22,36 @@ describe('Sidebar', () => {
 
   describe('renderização base', () => {
     it('renderiza o nome "Grupo Elopar"', () => {
-      render(<Sidebar user={defaultUser} profile={adminProfile} />)
+      render(<Sidebar />)
       expect(screen.getByText('Grupo Elopar')).toBeInTheDocument()
     })
 
-    it('renderiza todos os 6 itens de navegação', () => {
-      render(<Sidebar user={defaultUser} profile={adminProfile} />)
+    it('renderiza todos os itens de navegação', () => {
+      render(<Sidebar />)
       expect(screen.getByText('Dashboard')).toBeInTheDocument()
       expect(screen.getByText('Profissionais')).toBeInTheDocument()
       expect(screen.getByText('Clientes')).toBeInTheDocument()
       expect(screen.getByText('Renovações')).toBeInTheDocument()
       expect(screen.getByText('Equipamentos')).toBeInTheDocument()
       expect(screen.getByText('Férias')).toBeInTheDocument()
+      expect(screen.getByText('Notificações')).toBeInTheDocument()
     })
 
-    it('renderiza o botão de logout', () => {
-      render(<Sidebar user={defaultUser} profile={adminProfile} />)
-      expect(screen.getByRole('button', { name: /sair/i })).toBeInTheDocument()
-    })
-  })
-
-  describe('informações do usuário', () => {
-    it('exibe o nome completo do perfil quando disponível', () => {
-      render(<Sidebar user={defaultUser} profile={adminProfile} />)
-      expect(screen.getByText('Tide Cardoso')).toBeInTheDocument()
+    it('NÃO renderiza o botão de logout (movido para o header)', () => {
+      render(<Sidebar />)
+      expect(screen.queryByRole('button', { name: /sair/i })).toBeNull()
     })
 
-    it('exibe o email quando profile.full_name é null', () => {
-      render(<Sidebar user={defaultUser} profile={{ full_name: null, role: 'admin' }} />)
-      expect(screen.getByText('tide@elopar.com')).toBeInTheDocument()
-    })
-
-    it('exibe "Administrador" para role admin', () => {
-      render(<Sidebar user={defaultUser} profile={adminProfile} />)
-      expect(screen.getByText('Administrador')).toBeInTheDocument()
-    })
-
-    it('exibe "Gerente" para role manager', () => {
-      render(<Sidebar user={defaultUser} profile={managerProfile} />)
-      expect(screen.getByText('Gerente')).toBeInTheDocument()
-    })
-
-    it('exibe a inicial do nome como avatar', () => {
-      render(<Sidebar user={defaultUser} profile={adminProfile} />)
-      // "Tide Cardoso" → inicial "T"
-      expect(screen.getByText('T')).toBeInTheDocument()
-    })
-
-    it('exibe a inicial do email quando profile é null', () => {
-      render(<Sidebar user={defaultUser} profile={null} />)
-      // "tide@elopar.com" → inicial "T"
-      expect(screen.getByText('T')).toBeInTheDocument()
+    it('renderiza rodapé com © Elopar', () => {
+      render(<Sidebar />)
+      expect(screen.getByText(/© Elopar/)).toBeInTheDocument()
     })
   })
 
   describe('active state de navegação', () => {
     it('aplica classes de ativo no item Dashboard quando em /dashboard', () => {
       mockUsePathname.mockReturnValue('/dashboard')
-      render(<Sidebar user={defaultUser} profile={adminProfile} />)
+      render(<Sidebar />)
 
       const dashboardLink = screen.getByRole('link', { name: /dashboard/i })
       expect(dashboardLink).toHaveClass('bg-blue-50')
@@ -95,7 +60,7 @@ describe('Sidebar', () => {
 
     it('NÃO aplica classes de ativo em itens inativos', () => {
       mockUsePathname.mockReturnValue('/dashboard')
-      render(<Sidebar user={defaultUser} profile={adminProfile} />)
+      render(<Sidebar />)
 
       const profissionaisLink = screen.getByRole('link', { name: /profissionais/i })
       expect(profissionaisLink).not.toHaveClass('bg-blue-50')
@@ -103,7 +68,7 @@ describe('Sidebar', () => {
 
     it('aplica classes de ativo em Profissionais quando em /profissionais', () => {
       mockUsePathname.mockReturnValue('/profissionais')
-      render(<Sidebar user={defaultUser} profile={adminProfile} />)
+      render(<Sidebar />)
 
       const profissionaisLink = screen.getByRole('link', { name: /profissionais/i })
       expect(profissionaisLink).toHaveClass('bg-blue-50')
@@ -113,7 +78,7 @@ describe('Sidebar', () => {
   describe('hrefs de navegação', () => {
     it('cada item de menu aponta para o href correto', () => {
       mockUsePathname.mockReturnValue('/')
-      render(<Sidebar user={defaultUser} profile={adminProfile} />)
+      render(<Sidebar />)
 
       const links = [
         { name: /dashboard/i, href: '/dashboard' },
