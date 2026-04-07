@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { logAudit } from '@/lib/audit'
 import { requireWriteAccess } from '@/lib/auth-check'
+import { handleActionError } from '@/lib/errors'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -186,7 +187,7 @@ export async function createProfessional(
 
   if (error) {
     console.error('[createProfessional]', error)
-    return { error: `Erro ao criar profissional: ${error.message}` }
+    return { error: handleActionError(error) }
   }
 
   await logAudit({
@@ -265,7 +266,7 @@ export async function updateProfessional(
 
   if (error) {
     console.error('[updateProfessional]', error)
-    return { error: `Erro ao atualizar: ${error.message}` }
+    return { error: handleActionError(error) }
   }
 
   await logAudit({
@@ -304,7 +305,7 @@ export async function deleteProfessional(id: string): Promise<ActionResult> {
 
   if (error) {
     console.error('[deleteProfessional]', error)
-    return { error: `Erro ao desligar profissional: ${error.message}` }
+    return { error: handleActionError(error) }
   }
 
   await logAudit({
@@ -350,7 +351,7 @@ export async function renewProfessional(
 
   if (error) {
     console.error('[renewProfessional]', error)
-    return { error: `Erro ao renovar: ${error.message}` }
+    return { error: handleActionError(error) }
   }
 
   revalidatePath('/renovacoes')
