@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/header'
 import { RenewalBadge } from '@/components/renovacoes/renewal-badge'
 import { NotificationBell } from '@/components/layout/notification-bell'
 import { CommandPalette } from '@/components/GlobalSearch/CommandPalette'
+import { OfflineBanner } from '@/components/offline-banner'
 
 export default async function DashboardLayout({
   children,
@@ -43,6 +44,7 @@ export default async function DashboardLayout({
       </main>
 
       <CommandPalette />
+      <OfflineBanner />
     </div>
   )
 }
