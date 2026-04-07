@@ -2,6 +2,8 @@
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
+import { useSavedFilters } from '@/hooks/useSavedFilters'
+import { SavedFilters } from './saved-filters'
 
 interface Client {
   id: string
@@ -24,6 +26,11 @@ export function ProfessionalsFilters({ clients, positions = [] }: ProfessionalsF
   // Controlled state for text search (to support debounce)
   const [textSearch, setTextSearch] = useState(searchParams.get('q') ?? '')
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Saved filters
+  const { saveFilter } = useSavedFilters()
+  const [showSaveModal, setShowSaveModal] = useState(false)
+  const [filterName, setFilterName] = useState('')
 
   const createQueryString = useCallback(
     (updates: Record<string, string | null>) => {
@@ -70,6 +77,17 @@ export function ProfessionalsFilters({ clients, positions = [] }: ProfessionalsF
     startTransition(() => {
       router.push(pathname)
     })
+  }
+
+  const handleSave = () => {
+    const params: Record<string, string> = {}
+    FILTER_KEYS.forEach(k => {
+      const v = searchParams.get(k)
+      if (v) params[k] = v
+    })
+    saveFilter(filterName, params)
+    setFilterName('')
+    setShowSaveModal(false)
   }
 
   return (
@@ -192,6 +210,49 @@ export function ProfessionalsFilters({ clients, positions = [] }: ProfessionalsF
           </div>
         )}
       </div>
+
+      {/* Filtros salvos */}
+      <SavedFilters currentParams={searchParams.toString()} />
+
+      {/* Botão salvar + modal */}
+      {hasActiveFilters && (
+        <div>
+          <button
+            onClick={() => setShowSaveModal(true)}
+            className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+          >
+            + Salvar filtro atual
+          </button>
+        </div>
+      )}
+
+      {showSaveModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white rounded-xl shadow-xl p-5 w-72">
+            <p className="text-sm font-semibold text-gray-900 mb-3">Nomear filtro</p>
+            <input
+              autoFocus
+              type="text"
+              value={filterName}
+              onChange={e => setFilterName(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && filterName.trim() && handleSave()}
+              placeholder="Ex: Clientes Críticos"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowSaveModal(false)}
+                className="flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+              >Cancelar</button>
+              <button
+                onClick={handleSave}
+                disabled={!filterName.trim()}
+                className="flex-1 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700 disabled:opacity-50"
+              >Salvar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
