@@ -192,6 +192,7 @@ export default async function ProfissionalDetailPage({ params }: ProfissionalDet
               name={professional.name}
               status={professional.status}
               canEdit={currentRole === 'admin' || currentRole === 'gerente'}
+              isAdmin={currentRole === 'admin'}
             />
             <Link
               href="/profissionais"
