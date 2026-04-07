@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useRef, useState, useTransition } from 'react'
 import { uploadAvatar } from '@/actions/users'
 
@@ -42,7 +43,7 @@ export function AvatarUpload({ currentUrl, initials }: AvatarUploadProps) {
       >
         <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center overflow-hidden">
           {preview ? (
-            <img src={preview} alt="Avatar" className="w-full h-full object-cover" />
+            <Image src={preview} alt="Avatar" width={64} height={64} className="w-full h-full object-cover" />
           ) : (
             <span className="text-2xl font-semibold text-indigo-700">{initials}</span>
           )}
