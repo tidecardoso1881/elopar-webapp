@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { requireWriteAccess } from '@/lib/auth-check'
+import { handleActionError } from '@/lib/errors'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { logAudit } from '@/lib/audit'
@@ -84,7 +85,7 @@ export async function createVacation(
 
   if (error) {
     console.error('[createVacation]', error)
-    return { error: `Erro ao criar férias: ${error.message}` }
+    return { error: handleActionError(error) }
   }
 
   await logAudit({
@@ -157,7 +158,7 @@ export async function updateVacation(id: string) {
 
     if (error) {
       console.error('[updateVacation]', error)
-      return { error: `Erro ao atualizar: ${error.message}` }
+      return { error: handleActionError(error) }
     }
 
     await logAudit({
@@ -195,7 +196,7 @@ export async function deleteVacation(id: string): Promise<ActionResult> {
 
   if (error) {
     console.error('[deleteVacation]', error)
-    return { error: `Erro ao excluir férias: ${error.message}` }
+    return { error: handleActionError(error) }
   }
 
   await logAudit({
