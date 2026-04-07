@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
+import { canWrite } from '@/types/roles'
 import { ProfessionalForm } from '@/components/profissionais/professional-form'
 import { updateProfessional } from '@/actions/professionals'
 import { ActionResult } from '@/actions/professionals'
@@ -22,6 +23,17 @@ export async function generateMetadata({ params }: EditarProfissionalPageProps):
 export default async function EditarProfissionalPage({ params }: EditarProfissionalPageProps) {
   const { id } = await params
   const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (!canWrite(profile?.role)) redirect('/profissionais')
 
   const [{ data: professional, error }, { data: clients }] = await Promise.all([
     supabase.from('professionals').select('*').eq('id', id).single(),
