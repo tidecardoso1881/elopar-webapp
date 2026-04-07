@@ -23,11 +23,9 @@ export function ProfessionalsFilters({ clients, positions = [] }: ProfessionalsF
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
 
-  // Controlled state for text search (to support debounce)
   const [textSearch, setTextSearch] = useState(searchParams.get('q') ?? '')
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Saved filters
   const { saveFilter } = useSavedFilters()
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [filterName, setFilterName] = useState('')
@@ -35,7 +33,6 @@ export function ProfessionalsFilters({ clients, positions = [] }: ProfessionalsF
   const createQueryString = useCallback(
     (updates: Record<string, string | null>) => {
       const params = new URLSearchParams(searchParams.toString())
-      // Always reset pagination on any filter change
       params.delete('page')
       Object.entries(updates).forEach(([key, value]) => {
         if (value === null || value === '') {
@@ -55,7 +52,6 @@ export function ProfessionalsFilters({ clients, positions = [] }: ProfessionalsF
     })
   }, [router, pathname, createQueryString])
 
-  // Debounce text search (300ms)
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
@@ -165,15 +161,20 @@ export function ProfessionalsFilters({ clients, positions = [] }: ProfessionalsF
       </div>
 
       {/* Segunda linha de filtros */}
-      <div className="flex flex-col sm:flex-row gap-3 items-center">
+      <div className="flex flex-col sm:flex-row gap-3 items-center flex-wrap">
         {/* Filtro por cargo */}
-        <input
-          type="text"
-          placeholder="Filtrar por cargo..."
-          value={searchParams.get('position') ?? ''}
-          onChange={(e) => handleChange('position', e.target.value)}
-          className="rounded-lg border border-gray-300 bg-white py-2 pl-3 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        />
+        {positions.length > 0 && (
+          <select
+            value={searchParams.get('position') ?? ''}
+            onChange={(e) => handleChange('position', e.target.value)}
+            className="rounded-lg border border-gray-300 bg-white py-2 pl-3 pr-8 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="">Todos os cargos</option>
+            {positions.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
+        )}
 
         {/* Filtro por senioridade */}
         <select
@@ -182,10 +183,10 @@ export function ProfessionalsFilters({ clients, positions = [] }: ProfessionalsF
           className="rounded-lg border border-gray-300 bg-white py-2 pl-3 pr-8 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
           <option value="">Todas as senioridades</option>
-          <option value="JUNIOR">Júnior</option>
-          <option value="PLENO">Pleno</option>
-          <option value="SENIOR">Sênior</option>
-          <option value="ESPECIALISTA">Especialista</option>
+          <option value="Junior">Júnior</option>
+          <option value="Pleno">Pleno</option>
+          <option value="Senior">Sênior</option>
+          <option value="Especialista">Especialista</option>
         </select>
 
         {/* Filtro por tipo de contrato */}
@@ -195,69 +196,65 @@ export function ProfessionalsFilters({ clients, positions = [] }: ProfessionalsF
           className="rounded-lg border border-gray-300 bg-white py-2 pl-3 pr-8 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
           <option value="">Todos os contratos</option>
-          <option value="CLT_ESTRATEGICO">CLT Estratégico</option>
-          <option value="CLT_ILAED">CLT ILAED</option>
+          <option value="CLT">CLT</option>
           <option value="PJ">PJ</option>
+          <option value="Estagio">Estágio</option>
         </select>
 
-        {/* Loading indicator */}
-        {isPending && (
-          <div className="flex items-center text-sm text-gray-400 whitespace-nowrap">
-            <svg className="animate-spin h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            Carregando...
+        {/* Botão Salvar filtro — DESTACADO (NAV-003) */}
+        {hasActiveFilters && (
+          <div className="relative group">
+            <button
+              onClick={() => setShowSaveModal(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-700 hover:bg-amber-100 hover:border-amber-400 transition-colors font-medium whitespace-nowrap"
+              title="Salvar este conjunto de filtros para reutilizar depois"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+              </svg>
+              ⭐ Salvar filtro
+            </button>
+            {/* Tooltip */}
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10">
+              <div className="bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
+                Salva estes filtros com um nome para reutilizar depois
+              </div>
+            </div>
           </div>
         )}
+
+        {/* Filtros salvos */}
+        <SavedFilters currentParams={searchParams.toString()} />
       </div>
 
-      {/* Filtros salvos */}
-      <SavedFilters currentParams={searchParams.toString()} />
-
-      {/* Botão salvar + modal */}
-      {hasActiveFilters && (
-        <div>
-          <button
-            onClick={() => setShowSaveModal(true)}
-            title="Salve este filtro para usar rapidamente depois"
-            className={`inline-flex items-center gap-1 text-xs font-medium transition-colors rounded px-2 py-1 ${
-              hasActiveFilters
-                ? 'text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100'
-                : 'text-gray-400 hover:text-gray-600'
-            }`}
-          >
-            <svg className="w-3.5 h-3.5" fill={hasActiveFilters ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
-            </svg>
-            Salvar filtro
-          </button>
-        </div>
-      )}
-
+      {/* Modal de nome para salvar filtro */}
       {showSaveModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="bg-white rounded-xl shadow-xl p-5 w-72">
-            <p className="text-sm font-semibold text-gray-900 mb-3">Nomear filtro</p>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6">
+            <h3 className="text-base font-semibold text-gray-900 mb-4">Salvar filtro</h3>
             <input
-              autoFocus
               type="text"
+              placeholder="Nome do filtro (ex: Ativos CLT Sênior)"
               value={filterName}
-              onChange={e => setFilterName(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && filterName.trim() && handleSave()}
-              placeholder="Ex: Clientes Críticos"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              onChange={(e) => setFilterName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && filterName.trim() && handleSave()}
+              autoFocus
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 mb-4"
             />
-            <div className="flex gap-2">
+            <div className="flex gap-3 justify-end">
               <button
-                onClick={() => setShowSaveModal(false)}
-                className="flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
-              >Cancelar</button>
+                onClick={() => { setShowSaveModal(false); setFilterName('') }}
+                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                Cancelar
+              </button>
               <button
                 onClick={handleSave}
                 disabled={!filterName.trim()}
-                className="flex-1 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700 disabled:opacity-50"
-              >Salvar</button>
+                className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+              >
+                Salvar
+              </button>
             </div>
           </div>
         </div>
