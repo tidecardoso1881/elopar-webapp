@@ -2,12 +2,8 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { SignOutButton } from '@/components/auth/sign-out-button'
-import { getRoleLabel } from '@/types/roles'
 
 interface SidebarProps {
-  user: { email: string }
-  profile: { full_name: string | null; role: string } | null
   renewalBadge?: React.ReactNode
   showMetrics?: boolean
 }
@@ -78,12 +74,8 @@ const menuItems = [
   },
 ]
 
-export function Sidebar({ user, profile, renewalBadge, showMetrics = false }: SidebarProps) {
+export function Sidebar({ renewalBadge, showMetrics = false }: SidebarProps) {
   const pathname = usePathname()
-
-  const displayName = profile?.full_name ?? user.email ?? 'Usuário'
-  const roleDisplay = getRoleLabel(profile?.role)
-  const initials = displayName.charAt(0).toUpperCase()
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col" aria-label="Navegação principal">
@@ -153,24 +145,9 @@ export function Sidebar({ user, profile, renewalBadge, showMetrics = false }: Si
         )}
       </nav>
 
-      {/* User Info + Logout */}
-      <div className="p-3 border-t border-gray-200">
-        <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-gray-50 mb-2">
-          <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-            <span className="text-xs font-semibold text-blue-700">{initials}</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-gray-900 truncate">{displayName}</p>
-            <p className="text-xs text-gray-500">{roleDisplay}</p>
-          </div>
-        </div>
-
-        <SignOutButton className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer font-medium" aria-label="Sair da conta">
-          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3v-1" />
-          </svg>
-          Sair
-        </SignOutButton>
+      {/* Footer */}
+      <div className="p-3 border-t border-gray-200 text-center">
+        <p className="text-xs text-gray-400">© Elopar</p>
       </div>
     </aside>
   )
