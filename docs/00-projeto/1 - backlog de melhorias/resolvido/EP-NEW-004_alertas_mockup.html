@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EP-NEW-004 — Alertas de Renovação de Contrato</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .annotation-bar {
+            background-color: #f3f4f6;
+            border-bottom: 2px solid #e5e7eb;
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .callout {
+            border-left: 4px solid #10b981;
+            background-color: #ecfdf5;
+            padding: 12px 16px;
+            margin: 12px 0;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #065f46;
+        }
+
+        .callout.novo {
+            border-left-color: #10b981;
+            background-color: #ecfdf5;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+
+        .tab-button.active {
+            border-bottom-color: #3b82f6;
+            color: #1f2937;
+        }
+
+        .tab-button:hover {
+            color: #1f2937;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .badge-red {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-yellow {
+            background-color: #fef3c7;
+            color: #92400e;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-blue {
+            background-color: #dbeafe;
+            color: #1e40af;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .notification-item {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .notification-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .notification-item.lida {
+            opacity: 0.6;
+            background-color: #f3f4f6;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-text {
+            font-size: 14px;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .notification-lida {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-mark-read {
+            padding: 6px 12px;
+            background-color: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-mark-read:hover {
+            background-color: #e5e7eb;
+        }
+
+        .notification-badge-icon {
+            font-size: 16px;
+            margin-right: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #f3f4f6;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+            font-size: 13px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+            color: #1f2937;
+        }
+
+        tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .header-bar {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            background-color: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .filter-button {
+            padding: 8px 16px;
+            background-color: white;
+            color: #6b7280;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-button.active {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .filter-button:hover {
+            border-color: #9ca3af;
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Annotation Bar -->
+    <div class="annotation-bar">
+        EP-NEW-004 — Alertas de Renovação de Contrato | Rotas: badge na listagem + /notificacoes | Complexidade: L
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="bg-white border-b border-gray-200">
+        <div class="flex">
+            <button class="tab-button active" onclick="switchTab('view1')">
+                View 1 — Listagem com Badges
+            </button>
+            <button class="tab-button" onclick="switchTab('view2')">
+                View 2 — Centro de Notificações (/notificacoes)
+            </button>
+        </div>
+    </div>
+
+    <!-- VIEW 1: Listagem de Profissionais com Badges -->
+    <div id="view1" class="tab-content active">
+        <!-- Header -->
+        <div class="header-bar">
+            <h1 class="text-2xl font-bold text-gray-900">Profissionais</h1>
+            <div class="notification-bell">
+                🔔
+                <div class="notification-badge">3</div>
+            </div>
+        </div>
+
+        <!-- Callouts -->
+        <div style="padding: 16px;">
+            <div class="callout novo">
+                <strong>🎯 Badge de Alerta:</strong> Só aparece se data de vencimento ≤ 90 dias a partir de hoje (06/04/2026).
+            </div>
+            <div class="callout novo">
+                <strong>🎨 Código de Cores:</strong> Vermelho (≤30 dias) | Amarelo (≤60 dias) | Azul (≤90 dias)
+            </div>
+            <div class="callout novo">
+                <strong>⏰ Cálculo:</strong> João Silva (vence 15/04) = 9 dias | Maria Lima (vence 05/05) = 29 dias | Carlos Souza (vence 04/06) = 59 dias | Ana Costa (vence 15/08) = sem badge
+            </div>
+        </div>
+
+        <!-- Tabela de Profissionais -->
+        <div style="padding: 0 16px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Cliente</th>
+                        <th>Contrato Fim</th>
+                        <th>Status</th>
+                        <th>Alerta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>João Silva</strong></td>
+                        <td>Tech Sistemas LTDA</td>
+                        <td>15/04/2026</td>
+                        <td><span style="color: #059669;">✓ Ativo</span></td>
+                        <td>
+                            <div class="badge-red">
+                                <span>🔴 Vence em 9 dias</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Maria Lima</strong></td>
+                        <td>Inovação Digital Inc</td>
+                        <td>05/05/2026</td>
+                        <td><span style="color: #059669;">✓ Ativo</span></td>
+                        <td>
+                            <div class="badge-yellow">
+                                <span>🟡 Vence em 29 dias</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Carlos Souza</strong></td>
+                        <td>Solução Cloud Pro</td>
+                        <td>04/06/2026</td>
+                        <td><span style="color: #059669;">✓ Ativo</span></td>
+                        <td>
+                            <div class="badge-blue">
+                                <span>🔵 Vence em 59 dias</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ana Costa</strong></td>
+                        <td>Enterprise Solutions</td>
+                        <td>15/08/2026</td>
+                        <td><span style="color: #059669;">✓ Ativo</span></td>
+                        <td>
+                            <span style="color: #9ca3af; font-size: 12px;">—</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- VIEW 2: Centro de Notificações -->
+    <div id="view2" class="tab-content">
+        <!-- Header -->
+        <div class="header-bar">
+            <h1 class="text-2xl font-bold text-gray-900">Notificações</h1>
+        </div>
+
+        <!-- Callouts -->
+        <div style="padding: 16px;">
+            <div class="callout novo">
+                <strong>⏰ Job Diário:</strong> Executa a cada meia-noite (UTC). Verifica todos os contratos com vencimento ≤ 90 dias.
+            </div>
+            <div class="callout novo">
+                <strong>📧 E-mail:</strong> Notificação é enviada simultaneamente via Resend (SMTP integrado). PM recebe no e-mail.
+            </div>
+            <div class="callout novo">
+                <strong>🔒 RLS:</strong> Cada usuário vê apenas notificações de profissionais que gerencia (sua empresa).
+            </div>
+            <div class="callout novo">
+                <strong>🚫 Deduplicação:</strong> Sistema evita duplicatas — max 1 notificação por contrato por dia.
+            </div>
+        </div>
+
+        <!-- Filtro de Notificações -->
+        <div class="filter-tabs">
+            <button class="filter-button active" onclick="filterNotifications('todas')">
+                Todas (4)
+            </button>
+            <button class="filter-button" onclick="filterNotifications('nao-lidas')">
+                Não lidas (3)
+            </button>
+        </div>
+
+        <!-- Lista de Notificações -->
+        <div id="notification-list">
+            <!-- Notificação 1 (Não lida - Vermelho) -->
+            <div class="notification-item" data-status="nao-lida">
+                <div class="notification-content">
+                    <div class="notification-text">
+                        <span class="notification-badge-icon">🔴</span>
+                        <strong>João Silva</strong> — contrato vence em 9 dias (15/04/2026)
+                    </div>
+                    <div class="notification-lida">Não lida</div>
+                </div>
+                <div class="notification-actions">
+                    <button class="btn-mark-read" onclick="markAsRead(this)">
+                        Marcar como lida
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notificação 2 (Não lida - Amarelo) -->
+            <div class="notification-item" data-status="nao-lida">
+                <div class="notification-content">
+                    <div class="notification-text">
+                        <span class="notification-badge-icon">🟡</span>
+                        <strong>Maria Lima</strong> — contrato vence em 29 dias (05/05/2026)
+                    </div>
+                    <div class="notification-lida">Não lida</div>
+                </div>
+                <div class="notification-actions">
+                    <button class="btn-mark-read" onclick="markAsRead(this)">
+                        Marcar como lida
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notificação 3 (Não lida - Azul) -->
+            <div class="notification-item" data-status="nao-lida">
+                <div class="notification-content">
+                    <div class="notification-text">
+                        <span class="notification-badge-icon">🔵</span>
+                        <strong>Carlos Souza</strong> — contrato vence em 59 dias (04/06/2026)
+                    </div>
+                    <div class="notification-lida">Não lida</div>
+                </div>
+                <div class="notification-actions">
+                    <button class="btn-mark-read" onclick="markAsRead(this)">
+                        Marcar como lida
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notificação 4 (Lida) -->
+            <div class="notification-item lida" data-status="lida">
+                <div class="notification-content">
+                    <div class="notification-text">
+                        <span class="notification-badge-icon">✅</span>
+                        <strong>Pedro Alves</strong> — contrato venceu em 01/03/2026
+                    </div>
+                    <div class="notification-lida">Lida em 01/03/2026</div>
+                </div>
+                <div class="notification-actions">
+                    <!-- Sem ação para notificações lidas -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        function filterNotifications(filter) {
+            // Update button states
+            document.querySelectorAll('.filter-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Filter notifications
+            document.querySelectorAll('[data-status]').forEach(notification => {
+                if (filter === 'todas') {
+                    notification.style.display = '';
+                } else if (filter === 'nao-lidas') {
+                    if (notification.getAttribute('data-status') === 'nao-lida') {
+                        notification.style.display = '';
+                    } else {
+                        notification.style.display = 'none';
+                    }
+                }
+            });
+
+            // Update count in filter buttons
+            const allCount = document.querySelectorAll('[data-status]').length;
+            const unreadCount = document.querySelectorAll('[data-status="nao-lida"]').length;
+            document.querySelectorAll('.filter-button')[0].textContent = `Todas (${allCount})`;
+            document.querySelectorAll('.filter-button')[1].textContent = `Não lidas (${unreadCount})`;
+        }
+
+        function markAsRead(button) {
+            const notificationItem = button.closest('.notification-item');
+            notificationItem.setAttribute('data-status', 'lida');
+            notificationItem.classList.add('lida');
+
+            // Clear the action buttons
+            notificationItem.querySelector('.notification-actions').innerHTML = '';
+
+            // Update the read text
+            notificationItem.querySelector('.notification-lida').textContent = 'Lida agora';
+
+            // Update counts
+            const unreadCount = document.querySelectorAll('[data-status="nao-lida"]').length;
+            document.querySelectorAll('.filter-button')[1].textContent = `Não lidas (${unreadCount})`;
+        }
+    </script>
+</body>
+</html>
