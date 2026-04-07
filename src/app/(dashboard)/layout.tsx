@@ -4,6 +4,7 @@ import { Sidebar } from '@/components/layout/sidebar'
 import { Header } from '@/components/layout/header'
 import { RenewalBadge } from '@/components/renovacoes/renewal-badge'
 import { NotificationBell } from '@/components/layout/notification-bell'
+import { CommandPalette } from '@/components/GlobalSearch/CommandPalette'
 
 export default async function DashboardLayout({
   children,
@@ -40,6 +41,8 @@ export default async function DashboardLayout({
           {children}
         </div>
       </main>
+
+      <CommandPalette />
     </div>
   )
 }
