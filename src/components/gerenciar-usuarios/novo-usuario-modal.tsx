@@ -87,8 +87,9 @@ export function NovoUsuarioModal({ onClose }: Props) {
                   <option value="" disabled>Selecione o perfil...</option>
                   <option value="admin">Admin — acesso total ao sistema</option>
                   <option value="manager">Manager — visualização e gestão operacional</option>
+                  <option value="consulta">Consulta — somente leitura (sem edição)</option>
                 </select>
-                <p className="text-xs text-gray-400 mt-1">Admin tem acesso à Área do Usuário e Gerenciar Usuários.</p>
+                <p className="text-xs text-gray-400 mt-1">Admin tem acesso à Área do Usuário e Gerenciar Usuários. Consulta só visualiza — sem criar, editar ou excluir.</p>
               </div>
             </>
           )}
