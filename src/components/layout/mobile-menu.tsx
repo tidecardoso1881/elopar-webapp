@@ -84,7 +84,7 @@ export function MobileMenu({ user, profile }: MobileMenuProps) {
   const roleDisplay = profile?.role === 'admin' ? 'Administrador' : 'Gerente'
   const initials = displayName.charAt(0).toUpperCase()
   const userRole = profile?.role ?? 'consulta'
-  const isAdminOrManager = userRole === 'admin' || userRole === 'gerente'
+  const isAdminOrManager = userRole === 'admin' || userRole === 'gerente' || userRole === 'manager'
   const isAdmin = userRole === 'admin'
 
   return (
@@ -164,7 +164,7 @@ export function MobileMenu({ user, profile }: MobileMenuProps) {
             )
           })}
 
-          {isAdmin && (
+          {isAdminOrManager && (
             <>
               {/* Divisor */}
               <div className="my-2 border-t border-gray-100" />
