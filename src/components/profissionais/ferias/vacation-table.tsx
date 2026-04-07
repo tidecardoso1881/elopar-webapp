@@ -56,12 +56,12 @@ export function VacationTable({ vacations, sortBy, sortDir, buildSortUrl }: Vaca
         <thead>
           <tr className="bg-gray-50">
             <SortableHeader col="professional_name" label="Profissional" sortBy={sortBy} sortDir={sortDir} buildSortUrl={buildSortUrl} />
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Período Aquisitivo</th>
+            <th className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Período Aquisitivo</th>
             <SortableHeader col="vacation_start" label="Férias" sortBy={sortBy} sortDir={sortDir} buildSortUrl={buildSortUrl} />
-            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Dias</th>
-            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Saldo</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Ações</th>
+            <th className="px-3 py-2.5 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Dias</th>
+            <th className="px-3 py-2.5 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Saldo</th>
+            <th className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+            <th className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Ações</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-100">
@@ -69,7 +69,7 @@ export function VacationTable({ vacations, sortBy, sortDir, buildSortUrl }: Vaca
             const status = getVacationStatus(v.vacation_start)
             return (
               <tr key={v.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-4 py-3">
+                <td className="px-3 py-2.5">
                   <Link
                     href={`/ferias/${v.id}`}
                     className="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors"
@@ -77,28 +77,28 @@ export function VacationTable({ vacations, sortBy, sortDir, buildSortUrl }: Vaca
                     {v.professional_name}
                   </Link>
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-600">
+                <td className="px-3 py-2.5 text-sm text-gray-600">
                   {v.acquisition_start && v.acquisition_end
                     ? `${formatDate(v.acquisition_start)} a ${formatDate(v.acquisition_end)}`
                     : '—'}
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-600">
+                <td className="px-3 py-2.5 text-sm text-gray-600">
                   {v.vacation_start && v.vacation_end
                     ? `${formatDate(v.vacation_start)} a ${formatDate(v.vacation_end)}`
                     : '—'}
                 </td>
-                <td className="px-4 py-3 text-center text-sm font-medium text-gray-900">
+                <td className="px-3 py-2.5 text-center text-sm font-medium text-gray-900">
                   {v.total_days ?? '—'}
                 </td>
-                <td className="px-4 py-3 text-center text-sm font-medium text-gray-900">
+                <td className="px-3 py-2.5 text-center text-sm font-medium text-gray-900">
                   {v.days_balance ?? '—'}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-3 py-2.5">
                   <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${status.color}`}>
                     {status.label}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-sm">
+                <td className="px-3 py-2.5 text-sm">
                   <VacationActions id={v.id} name={v.professional_name} />
                 </td>
               </tr>

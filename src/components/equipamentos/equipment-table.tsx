@@ -151,22 +151,22 @@ export function EquipmentTable({ equipment }: EquipmentTableProps) {
           <table className="min-w-full divide-y divide-gray-200" aria-label="Lista de equipamentos">
             <thead>
               <tr className="bg-gray-50">
-                <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Profissional
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Empresa
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Tipo
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Modelo
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Office
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Software
                 </th>
               </tr>
@@ -174,18 +174,18 @@ export function EquipmentTable({ equipment }: EquipmentTableProps) {
             <tbody className="bg-white divide-y divide-gray-100">
               {filteredEquipment.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  <td className="px-3 py-2.5 text-sm font-medium text-gray-900">
                     {item.professional_name}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
+                  <td className="px-3 py-2.5 text-sm text-gray-600">
                     {item.company ?? '—'}
                   </td>
-                  <td className="px-4 py-3">{getMachineTypeBadge(item.machine_type)}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
+                  <td className="px-3 py-2.5">{getMachineTypeBadge(item.machine_type)}</td>
+                  <td className="px-3 py-2.5 text-sm text-gray-600">
                     {item.machine_model ?? '—'}
                   </td>
-                  <td className="px-4 py-3">{getOfficeBadge(item.office_package)}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">
+                  <td className="px-3 py-2.5">{getOfficeBadge(item.office_package)}</td>
+                  <td className="px-3 py-2.5 text-sm text-gray-600 max-w-xs truncate">
                     {item.software_details ?? '—'}
                   </td>
                 </tr>
