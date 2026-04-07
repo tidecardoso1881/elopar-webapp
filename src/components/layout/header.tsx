@@ -34,17 +34,6 @@ export function Header({ user, profile, notificationBell }: HeaderProps) {
         <MobileMenu user={user} profile={profile} />
       </div>
 
-      {/* Left: Logo + Elopar (desktop only) */}
-      <div className="hidden md:flex items-center gap-3 flex-shrink-0">
-        <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center flex-shrink-0">
-          <span className="text-white font-bold text-sm" aria-hidden="true">E</span>
-        </div>
-        <div>
-          <p className="font-semibold text-gray-900 text-sm leading-tight">Grupo Elopar</p>
-          <p className="text-xs text-gray-500 leading-tight">Gestão de Profissionais</p>
-        </div>
-      </div>
-
       {/* Right: Notifications + User Dropdown */}
       <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-auto">
         {notificationBell}
