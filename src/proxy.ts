@@ -52,33 +52,45 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Rotas exclusivas para admin — verificar role no banco
-  const adminOnlyRoutes = ['/area-usuario/gerenciar-usuarios', '/area-usuario/audit-log']
+  // Rotas que requerem role admin ou gerente (analytics + audit log)
+  const adminOrManagerRoutes = [
+    '/area-usuario/metricas',
+    '/area-usuario/saude-testes',
+    '/area-usuario/audit-log',
+  ]
 
-  // Rota exclusiva para tidebatera@gmail.com
-  if (user && pathname.startsWith('/area-usuario/metricas')) {
-    if (user.email !== process.env.METRICS_ALLOWED_EMAIL) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/area-usuario'
-      return NextResponse.redirect(url)
-    }
-  }
-  if (user && adminOnlyRoutes.some(r => pathname.startsWith(r))) {
+  // Rota que requer role admin exclusivamente
+  const adminOnlyRoutes = [
+    '/area-usuario/gerenciar-usuarios',
+  ]
+
+  const requiresAdminOrManager = adminOrManagerRoutes.some(r => pathname.startsWith(r))
+  const requiresAdmin = adminOnlyRoutes.some(r => pathname.startsWith(r))
+
+  if (user && (requiresAdminOrManager || requiresAdmin)) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
 
-    if (profile?.role !== 'admin') {
+    const role = profile?.role ?? ''
+    const isAdminOrManager = role === 'admin' || role === 'gerente' || role === 'manager'
+    const isAdmin = role === 'admin'
+
+    if (requiresAdmin && !isAdmin) {
       const url = request.nextUrl.clone()
-      url.pathname = '/area-usuario'
+      url.pathname = '/dashboard'
+      return NextResponse.redirect(url)
+    }
+
+    if (requiresAdminOrManager && !isAdminOrManager) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard'
       return NextResponse.redirect(url)
     }
   }
 
-  // IMPORTANTE: Retornar supabaseResponse para que os cookies de sessão
-  // sejam propagados corretamente
   return supabaseResponse
 }
 
