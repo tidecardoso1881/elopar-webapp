@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { VacationForm } from '@/components/profissionais/ferias/vacation-form'
 import { updateVacation } from '@/actions/vacations'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
+import { canWrite } from '@/types/roles'
 
 interface EditFeriasPageProps {
   params: Promise<{
@@ -12,6 +13,11 @@ interface EditFeriasPageProps {
 export default async function EditFeriasPage({ params }: EditFeriasPageProps) {
   const { id } = await params
   const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  if (!canWrite(profile?.role)) redirect('/ferias')
 
   const { data: vacation, error } = await supabase
     .from('vacations')

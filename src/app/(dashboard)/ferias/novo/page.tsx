@@ -1,7 +1,16 @@
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import { canWrite } from '@/types/roles'
 import { VacationForm } from '@/components/profissionais/ferias/vacation-form'
 import { createVacation } from '@/actions/vacations'
 
-export default function NovaFeriasPage() {
+export default async function NovaFeriasPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  if (!canWrite(profile?.role)) redirect('/ferias')
+
   return (
     <div className="space-y-6">
       <div>
