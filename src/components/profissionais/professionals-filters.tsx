@@ -135,6 +135,20 @@ export function ProfessionalsFilters({ clients, positions = [] }: ProfessionalsF
           <option value="INATIVO">Inativo</option>
         </select>
 
+        {/* Filtro por vencimento */}
+        <select
+          value={searchParams.get('renewal') ?? ''}
+          onChange={(e) => handleChange('renewal', e.target.value)}
+          className="rounded-lg border border-gray-300 bg-white py-2 pl-3 pr-8 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        >
+          <option value="">Todos os vencimentos</option>
+          <option value="expired">⛔ Expirado</option>
+          <option value="critical">🔴 Crítico (≤30d)</option>
+          <option value="warning">🟠 Aviso (31–60d)</option>
+          <option value="attention">🟡 Atenção (61–90d)</option>
+          <option value="ok">🟢 OK (&gt;90d)</option>
+        </select>
+
         {/* Botão Limpar */}
         {hasActiveFilters && (
           <button
@@ -184,19 +198,6 @@ export function ProfessionalsFilters({ clients, positions = [] }: ProfessionalsF
           <option value="CLT_ESTRATEGICO">CLT Estratégico</option>
           <option value="CLT_ILAED">CLT ILAED</option>
           <option value="PJ">PJ</option>
-        </select>
-
-        {/* Filtro por período de renovação */}
-        <select
-          value={searchParams.get('renewal') ?? ''}
-          onChange={(e) => handleChange('renewal', e.target.value)}
-          className="rounded-lg border border-gray-300 bg-white py-2 pl-3 pr-8 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        >
-          <option value="">Todos os períodos</option>
-          <option value="expired">Vencidos</option>
-          <option value="critical">Crítico (≤30 dias)</option>
-          <option value="warning">Atenção (≤60 dias)</option>
-          <option value="ok">OK ({'>'}90 dias)</option>
         </select>
 
         {/* Loading indicator */}
