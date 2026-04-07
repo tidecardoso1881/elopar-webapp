@@ -1,6 +1,5 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
 import { useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { MobileMenu } from './mobile-menu'
@@ -12,19 +11,7 @@ interface HeaderProps {
   notificationBell?: React.ReactNode
 }
 
-const pageLabels: Record<string, string> = {
-  '/dashboard': 'Dashboard',
-  '/profissionais': 'Profissionais',
-  '/clientes': 'Clientes',
-  '/renovacoes': 'Renovações',
-  '/equipamentos': 'Equipamentos',
-  '/ferias': 'Férias',
-  '/notificacoes': 'Notificações',
-}
-
 export function Header({ user, profile, notificationBell }: HeaderProps) {
-  const pathname = usePathname()
-  const pageTitle = pageLabels[pathname] || 'Página'
   const displayName = profile?.full_name ?? user.email ?? 'Usuário'
   const initials = displayName.charAt(0).toUpperCase()
   const detailsRef = useRef<HTMLDetailsElement>(null)
@@ -58,18 +45,8 @@ export function Header({ user, profile, notificationBell }: HeaderProps) {
         </div>
       </div>
 
-      {/* Center: Page Title + Breadcrumb */}
-      <div className="flex-1 min-w-0 md:text-center">
-        <h1 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">{pageTitle}</h1>
-        <nav className="hidden sm:flex md:justify-center items-center gap-2 mt-0.5 text-xs text-gray-600" aria-label="Breadcrumb">
-          <span>Início</span>
-          <span className="text-gray-400" aria-hidden="true">/</span>
-          <span className="font-medium text-gray-700 truncate">{pageTitle}</span>
-        </nav>
-      </div>
-
       {/* Right: Notifications + User Dropdown */}
-      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-auto">
         {notificationBell}
 
         {/* User Dropdown */}
