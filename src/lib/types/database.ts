@@ -553,6 +553,17 @@ export type Database = {
       }
     }
     Functions: {
+      get_users_for_admin: {
+        Args: never
+        Returns: {
+          banned_until: string | null
+          confirmed_at: string | null
+          created_at: string
+          email: string
+          id: string
+          last_sign_in_at: string | null
+        }[]
+      }
       is_admin: { Args: never; Returns: boolean }
       is_gerente_or_admin: { Args: never; Returns: boolean }
     }

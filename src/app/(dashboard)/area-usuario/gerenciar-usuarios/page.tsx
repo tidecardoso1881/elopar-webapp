@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import { UsuariosTable, type UserRow, type UserStatus } from '@/components/gerenciar-usuarios/usuarios-table'
 import type { Metadata } from 'next'
@@ -31,8 +30,13 @@ export default async function GerenciarUsuariosPage() {
 
   if (profile?.role !== 'admin') redirect('/area-usuario')
 
-  const admin = createAdminClient()
-  const { data: { users: authUsers } } = await admin.auth.admin.listUsers({ perPage: 200 })
+  // RPC com SECURITY DEFINER — acessa auth.users sem precisar de SUPABASE_SERVICE_ROLE_KEY
+  const { data: authUsers, error: rpcError } = await supabase
+    .rpc('get_users_for_admin')
+
+  if (rpcError) {
+    console.error('[gerenciar-usuarios] Erro na RPC:', rpcError.message)
+  }
 
   const { data: profiles } = await supabase
     .from('profiles')
@@ -40,7 +44,7 @@ export default async function GerenciarUsuariosPage() {
 
   const profilesMap = new Map((profiles ?? []).map(p => [p.id, p]))
 
-  const rows: UserRow[] = authUsers.map(u => {
+  const rows: UserRow[] = (authUsers ?? []).map(u => {
     const p = profilesMap.get(u.id)
     return {
       id: u.id,
