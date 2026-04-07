@@ -27,11 +27,12 @@ const DEFAULT_FIELDS = ['nome', 'email', 'cliente', 'posicao', 'senioridade', 's
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
 
-  // Verifica sessão
+  // Verifica autenticação com validação no servidor (getUser é mais seguro que getSession)
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+  if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -153,9 +154,9 @@ export async function GET(request: NextRequest) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('full_name')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single()
-    const userName = profile?.full_name ?? session.user.email ?? 'Usuário'
+    const userName = profile?.full_name ?? user.email ?? 'Usuário'
 
     const buf = await exportToPDF({
       fields: selectedFields,
