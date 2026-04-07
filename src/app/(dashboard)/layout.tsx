@@ -30,7 +30,7 @@ export default async function DashboardLayout({
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar - Hidden on mobile, visible on md+ */}
       <div className="hidden md:flex">
-        <Sidebar user={{ email: user.email ?? '' }} profile={profile} renewalBadge={<RenewalBadge />} />
+        <Sidebar user={{ email: user.email ?? '' }} profile={profile} renewalBadge={<RenewalBadge />} showMetrics={user.email === process.env.METRICS_ALLOWED_EMAIL} />
       </div>
 
       <main className="flex-1 flex flex-col overflow-hidden">

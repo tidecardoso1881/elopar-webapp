@@ -16,34 +16,34 @@ export type Database = {
     Tables: {
       audit_log: {
         Row: {
+          acao: string
+          criado_em: string
+          dados_antes: Json | null
+          dados_depois: Json | null
+          entidade: string
+          entidade_id: string
           id: string
           user_id: string
-          entidade: string
-          entidade_id: string
-          acao: string
-          dados_antes: Record<string, unknown> | null
-          dados_depois: Record<string, unknown> | null
-          criado_em: string
         }
         Insert: {
-          id?: string
-          user_id: string
+          acao: string
+          criado_em?: string
+          dados_antes?: Json | null
+          dados_depois?: Json | null
           entidade: string
           entidade_id: string
-          acao: string
-          dados_antes?: Record<string, unknown> | null
-          dados_depois?: Record<string, unknown> | null
-          criado_em?: string
+          id?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
+          acao?: string
+          criado_em?: string
+          dados_antes?: Json | null
+          dados_depois?: Json | null
           entidade?: string
           entidade_id?: string
-          acao?: string
-          dados_antes?: Record<string, unknown> | null
-          dados_depois?: Record<string, unknown> | null
-          criado_em?: string
+          id?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -68,6 +68,60 @@ export type Database = {
         }
         Relationships: []
       }
+      contract_notifications: {
+        Row: {
+          client_name: string | null
+          created_at: string
+          days_until_expiry: number
+          id: string
+          professional_id: string | null
+          professional_name: string
+          read_at: string | null
+          renewal_deadline: string | null
+          sent_at: string
+          urgency: string
+        }
+        Insert: {
+          client_name?: string | null
+          created_at?: string
+          days_until_expiry: number
+          id?: string
+          professional_id?: string | null
+          professional_name: string
+          read_at?: string | null
+          renewal_deadline?: string | null
+          sent_at?: string
+          urgency: string
+        }
+        Update: {
+          client_name?: string | null
+          created_at?: string
+          days_until_expiry?: number
+          id?: string
+          professional_id?: string | null
+          professional_name?: string
+          read_at?: string | null
+          renewal_deadline?: string | null
+          sent_at?: string
+          urgency?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_notifications_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_notifications_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "v_renewal_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       equipment: {
         Row: {
           company: string | null
@@ -78,6 +132,7 @@ export type Database = {
           office_package: boolean | null
           professional_name: string
           software_details: string | null
+          updated_at: string
         }
         Insert: {
           company?: string | null
@@ -88,6 +143,7 @@ export type Database = {
           office_package?: boolean | null
           professional_name: string
           software_details?: string | null
+          updated_at?: string
         }
         Update: {
           company?: string | null
@@ -98,6 +154,43 @@ export type Database = {
           office_package?: boolean | null
           professional_name?: string
           software_details?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      kanban_metrics_snapshot: {
+        Row: {
+          created_at: string | null
+          cycle_time_avg: number | null
+          efficiency_rate: number | null
+          id: string
+          lead_time_avg: number | null
+          metric_date: string
+          rework_rate: number | null
+          throughput: number | null
+          wip_total: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          cycle_time_avg?: number | null
+          efficiency_rate?: number | null
+          id?: string
+          lead_time_avg?: number | null
+          metric_date?: string
+          rework_rate?: number | null
+          throughput?: number | null
+          wip_total?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          cycle_time_avg?: number | null
+          efficiency_rate?: number | null
+          id?: string
+          lead_time_avg?: number | null
+          metric_date?: string
+          rework_rate?: number | null
+          throughput?: number | null
+          wip_total?: number | null
         }
         Relationships: []
       }
@@ -240,6 +333,69 @@ export type Database = {
         }
         Relationships: []
       }
+      test_health_logs: {
+        Row: {
+          branch: string | null
+          commit_sha: string | null
+          coverage_files_covered: number
+          coverage_files_total: number
+          coverage_percent: number
+          created_at: string | null
+          e2e_duration_ms: number | null
+          e2e_failed: number
+          e2e_passed: number
+          e2e_total: number
+          id: string
+          integration_duration_ms: number | null
+          integration_failed: number
+          integration_passed: number
+          integration_total: number
+          notes: string | null
+          recorded_at: string
+          triggered_by: string | null
+        }
+        Insert: {
+          branch?: string | null
+          commit_sha?: string | null
+          coverage_files_covered?: number
+          coverage_files_total?: number
+          coverage_percent?: number
+          created_at?: string | null
+          e2e_duration_ms?: number | null
+          e2e_failed?: number
+          e2e_passed?: number
+          e2e_total?: number
+          id?: string
+          integration_duration_ms?: number | null
+          integration_failed?: number
+          integration_passed?: number
+          integration_total?: number
+          notes?: string | null
+          recorded_at?: string
+          triggered_by?: string | null
+        }
+        Update: {
+          branch?: string | null
+          commit_sha?: string | null
+          coverage_files_covered?: number
+          coverage_files_total?: number
+          coverage_percent?: number
+          created_at?: string | null
+          e2e_duration_ms?: number | null
+          e2e_failed?: number
+          e2e_passed?: number
+          e2e_total?: number
+          id?: string
+          integration_duration_ms?: number | null
+          integration_failed?: number
+          integration_passed?: number
+          integration_total?: number
+          notes?: string | null
+          recorded_at?: string
+          triggered_by?: string | null
+        }
+        Relationships: []
+      }
       vacations: {
         Row: {
           acquisition_end: string | null
@@ -255,6 +411,7 @@ export type Database = {
           leadership: string | null
           professional_name: string
           total_days: number | null
+          updated_at: string
           vacation_end: string | null
           vacation_start: string | null
         }
@@ -272,6 +429,7 @@ export type Database = {
           leadership?: string | null
           professional_name: string
           total_days?: number | null
+          updated_at?: string
           vacation_end?: string | null
           vacation_start?: string | null
         }
@@ -289,110 +447,9 @@ export type Database = {
           leadership?: string | null
           professional_name?: string
           total_days?: number | null
+          updated_at?: string
           vacation_end?: string | null
           vacation_start?: string | null
-        }
-        Relationships: []
-      }
-      contract_notifications: {
-        Row: {
-          id: string
-          professional_id: string | null
-          professional_name: string
-          client_name: string | null
-          days_until_expiry: number
-          renewal_deadline: string | null
-          urgency: 'expired' | 'critical' | 'warning' | 'attention'
-          read_at: string | null
-          sent_at: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          professional_id?: string | null
-          professional_name: string
-          client_name?: string | null
-          days_until_expiry: number
-          renewal_deadline?: string | null
-          urgency: 'expired' | 'critical' | 'warning' | 'attention'
-          read_at?: string | null
-          sent_at?: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          professional_id?: string | null
-          professional_name?: string
-          client_name?: string | null
-          days_until_expiry?: number
-          renewal_deadline?: string | null
-          urgency?: 'expired' | 'critical' | 'warning' | 'attention'
-          read_at?: string | null
-          sent_at?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
-      test_health_logs: {
-        Row: {
-          id: string
-          recorded_at: string
-          coverage_percent: number
-          coverage_files_covered: number
-          coverage_files_total: number
-          integration_total: number
-          integration_passed: number
-          integration_failed: number
-          integration_duration_ms: number | null
-          e2e_total: number
-          e2e_passed: number
-          e2e_failed: number
-          e2e_duration_ms: number | null
-          branch: string | null
-          commit_sha: string | null
-          triggered_by: string | null
-          notes: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          recorded_at?: string
-          coverage_percent?: number
-          coverage_files_covered?: number
-          coverage_files_total?: number
-          integration_total?: number
-          integration_passed?: number
-          integration_failed?: number
-          integration_duration_ms?: number | null
-          e2e_total?: number
-          e2e_passed?: number
-          e2e_failed?: number
-          e2e_duration_ms?: number | null
-          branch?: string | null
-          commit_sha?: string | null
-          triggered_by?: string | null
-          notes?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          recorded_at?: string
-          coverage_percent?: number
-          coverage_files_covered?: number
-          coverage_files_total?: number
-          integration_total?: number
-          integration_passed?: number
-          integration_failed?: number
-          integration_duration_ms?: number | null
-          e2e_total?: number
-          e2e_passed?: number
-          e2e_failed?: number
-          e2e_duration_ms?: number | null
-          branch?: string | null
-          commit_sha?: string | null
-          triggered_by?: string | null
-          notes?: string | null
-          created_at?: string
         }
         Relationships: []
       }
@@ -439,6 +496,7 @@ export type Database = {
     }
     Functions: {
       is_admin: { Args: never; Returns: boolean }
+      is_gerente_or_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

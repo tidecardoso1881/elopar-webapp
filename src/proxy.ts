@@ -54,6 +54,15 @@ export async function proxy(request: NextRequest) {
 
   // Rotas exclusivas para admin — verificar role no banco
   const adminOnlyRoutes = ['/area-usuario/gerenciar-usuarios', '/area-usuario/audit-log']
+
+  // Rota exclusiva para tidebatera@gmail.com
+  if (user && pathname.startsWith('/area-usuario/metricas')) {
+    if (user.email !== process.env.METRICS_ALLOWED_EMAIL) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/area-usuario'
+      return NextResponse.redirect(url)
+    }
+  }
   if (user && adminOnlyRoutes.some(r => pathname.startsWith(r))) {
     const { data: profile } = await supabase
       .from('profiles')
