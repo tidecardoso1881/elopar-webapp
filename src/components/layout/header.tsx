@@ -4,6 +4,8 @@ import { useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { MobileMenu } from './mobile-menu'
 import { SignOutButton } from '@/components/auth/sign-out-button'
+import { CommandPalette } from '@/components/ui/command-palette'
+import { useCommandPalette } from '@/hooks/useCommandPalette'
 
 interface HeaderProps {
   user: { email: string }
@@ -15,6 +17,7 @@ export function Header({ user, profile, notificationBell }: HeaderProps) {
   const displayName = profile?.full_name ?? user.email ?? 'Usuário'
   const initials = displayName.charAt(0).toUpperCase()
   const detailsRef = useRef<HTMLDetailsElement>(null)
+  const { open, setOpen } = useCommandPalette()
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -34,9 +37,22 @@ export function Header({ user, profile, notificationBell }: HeaderProps) {
         <MobileMenu user={user} profile={profile} />
       </div>
 
-      {/* Right: Notifications + User Dropdown */}
+      {/* Right: Notifications + Search + User Dropdown */}
       <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-auto">
         {notificationBell}
+
+        {/* Search Button */}
+        <button
+          onClick={() => setOpen(true)}
+          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-500 hover:border-gray-300 hover:text-gray-700 transition-colors"
+          title="Busca global (Ctrl+K)"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <span className="hidden sm:inline">Buscar</span>
+          <kbd className="hidden sm:inline-flex items-center px-1 py-0.5 text-xs font-mono text-gray-400 bg-gray-100 rounded border border-gray-200">Ctrl K</kbd>
+        </button>
 
         {/* User Dropdown */}
         <details ref={detailsRef} className="relative">
@@ -94,6 +110,9 @@ export function Header({ user, profile, notificationBell }: HeaderProps) {
             </div>
           </div>
         </details>
+
+        {/* Command Palette */}
+        <CommandPalette open={open} onClose={() => setOpen(false)} />
       </div>
     </header>
   )
