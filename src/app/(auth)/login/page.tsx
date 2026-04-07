@@ -170,12 +170,12 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-4 text-center">
-            <a
-              href="https://elopar-webapp.vercel.app/reset-password"
+            <Link
+              href="/reset-password"
               className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
             >
               Esqueceu a senha?
-            </a>
+            </Link>
           </div>
         </div>
 

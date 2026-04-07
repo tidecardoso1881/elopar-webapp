@@ -25,7 +25,7 @@ const SENIORITY_OPTIONS = [
 const CONTRACT_OPTIONS = [
   { value: 'PJ', label: 'PJ' },
   { value: 'CLT_ESTRATEGICO', label: 'CLT Estratégico' },
-  { value: 'CLT_ILATI', label: 'CLT ILATI' },
+  { value: 'CLT_ILAED', label: 'CLT ILAED' },
 ]
 
 const STATUS_OPTIONS = [

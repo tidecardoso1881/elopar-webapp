@@ -118,6 +118,7 @@ export function normalizeContractType(value: string | null | undefined): string 
     'CLT ESTRATÉGICO': 'CLT_ESTRATEGICO',
     'CLT ESTRÁTEGICO': 'CLT_ESTRATEGICO',
     'CLT ILAED': 'CLT_ILAED',
+    'CLT ILATI': 'CLT_ILATI',
     'PJ': 'PJ',
   }
   return map[normalized] ?? normalized

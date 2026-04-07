@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
+import Link from 'next/link'
 import { SignOutButton } from '@/components/auth/sign-out-button'
 
 interface MobileMenuProps {
@@ -61,6 +62,15 @@ const menuItems = [
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432m0 0a2.25 2.25 0 1 0-3.182-3.182m3.182 3.182l6.94 6.939M3 12a9 9 0 1 1 18 0 9 9 0 0 1-18 0Z" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Notificações',
+    href: '/notificacoes',
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
       </svg>
     ),
   },
@@ -134,7 +144,7 @@ export function MobileMenu({ user, profile }: MobileMenuProps) {
           {menuItems.map((item) => {
             const isActive = pathname === item.href
             return (
-              <a
+              <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
@@ -147,7 +157,7 @@ export function MobileMenu({ user, profile }: MobileMenuProps) {
               >
                 <span className={isActive ? 'text-blue-600' : 'text-gray-500'} aria-hidden="true">{item.icon}</span>
                 {item.label}
-              </a>
+              </Link>
             )
           })}
         </nav>
