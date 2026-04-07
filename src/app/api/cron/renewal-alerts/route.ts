@@ -5,7 +5,7 @@ import type { Database } from '@/lib/types/database'
 // Proteção da rota: requer CRON_SECRET no header Authorization
 function isAuthorized(req: Request): boolean {
   const secret = process.env.CRON_SECRET
-  if (!secret) return true // dev sem secret configurado
+  if (!secret) return false // fail closed — sem secret configurado, negar sempre
   const auth = req.headers.get('authorization')
   return auth === `Bearer ${secret}`
 }
@@ -20,6 +20,11 @@ function toUrgency(days: number): 'expired' | 'critical' | 'warning' | 'attentio
 }
 
 export async function GET(req: Request) {
+  const secret = process.env.CRON_SECRET
+  if (!secret) {
+    console.error('[cron] CRON_SECRET não configurado — endpoint bloqueado por segurança')
+    return NextResponse.json({ error: 'Service unavailable' }, { status: 503 })
+  }
   if (!isAuthorized(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
