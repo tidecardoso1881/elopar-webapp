@@ -1,8 +1,16 @@
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import { canWrite } from '@/types/roles'
 import { EquipmentForm } from '@/components/profissionais/equipment-form'
 import { createEquipment } from '@/actions/equipment'
 
 export default async function NovoEquipamentoPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  if (!canWrite(profile?.role)) redirect('/equipamentos')
   return (
     <div className="space-y-6 max-w-3xl">
       {/* Header */}
