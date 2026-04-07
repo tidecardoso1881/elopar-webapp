@@ -1,10 +1,23 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { canWrite } from '@/types/roles'
 import { ProfessionalForm } from '@/components/profissionais/professional-form'
 import { createProfessional } from '@/actions/professionals'
 
 export default async function NovoProfissionalPage() {
   const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (!canWrite(profile?.role)) redirect('/profissionais')
 
   const { data: clients } = await supabase
     .from('clients')
