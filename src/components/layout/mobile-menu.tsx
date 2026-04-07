@@ -164,7 +164,7 @@ export function MobileMenu({ user, profile }: MobileMenuProps) {
             )
           })}
 
-          {isAdminOrManager && (
+          {isAdmin && (
             <>
               {/* Divisor */}
               <div className="my-2 border-t border-gray-100" />

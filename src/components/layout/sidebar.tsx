@@ -126,7 +126,7 @@ export function Sidebar({ renewalBadge, userRole = 'consulta' }: SidebarProps) {
           )
         })}
 
-        {isAdminOrManager && (
+        {isAdmin && (
           <>
             {/* Divisor */}
             <div className="my-2 border-t border-gray-100" />
