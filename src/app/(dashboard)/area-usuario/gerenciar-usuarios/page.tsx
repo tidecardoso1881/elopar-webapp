@@ -39,7 +39,7 @@ export default async function GerenciarUsuariosPage() {
   // Buscar perfis
   const { data: profiles } = await supabase
     .from('profiles')
-    .select('id, full_name, role')
+    .select('id, full_name, role, permissions')
 
   const profilesMap = new Map((profiles ?? []).map(p => [p.id, p]))
 
@@ -49,10 +49,11 @@ export default async function GerenciarUsuariosPage() {
       id: u.id,
       email: u.email ?? '',
       full_name: p?.full_name ?? null,
-      role: p?.role ?? 'manager',
+      role: p?.role ?? 'consulta',
       status: resolveStatus(u.confirmed_at ?? null, u.banned_until ?? null),
       created_at: u.created_at,
       last_sign_in_at: u.last_sign_in_at ?? null,
+      permissions: (p?.permissions as import('@/types/permissions').UserPermissions | null) ?? null,
     }
   })
 
