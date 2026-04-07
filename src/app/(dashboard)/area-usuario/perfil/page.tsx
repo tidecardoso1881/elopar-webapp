@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { ProfileForm } from '@/components/user/profile-form'
+import { AvatarUpload } from '@/components/user/avatar-upload'
 
 export default async function PerfilPage() {
   const supabase = await createClient()
@@ -22,18 +23,10 @@ export default async function PerfilPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-6">
-        {/* Avatar placeholder */}
-        <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
-          <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-            <span className="text-2xl font-semibold text-indigo-700">
-              {(profile?.full_name ?? user.email ?? 'U').charAt(0).toUpperCase()}
-            </span>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-900">{profile?.full_name ?? '—'}</p>
-            <p className="text-xs text-gray-500 capitalize">{profile?.role ?? 'usuário'}</p>
-          </div>
-        </div>
+        <AvatarUpload
+          currentUrl={profile?.avatar_url ?? null}
+          initials={(profile?.full_name ?? user.email ?? 'U').charAt(0).toUpperCase()}
+        />
 
         <ProfileForm
           initialName={profile?.full_name ?? ''}

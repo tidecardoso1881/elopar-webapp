@@ -24,3 +24,39 @@ export async function updateProfile(data: {
   revalidatePath('/', 'layout')
   return { success: true }
 }
+
+export async function uploadAvatar(formData: FormData): Promise<ActionResult & { avatarUrl?: string }> {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Não autorizado.' }
+
+  const file = formData.get('avatar') as File | null
+  if (!file || file.size === 0) return { error: 'Nenhum arquivo selecionado.' }
+  if (!file.type.startsWith('image/')) return { error: 'Apenas imagens são permitidas.' }
+  if (file.size > 2 * 1024 * 1024) return { error: 'Imagem deve ter no máximo 2MB.' }
+
+  const ext = file.name.split('.').pop() ?? 'jpg'
+  const path = `${user.id}/avatar.${ext}`
+
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(path, file, { upsert: true, contentType: file.type })
+
+  if (uploadError) return { error: uploadError.message }
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('avatars')
+    .getPublicUrl(path)
+
+  const { error: updateError } = await supabase
+    .from('profiles')
+    .update({ avatar_url: publicUrl })
+    .eq('id', user.id)
+
+  if (updateError) return { error: updateError.message }
+
+  revalidatePath('/area-usuario/perfil')
+  revalidatePath('/', 'layout')
+  return { success: true, avatarUrl: publicUrl }
+}
