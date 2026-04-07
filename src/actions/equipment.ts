@@ -29,6 +29,9 @@ export async function createEquipment(
 ): Promise<ActionResult> {
   const supabase = await createClient()
 
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (!user || authError) return { error: 'Não autorizado.' }
+
   const data: EquipmentFormData = {
     professional_name: formData.get('professional_name') as string,
     company: formData.get('company') as string,
@@ -82,6 +85,9 @@ export async function updateEquipment(
   formData: FormData
 ): Promise<ActionResult> {
   const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (!user || authError) return { error: 'Não autorizado.' }
 
   const data: EquipmentFormData = {
     professional_name: formData.get('professional_name') as string,
@@ -138,6 +144,9 @@ export async function updateEquipment(
 
 export async function deleteEquipment(id: string): Promise<ActionResult> {
   const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (!user || authError) return { error: 'Não autorizado.' }
 
   const { data: antes } = await supabase
     .from('equipment')

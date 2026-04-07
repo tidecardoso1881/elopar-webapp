@@ -136,6 +136,9 @@ export async function createProfessional(
 ): Promise<ActionResult> {
   const supabase = await createClient()
 
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (!user || authError) return { error: 'Não autorizado.' }
+
   const data: ProfessionalFormData = {
     name: formData.get('name') as string,
     os: formData.get('os') as string,
@@ -203,6 +206,9 @@ export async function updateProfessional(
   formData: FormData
 ): Promise<ActionResult> {
   const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (!user || authError) return { error: 'Não autorizado.' }
 
   const data: ProfessionalFormData = {
     name: formData.get('name') as string,
@@ -275,6 +281,9 @@ export async function updateProfessional(
 export async function deleteProfessional(id: string): Promise<ActionResult> {
   const supabase = await createClient()
 
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (!user || authError) return { error: 'Não autorizado.' }
+
   const { data: antes } = await supabase
     .from('professionals')
     .select()
@@ -318,6 +327,9 @@ export async function renewProfessional(
   }
 
   const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (!user || authError) return { error: 'Não autorizado.' }
 
   const { error } = await supabase
     .from('professionals')

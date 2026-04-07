@@ -36,6 +36,9 @@ export async function createVacation(
 ): Promise<ActionResult> {
   const supabase = await createClient()
 
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (!user || authError) return { error: 'Não autorizado.' }
+
   const data: VacationFormData = {
     professional_name: formData.get('professional_name') as string,
     admission_date: formData.get('admission_date') as string,
@@ -100,6 +103,9 @@ export async function createVacation(
 export async function updateVacation(id: string) {
   return async function (_prevState: ActionResult, formData: FormData): Promise<ActionResult> {
     const supabase = await createClient()
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (!user || authError) return { error: 'Não autorizado.' }
 
     const data: VacationFormData = {
       professional_name: formData.get('professional_name') as string,
@@ -171,6 +177,9 @@ export async function updateVacation(id: string) {
 
 export async function deleteVacation(id: string): Promise<ActionResult> {
   const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (!user || authError) return { error: 'Não autorizado.' }
 
   const { data: antes } = await supabase
     .from('vacations')

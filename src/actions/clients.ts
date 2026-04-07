@@ -18,6 +18,9 @@ export async function createClientAction(
 ): Promise<ClientActionResult> {
   const supabase = await createClient()
 
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (!user || authError) return { error: 'Não autorizado.' }
+
   const name = (formData.get('name') as string)?.trim()
 
   if (!name) {
@@ -57,6 +60,9 @@ export async function updateClientAction(
   formData: FormData
 ): Promise<ClientActionResult> {
   const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (!user || authError) return { error: 'Não autorizado.' }
 
   const name = (formData.get('name') as string)?.trim()
 
@@ -98,6 +104,9 @@ export async function updateClientAction(
 
 export async function deleteClientAction(id: string): Promise<ClientActionResult> {
   const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (!user || authError) return { error: 'Não autorizado.' }
 
   // Verifica se há profissionais vinculados
   const { count } = await supabase
