@@ -54,17 +54,17 @@ describe('ProfessionalsFilters', () => {
   it('renders contract type dropdown with all options', () => {
     render(<ProfessionalsFilters clients={clients} />)
     expect(screen.getByText('Todos os contratos')).toBeTruthy()
-    expect(screen.getByText('CLT Estratégico')).toBeTruthy()
-    expect(screen.getByText('CLT ILAED')).toBeTruthy()
+    expect(screen.getByText('CLT')).toBeTruthy()
     expect(screen.getByText('PJ')).toBeTruthy()
+    expect(screen.getByText('Estágio')).toBeTruthy()
   })
 
   it('renders renewal dropdown with all options', () => {
     render(<ProfessionalsFilters clients={clients} />)
-    expect(screen.getByText('Todos os períodos')).toBeTruthy()
-    expect(screen.getByText('Vencidos')).toBeTruthy()
+    expect(screen.getByText('Todos os vencimentos')).toBeTruthy()
+    expect(screen.getByText(/Expirado/)).toBeTruthy()
     expect(screen.getByText(/Crítico/)).toBeTruthy()
-    expect(screen.getByText(/Atenção/)).toBeTruthy()
+    expect(screen.getByText(/Aviso/)).toBeTruthy()
     expect(screen.getByText(/OK/)).toBeTruthy()
   })
 
