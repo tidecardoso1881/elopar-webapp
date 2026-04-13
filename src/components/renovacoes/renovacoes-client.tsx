@@ -62,8 +62,8 @@ export function RenovacoesClient({
 
     // Apply sorting
     const sorted = [...result].sort((a, b) => {
-      let aVal: any
-      let bVal: any
+      let aVal: string | number | Date | undefined
+      let bVal: string | number | Date | undefined
 
       switch (sortCol) {
         case 'name':

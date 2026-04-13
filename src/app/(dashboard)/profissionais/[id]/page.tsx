@@ -212,9 +212,9 @@ export default async function ProfissionalDetailPage({ params }: ProfissionalDet
       )}
 
       <ProfessionalTabs
-        professional={professional as any}
-        equipment={equipment as any}
-        vacations={(vacations ?? []) as any}
+        professional={professional as unknown as any}
+        equipment={equipment as unknown as any}
+        vacations={(vacations ?? []) as unknown as any}
         notes={notes}
         canReadNotes={canReadNotes}
         currentUserId={currentUserId}

@@ -17,7 +17,7 @@ export interface ModulePermissions {
   reports?: { export?: boolean }
 }
 
-export interface UserPermissions extends ModulePermissions {}
+export type UserPermissions = ModulePermissions
 
 export interface PermissionProfile {
   id: string

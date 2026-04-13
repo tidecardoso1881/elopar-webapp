@@ -93,9 +93,11 @@ export default async function ProfissionaisPage({ searchParams }: ProfissionaisP
     query = query.eq('contract_type', contractType)
   }
 
-  let { data: professionals, count, error } = await query
+  const { data: professionalsData, count: initialCount, error } = await query
 
   // Filtro de renovação é aplicado em memória se necessário
+  let professionals = professionalsData
+  let count = initialCount
   if (renewalFilter && professionals) {
     professionals = professionals.filter((p) => {
       const status = getRenewalStatus(p.renewal_deadline)

@@ -271,4 +271,17 @@ async function seed() {
     console.log(`Total de erros: ${totalErrors}`);
     if (allErrors.length > 0) {
       console.log('Erros encontrados:');
+      allErrors.slice(0, 20).forEach(e => console.log(`  - ${e}`));
+      if (allErrors.length > 20) {
+        console.log(`  ... e ${allErrors.length - 20} erros adicionais`);
+      }
+    }
+    console.log('================================================================================\n');
+  } catch (error) {
+    console.error('❌ Erro durante seed:', error.message);
+    process.exit(1);
+  }
+}
+
+seed();
    

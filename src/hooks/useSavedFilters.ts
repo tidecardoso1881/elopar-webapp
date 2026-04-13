@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 
 export interface SavedFilter {
   id: string
@@ -25,11 +25,7 @@ function save(filters: SavedFilter[]): void {
 }
 
 export function useSavedFilters() {
-  const [filters, setFilters] = useState<SavedFilter[]>([])
-
-  useEffect(() => {
-    setFilters(load())
-  }, [])
+  const [filters, setFilters] = useState<SavedFilter[]>(load)
 
   const saveFilter = useCallback((name: string, params: Record<string, string>) => {
     if (!name.trim()) return
