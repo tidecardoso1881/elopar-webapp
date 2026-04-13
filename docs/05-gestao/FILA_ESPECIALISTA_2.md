@@ -15,6 +15,15 @@ atualizado: 2026-04-07
 2. Nunca leia ou execute arquivos da pasta `especialista-1/`
 3. Fila vazia → pare e aguarde. Não busque trabalho em outro lugar
 4. **Máximo 1 tarefa em `fazendo/` por vez**
+5. **Arquivo `URGENT_*` no inbox = interrompa o que está fazendo e leia imediatamente**
+
+## 📄 Nomenclatura de arquivos
+
+```
+[TIPO]_[Assunto-Breve]_[ddmmaaaa]_[hh_mm].md
+```
+
+Tipos por prioridade: `URGENT` → `BLOCK` → `DONE` → `SOLICIT` → `DIRETRIZ` → `TICKET` → `INFO`
 
 ---
 
@@ -35,49 +44,35 @@ docs/05-gestao/comunicacao/
 
 ---
 
-## 🎯 Seus tickets — Wave NAV (atualizado 2026-04-07)
+## 🎯 Seus tickets — Wave Backlog (atualizado 2026-04-07)
 
-### ▶️ FAZENDO AGORA — Liberado por Cowork
+### ✅ CONCLUÍDO
 
-| Ticket | Status | Branch |
+| Ticket | Status | PR |
 |---|---|---|
-| **NAV-001-002** | 🚀 **EM PROGRESSO** | `feat/nav-sidebar-roles` |
+| **EP-NEW-015** | ✅ **REVIEW** | #101 |
 
-**Descrição:** Sidebar mostra "Analytics" só para admin/gerente
+**Descrição:** Busca global com Command Palette (Ctrl+K)
+
+**Status:**
+- API `/api/search` ✅
+- Hook `useCommandPalette` ✅
+- Componente `CommandPalette` ✅
+- Integração Header ✅
+- Sem conflitos ✅
+
+### ⏳ AGUARDANDO LIBERAÇÃO
+
+| Ticket | Status | Nota |
+|---|---|---|
+| EP-NEW-020 | ⏳ Próxima onda | Aguardando Gerente |
 
 ---
 
-### ⏳ BLOQUEADO — Aguarda E1
+## 🔒 Escopo — concluído vs. novo
 
-| Ticket | Status | Bloqueio |
-|---|---|---|
-| **NAV-003** | ⏳ Wave 2 | Aguarda merge do ticket de E1 |
-| NAV-004 | ⏳ Wave 2 | Não liberado ainda |
-| NAV-005 | ⏳ Wave 2 | Não liberado ainda |
-
-**Seu próximo trabalho:** Após concluir NAV-001-002 e E1 fazer merge → começar NAV-003 (abas no detalhe do profissional)
-
----
-
-## 🔒 Escopo — o que é seu e o que não é
-
-| EP | De quem é | Status |
-|---|---|---|
-| NAV-001+002 — Sidebar por role | ❌ Especialista 1 | Delegado a E2 por Cowork — em progresso |
-| NAV-004 — Salvar filtro | ❌ Especialista 1 | Não liberado |
-| NAV-005 — Limpeza área usuário | ❌ Especialista 1 | Não liberado |
-| **NAV-003 — Abas detalhe profissional** | ✅ **Seu** | ⏳ Bloqueado até E1 merge |
-
----
-
-## 🔁 Fluxo por ticket (quando liberado)
-
-```
-1. Leia o ticket no inbox/
-2. Mova para fazendo/   ← sinaliza que começou
-3. Implemente + tsc + lint + build
-4. git fetch origin && git merge origin/main
-5. Abra o PR
-6. Mova para done/ e adicione PR: #NNN no arquivo
-7. Crie mensagem em gerente/inbox/ com o número do PR
-```
+| EP | Status |
+|---|---|
+| NAV-001+002 — Sidebar por role | ✅ PR #90 merged |
+| NAV-003 — Abas detalhe profissional | ✅ PR #95 merged |
+| **EP-NEW-015 — Busca Global** | ▶️ **SEU PRÓXIMO** |

@@ -1,6 +1,6 @@
 ---
 para: Especialista 2 (Haiku)
-atualizado: 2026-04-07
+atualizado: 2026-04-07 v3
 ---
 
 # Fila — Especialista 2
@@ -18,36 +18,46 @@ Se sua fila estiver vazia: **pare e aguarde**. Não busque trabalho em outro lug
 
 ---
 
-## 🎯 TAREFA ATUAL
+## 🎯 FILA ATUAL
 
-### ▶️ E2-J — Perfil Completo (URGENTE — substitui PRs #81 e #82)
-**Ticket:** `TICKET-E2-J_consolida-perfil.md`
-**Branch:** `feat/ep-005-perfil-completo`
-**Por quê:** PRs #81 e #82 têm conflitos. Este ticket entrega os 4 arquivos em uma branch limpa.
-**Após concluir:** fechar PRs #81 e #82 manualmente + criar `NOTE_e2j_done.md` com número do PR
+### ▶️ E2-L — NAV-001: Sidebar + MobileMenu — expor seções Admin/Analytics
+**Ticket:** `comunicacao/especialista-2/inbox/TICKET_nav-001-sidebar-refactor_07042026_20_00.md`
+**Branch:** `feat/nav-001-sidebar-admin-sections`
+**Por quê:** `sidebar.tsx` (150 linhas) e `mobile-menu.tsx` (184 linhas) estão TRUNCADOS no disco. O ticket contém o arquivo sidebar.tsx completo para reescrita. Mobile menu: mesmas mudanças (ler e completar o arquivo). Adiciona seção Analytics (Métricas + Saúde dos Testes) e Administração (Audit Log + Usuários) visíveis por role.
+
+### ⏳ E2-M — NAV-002: Corrigir acesso a Métricas por role (remover METRICS_ALLOWED_EMAIL)
+**Ticket:** `comunicacao/especialista-2/inbox/TICKET_nav-002-metricas-role-fix_07042026_20_30.md`
+**Branch:** `fix/nav-002-metricas-role-check`
+**Por quê:** `proxy.ts` está TRUNCADO. `/area-usuario/metricas` só abre para 1 email específico — todos os outros são bloqueados. O ticket tem o proxy.ts completo reconstruído + fix em metricas/page.tsx.
+
+### ⏳ E2-N — NAV-004: Simplificar Área do Usuário
+**Ticket:** `comunicacao/especialista-2/inbox/TICKET_nav-004-area-usuario-simplificada_07042026_22_00.md`
+**Branch:** `fix/nav-004-area-usuario-simplificada`
+**Dependência: E2-L deve estar merged antes.**
+**Por quê:** `area-usuario/page.tsx` está TRUNCADO (60 linhas). Após E2-L adicionar Métricas, Saúde dos Testes, Audit Log e Gerenciar Usuários na sidebar, os cards admin ficam redundantes. O ticket tem o arquivo completo reescrito — apenas profile card + Meu Perfil + Permissões.
 
 ---
 
-## ⏳ Próxima (não iniciar antes de E2-J estar mergeado)
-
-### E2-I — Saved Filters UI
-**Ticket:** `TICKET-E2-I_saved-filters-ui.md`
-**Bloqueio:** aguarda E2-J mergeado no main
-
----
-
-## ✅ Concluídas
+## ✅ Concluídas hoje (07/04/2026)
 
 | # | Ticket | PR |
 |---|---|---|
-| 1 | E2-A — Histórico integração | ✅ done |
-| 2 | E2-B — Offline page | ✅ done |
-| 3 | E2-C — Professional actions RBAC | ✅ PR #70 |
-| 4 | E2-D — Guard clientes | ✅ PR #73 |
-| 5 | E2-E — Guard equipamentos | ✅ PR #75 |
-| 6 | E2-F — Perfil dropdown links (header) | ✅ PR #76 |
-| 7 | E2-G — Perfil page + action updateProfile | ✅ PR #79 (substituído por E2-J) |
-| 8 | E2-H — Avatar upload | ⚠️ PR #82 conflito — substituído por E2-J |
+| E2-K | EP-015 — header.tsx + command-palette.tsx | ✅ PR #101 aguardando merge |
+
+## ✅ Concluídas (sessão anterior)
+
+| # | Ticket | PR |
+|---|---|---|
+| E2-A | Histórico integração | ✅ done |
+| E2-B | Offline page | ✅ done |
+| E2-C | Professional actions RBAC | ✅ PR #70 |
+| E2-D | Guard clientes | ✅ PR #73 |
+| E2-E | Guard equipamentos | ✅ PR #75 |
+| E2-F | Perfil dropdown links (header) | ✅ PR #76 |
+| E2-G | Perfil page + action updateProfile | ✅ PR #79 |
+| E2-H | Avatar upload | ✅ PR #82 |
+| E2-J | Consolida Perfil Completo | ✅ PR #84 |
+| E2-I | Saved Filters UI | ✅ merged |
 
 ---
 
@@ -56,14 +66,5 @@ Se sua fila estiver vazia: **pare e aguarde**. Não busque trabalho em outro lug
 1. `git checkout main && git pull origin main` antes de cada branch nova
 2. `npx tsc --noEmit` antes de todo commit — zero erros
 3. Nunca push direto em `main`
-4. Bloqueio ou dúvida → criar `NOTE_e2_BLOQUEADO_[ticket].md` e parar
-5. Concluído → criar `NOTE_e2_[ticket]_done.md` com número do PR
-
----
-
-## 🗄️ Contexto técnico (E2-J)
-
-- Tabela `profiles`: `id`, `full_name`, `role`, `avatar_url` ← coluna já existe no Supabase
-- Storage bucket `avatars` já criado no Supabase
-- `src/lib/supabase/server.ts` — padrão `createClient()` disponível
-- TypeScript types atualizados em `src/lib/types/database.ts`
+4. Bloqueio ou dúvida → criar `BLOCK_[assunto]_[ddmmaaaa]_[hh_mm].md` no inbox do gerente e parar
+5. Concluído → criar `DONE_[assunto]_[ddmmaaaa]_[hh_mm].md` no inbox do gerente com número do PR
