@@ -3,7 +3,7 @@
 import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { updatePassword } from './actions'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 function SubmitButton() {
   const { pending } = useFormStatus()
@@ -68,6 +68,19 @@ function PasswordInput({ id, name, label, placeholder }: { id: string; name: str
 
 export default function UpdatePasswordPage() {
   const [state, formAction] = useActionState(updatePassword, null)
+  const [linkError, setLinkError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const authError = params.get('auth_error')
+    if (authError) {
+      setLinkError(
+        authError === 'otp_expired'
+          ? 'Seu link de convite expirou. Solicite um novo convite ao administrador.'
+          : 'Link de convite inválido ou já utilizado. Solicite um novo convite ao administrador.'
+      )
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 flex items-center justify-center p-4">
@@ -87,6 +100,15 @@ export default function UpdatePasswordPage() {
           <p className="text-sm text-gray-500 mb-6">
             Escolha uma senha com pelo menos 8 caracteres.
           </p>
+
+          {linkError && (
+            <div className="mb-4 flex gap-2 items-start p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+              <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+              </svg>
+              <span>{linkError}</span>
+            </div>
+          )}
 
           {state?.error && (
             <div className="mb-4 flex gap-2 items-start p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
