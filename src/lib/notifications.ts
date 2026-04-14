@@ -15,8 +15,7 @@ export async function insertNotification({
 }) {
   try {
     const admin = createAdminClient()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (admin as any).from('notifications').insert({ user_id, tipo, mensagem, link })
+    await admin.from('notifications').insert({ user_id, tipo, mensagem, link })
   } catch {
     // best-effort: não bloqueia a action principal
   }

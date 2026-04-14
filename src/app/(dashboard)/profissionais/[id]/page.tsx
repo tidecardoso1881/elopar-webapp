@@ -59,9 +59,9 @@ export default async function ProfissionalDetailPage({ params }: ProfissionalDet
     notFound()
   }
 
-  // Busca equipamentos via professional_id (FK adicionada via migration)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: equipmentList } = await (supabase.from('equipment') as any)
+  // Busca equipamentos via professional_id
+  const { data: equipmentList } = await supabase
+    .from('equipment')
     .select('id, machine_type, machine_model, office_package, software_details, company')
     .eq('professional_id', professional.id)
     .order('created_at', { ascending: false })

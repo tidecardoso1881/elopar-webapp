@@ -41,7 +41,6 @@ export async function createEquipment(
     return { error: 'Selecione um profissional cadastrado.' }
   }
 
-  // professional_id adicionado via migration — cast até tipos serem regenerados
   const payload = {
     professional_id: professionalId,
     professional_name: professionalName?.trim() || '',
@@ -52,8 +51,8 @@ export async function createEquipment(
     software_details: (formData.get('software_details') as string)?.trim() || null,
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: created, error } = await (supabase.from('equipment') as any)
+  const { data: created, error } = await supabase
+    .from('equipment')
     .insert(payload)
     .select()
     .single()
@@ -94,7 +93,6 @@ export async function updateEquipment(
     return { error: 'Selecione um profissional cadastrado.' }
   }
 
-  // professional_id adicionado via migration — cast até tipos serem regenerados
   const payload = {
     professional_id: professionalId,
     professional_name: professionalName?.trim() || '',
@@ -111,8 +109,8 @@ export async function updateEquipment(
     .eq('id', id)
     .single()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase.from('equipment') as any)
+  const { error } = await supabase
+    .from('equipment')
     .update(payload)
     .eq('id', id)
 
