@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Entidade = 'professional' | 'client' | 'equipment' | 'vacation'
+type Entidade = 'professional' | 'client' | 'equipment' | 'vacation' | 'user'
 type Acao = 'CREATE' | 'UPDATE' | 'DELETE'
 
 interface LogAuditParams {

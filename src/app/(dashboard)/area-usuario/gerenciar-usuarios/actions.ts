@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import type { UserPermissions } from '@/types/permissions'
+import { logAudit } from '@/lib/audit'
 
 type ActionResult = { success: boolean; error?: string }
 
@@ -63,6 +64,13 @@ export async function createUserAction(formData: FormData): Promise<ActionResult
       .upsert({ id: data.user.id, full_name: fullName, role, updated_at: new Date().toISOString() })
   }
 
+  await logAudit({
+    entidade: 'user',
+    entidade_id: data.user?.id ?? email,
+    acao: 'CREATE',
+    dados_depois: { email, full_name: fullName, role },
+  })
+
   revalidatePath('/area-usuario/gerenciar-usuarios')
   return { success: true }
 }
@@ -78,6 +86,14 @@ export async function deactivateUserAction(userId: string): Promise<ActionResult
   const { error } = await admin.auth.admin.updateUserById(userId, { ban_duration: '876600h' })
   if (error) return { success: false, error: error.message }
 
+  await logAudit({
+    entidade: 'user',
+    entidade_id: userId,
+    acao: 'UPDATE',
+    dados_antes: { status: 'ativo' },
+    dados_depois: { status: 'desativado' },
+  })
+
   revalidatePath('/area-usuario/gerenciar-usuarios')
   return { success: true }
 }
@@ -91,6 +107,14 @@ export async function reactivateUserAction(userId: string): Promise<ActionResult
 
   const { error } = await admin.auth.admin.updateUserById(userId, { ban_duration: 'none' })
   if (error) return { success: false, error: error.message }
+
+  await logAudit({
+    entidade: 'user',
+    entidade_id: userId,
+    acao: 'UPDATE',
+    dados_antes: { status: 'desativado' },
+    dados_depois: { status: 'ativo' },
+  })
 
   revalidatePath('/area-usuario/gerenciar-usuarios')
   return { success: true }
@@ -108,6 +132,13 @@ export async function resendInviteAction(email: string): Promise<ActionResult> {
     redirectTo: `${appUrl}/update-password`,
   })
   if (error) return { success: false, error: error.message }
+
+  await logAudit({
+    entidade: 'user',
+    entidade_id: email,
+    acao: 'UPDATE',
+    dados_depois: { acao: 'convite_reenviado', email },
+  })
 
   revalidatePath('/area-usuario/gerenciar-usuarios')
   return { success: true }
@@ -140,6 +171,13 @@ export async function updateUserPermissionsAction(
 
   if (error) return { success: false, error: error.message }
 
+  await logAudit({
+    entidade: 'user',
+    entidade_id: userId,
+    acao: 'UPDATE',
+    dados_depois: { role, permissions: role === 'admin' ? {} : permissions },
+  })
+
   revalidatePath('/area-usuario/gerenciar-usuarios')
   return { success: true }
 }
@@ -154,6 +192,13 @@ export async function deleteUserAction(userId: string): Promise<ActionResult> {
 
   const { error } = await admin.auth.admin.deleteUser(userId)
   if (error) return { success: false, error: error.message }
+
+  await logAudit({
+    entidade: 'user',
+    entidade_id: userId,
+    acao: 'DELETE',
+    dados_antes: { id: userId },
+  })
 
   // profiles é deletado automaticamente via CASCADE DELETE
   revalidatePath('/area-usuario/gerenciar-usuarios')
