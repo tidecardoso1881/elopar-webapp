@@ -18,8 +18,8 @@ export default async function EditEquipmentPage({ params }: EditEquipmentPagePro
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
   if (!canWrite(profile?.role)) redirect('/equipamentos')
 
-  const { data: equipment, error } = await supabase
-    .from('equipment')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: equipment, error } = await (supabase.from('equipment') as any)
     .select('*')
     .eq('id', id)
     .single()
@@ -27,6 +27,18 @@ export default async function EditEquipmentPage({ params }: EditEquipmentPagePro
   if (error || !equipment) {
     notFound()
   }
+
+  const { data: professionals } = await supabase
+    .from('professionals')
+    .select('id, name, clients(name)')
+    .eq('status', 'Ativo')
+    .order('name')
+
+  const profOptions = (professionals ?? []).map((p: { id: string; name: string; clients: { name: string } | null }) => ({
+    id: p.id,
+    name: p.name,
+    clientName: (p.clients as { name: string } | null)?.name ?? '',
+  }))
 
   const boundUpdateEquipment = (prevState: ActionResult, formData: FormData) => updateEquipment(id, prevState, formData)
 
@@ -55,6 +67,7 @@ export default async function EditEquipmentPage({ params }: EditEquipmentPagePro
       <EquipmentForm
         action={boundUpdateEquipment}
         defaultValues={equipment}
+        professionals={profOptions}
         submitLabel="Salvar Alterações"
         cancelHref={`/equipamentos/${id}`}
       />

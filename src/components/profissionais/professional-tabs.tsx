@@ -43,6 +43,8 @@ interface Equipment {
   software_details?: string | null
 }
 
+type EquipmentList = Equipment[]
+
 interface Vacation {
   id: string
   acquisition_start: string | null
@@ -64,7 +66,7 @@ interface Note {
 
 interface ProfessionalTabsProps {
   professional: Professional
-  equipment: Equipment | null
+  equipment: EquipmentList
   vacations: Vacation[]
   notes: Note[]
   canReadNotes: boolean
@@ -118,7 +120,7 @@ function DadosTab({
   renewalStyle,
 }: {
   professional: Professional
-  equipment: Equipment | null
+  equipment: EquipmentList
   vacations: Vacation[]
   currentRole: string
   renewalStyle: { bg: string; label: string }
@@ -278,25 +280,35 @@ function DadosTab({
               </svg>
             }
           >
-            {!equipment ? (
+            {equipment.length === 0 ? (
               <p className="text-sm text-gray-400 text-center py-3">Nenhum equipamento vinculado.</p>
             ) : (
-              <div className="space-y-4">
-                <InfoField label="Empresa" value={equipment.company} />
-                <InfoField label="Modelo" value={equipment.machine_model} />
-                <InfoField label="Tipo" value={equipment.machine_type} />
-                <InfoField
-                  label="Pacote Office"
-                  value={
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${equipment.office_package ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                      {equipment.office_package ? 'Sim' : 'Não'}
-                    </span>
-                  }
-                />
-                {equipment.software_details && (
-                  <InfoField label="Softwares" value={equipment.software_details} />
-                )}
-              </div>
+              <ul className="divide-y divide-gray-100 -mx-5">
+                {equipment.map(eq => (
+                  <li key={eq.id} className="px-5 py-3 hover:bg-gray-50 transition-colors">
+                    <a href={`/equipamentos/${eq.id}`} className="flex items-center justify-between gap-3 group">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-indigo-600 group-hover:text-indigo-800 truncate">
+                          {eq.machine_model ?? '—'} · {eq.machine_type ?? '—'}
+                        </p>
+                        {eq.company && (
+                          <p className="text-xs text-gray-500 truncate">{eq.company}</p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {eq.office_package && (
+                          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700">
+                            Office
+                          </span>
+                        )}
+                        <svg className="h-4 w-4 text-gray-400 group-hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </a>
+                  </li>
+                ))}
+              </ul>
             )}
           </SectionCard>
 

@@ -59,12 +59,12 @@ export default async function ProfissionalDetailPage({ params }: ProfissionalDet
     notFound()
   }
 
-  // Busca equipamento pelo nome (FK por nome no schema atual)
-  const { data: equipment } = await supabase
-    .from('equipment')
-    .select('*')
-    .eq('professional_name', professional.name)
-    .maybeSingle()
+  // Busca equipamentos via professional_id (FK adicionada via migration)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: equipmentList } = await (supabase.from('equipment') as any)
+    .select('id, machine_type, machine_model, office_package, software_details, company')
+    .eq('professional_id', professional.id)
+    .order('created_at', { ascending: false })
 
   // Busca férias pelo nome
   const { data: vacations } = await supabase
@@ -211,9 +211,10 @@ export default async function ProfissionalDetailPage({ params }: ProfissionalDet
         </div>
       )}
 
+      {/* eslint-disable @typescript-eslint/no-explicit-any */}
       <ProfessionalTabs
         professional={professional as unknown as any}
-        equipment={equipment as unknown as any}
+        equipment={(equipmentList ?? []) as unknown as any}
         vacations={(vacations ?? []) as unknown as any}
         notes={notes}
         canReadNotes={canReadNotes}
