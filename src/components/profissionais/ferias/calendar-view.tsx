@@ -14,7 +14,6 @@ interface CalendarVacation extends VacationShelfData {
 interface CalendarViewProps {
   vacations: CalendarVacation[]
   year: number
-  buildYearUrl: (year: number) => string
 }
 
 function getInitials(name: string): string {
@@ -33,6 +32,10 @@ function daysInMonth(year: number, month: number): number {
 function isRealizado(vacationStart: string | null): boolean {
   if (!vacationStart) return false
   return new Date(vacationStart) < new Date()
+}
+
+function buildYearUrl(year: number): string {
+  return `/ferias?view=calendar&year=${year}`
 }
 
 /** Calcula quantos dias da férias caem no mês especificado (0-indexed). */
@@ -78,7 +81,7 @@ function buildMonthData(
   })
 }
 
-export function CalendarView({ vacations, year, buildYearUrl }: CalendarViewProps) {
+export function CalendarView({ vacations, year }: CalendarViewProps) {
   const [selectedVacation, setSelectedVacation] = useState<CalendarVacation | null>(null)
   const monthData = buildMonthData(vacations, year)
 
