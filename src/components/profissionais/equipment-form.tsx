@@ -1,14 +1,24 @@
 'use client'
 
+import { useState, useRef, useEffect } from 'react'
 import { useActionState } from 'react'
 import { type ActionResult } from '@/actions/equipment'
 import { Database } from '@/lib/types/database'
 
-type Equipment = Database['public']['Tables']['equipment']['Row']
+type EquipmentRow = Database['public']['Tables']['equipment']['Row']
+// professional_id será adicionado via migration — extendido aqui até tipos serem regenerados
+type Equipment = EquipmentRow & { professional_id?: string | null }
+
+interface ProfOption {
+  id: string
+  name: string
+  clientName: string
+}
 
 interface EquipmentFormProps {
   action: (prevState: ActionResult, formData: FormData) => Promise<ActionResult>
   defaultValues?: Partial<Equipment>
+  professionals: ProfOption[]
   submitLabel?: string
   cancelHref?: string
 }
@@ -21,41 +31,13 @@ const MACHINE_TYPE_OPTIONS = [
   { value: 'Outro', label: 'Outro' },
 ]
 
-function FormField({
-  label,
-  name,
-  type = 'text',
-  defaultValue,
-  required,
-  placeholder,
-  children,
-}: {
-  label: string
-  name: string
-  type?: string
-  defaultValue?: string | number | null
-  required?: boolean
-  placeholder?: string
-  children?: React.ReactNode
-}) {
-  return (
-    <div className="space-y-1.5">
-      <label htmlFor={name} className="block text-xs font-medium text-gray-600">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      {children ?? (
-        <input
-          id={name}
-          name={name}
-          type={type}
-          defaultValue={defaultValue ?? ''}
-          required={required}
-          placeholder={placeholder}
-          className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-colors"
-        />
-      )}
-    </div>
-  )
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(n => n[0].toUpperCase())
+    .join('')
 }
 
 function SelectField({
@@ -149,9 +131,153 @@ function TextAreaField({
   )
 }
 
+function ProfessionalAutocomplete({
+  professionals,
+  defaultProfessionalId,
+  defaultProfessionalName,
+}: {
+  professionals: ProfOption[]
+  defaultProfessionalId?: string | null
+  defaultProfessionalName?: string | null
+}) {
+  const [selected, setSelected] = useState<ProfOption | null>(() => {
+    if (defaultProfessionalId) {
+      return professionals.find(p => p.id === defaultProfessionalId) ?? null
+    }
+    return null
+  })
+  const [query, setQuery] = useState(
+    !defaultProfessionalId && defaultProfessionalName ? defaultProfessionalName : ''
+  )
+  const [open, setOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const isOldRecord = !defaultProfessionalId && !!defaultProfessionalName
+
+  const filtered = query.trim()
+    ? professionals.filter(p =>
+        p.name.toLowerCase().includes(query.toLowerCase()) ||
+        p.clientName.toLowerCase().includes(query.toLowerCase())
+      )
+    : professionals
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  return (
+    <div className="md:col-span-2 space-y-4">
+      {/* Aviso para registros antigos sem FK */}
+      {isOldRecord && !selected && (
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 flex items-start gap-2.5">
+          <svg className="h-4 w-4 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+          </svg>
+          <p className="text-xs text-yellow-800">
+            Este registro não tem profissional vinculado. Selecione um profissional na lista abaixo para associar corretamente.
+          </p>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Campo Profissional */}
+        <div className="space-y-1.5" ref={containerRef}>
+          <label className="block text-xs font-medium text-gray-600">
+            Nome do Profissional <span className="text-red-500">*</span>
+          </label>
+
+          {selected ? (
+            /* Badge selecionado */
+            <div className="flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2">
+              <span className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold">
+                {getInitials(selected.name)}
+              </span>
+              <span className="flex-1 text-sm font-medium text-indigo-900 truncate">{selected.name}</span>
+              <button
+                type="button"
+                onClick={() => { setSelected(null); setQuery('') }}
+                className="text-xs text-indigo-600 hover:text-indigo-800 flex-shrink-0 transition-colors"
+              >
+                Trocar
+              </button>
+              <input type="hidden" name="professional_id" value={selected.id} />
+              <input type="hidden" name="professional_name" value={selected.name} />
+              <input type="hidden" name="company" value={selected.clientName} />
+            </div>
+          ) : (
+            /* Input de busca */
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
+                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                value={query}
+                onChange={e => { setQuery(e.target.value); setOpen(true) }}
+                onFocus={() => setOpen(true)}
+                placeholder="Buscar profissional..."
+                className="w-full rounded-lg border border-gray-200 bg-white pl-9 pr-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-colors"
+              />
+              {open && filtered.length > 0 && (
+                <ul className="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-56 overflow-auto">
+                  {filtered.map(p => (
+                    <li key={p.id}>
+                      <button
+                        type="button"
+                        onMouseDown={() => { setSelected(p); setOpen(false); setQuery('') }}
+                        className="flex items-center gap-2.5 w-full px-3 py-2.5 text-left hover:bg-indigo-50 transition-colors"
+                      >
+                        <span className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold">
+                          {getInitials(p.name)}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">{p.name}</p>
+                          {p.clientName && (
+                            <p className="text-xs text-gray-500 truncate">{p.clientName}</p>
+                          )}
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {open && filtered.length === 0 && query.trim() && (
+                <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg px-3 py-3 text-sm text-gray-400 text-center">
+                  Nenhum profissional encontrado
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Campo Cliente (read-only) */}
+        <div className="space-y-1.5">
+          <label className="block text-xs font-medium text-gray-600">Cliente</label>
+          <input
+            type="text"
+            value={selected?.clientName ?? ''}
+            readOnly
+            placeholder="Preenchido ao selecionar o profissional"
+            className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 placeholder:text-gray-400 cursor-not-allowed"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function EquipmentForm({
   action,
   defaultValues,
+  professionals,
   submitLabel = 'Salvar',
   cancelHref = '/equipamentos',
 }: EquipmentFormProps) {
@@ -168,20 +294,10 @@ export function EquipmentForm({
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
         <h2 className="text-sm font-semibold text-gray-700 mb-5">Identificação</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="md:col-span-2">
-            <FormField
-              label="Nome do Profissional"
-              name="professional_name"
-              required
-              defaultValue={defaultValues?.professional_name}
-              placeholder="Ex: João da Silva"
-            />
-          </div>
-          <FormField
-            label="Empresa"
-            name="company"
-            defaultValue={defaultValues?.company}
-            placeholder="Ex: Acme Corp"
+          <ProfessionalAutocomplete
+            professionals={professionals}
+            defaultProfessionalId={defaultValues?.professional_id}
+            defaultProfessionalName={defaultValues?.professional_name}
           />
         </div>
       </div>
@@ -196,12 +312,19 @@ export function EquipmentForm({
             placeholder="Selecione um tipo..."
             options={MACHINE_TYPE_OPTIONS}
           />
-          <FormField
-            label="Modelo da Máquina"
-            name="machine_model"
-            defaultValue={defaultValues?.machine_model}
-            placeholder="Ex: MacBook Pro 14"
-          />
+          <div className="space-y-1.5">
+            <label htmlFor="machine_model" className="block text-xs font-medium text-gray-600">
+              Modelo da Máquina
+            </label>
+            <input
+              id="machine_model"
+              name="machine_model"
+              type="text"
+              defaultValue={defaultValues?.machine_model ?? ''}
+              placeholder="Ex: MacBook Pro 14"
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-colors"
+            />
+          </div>
           <div className="md:col-span-2">
             <CheckboxField
               label="Pacote Office instalado"

@@ -103,7 +103,7 @@ export default async function EquipmentDetailPage({ params }: EquipmentDetailPag
           >
             <div className="grid grid-cols-2 gap-x-8 gap-y-5">
               <InfoField label="Profissional" value={equipment.professional_name} />
-              <InfoField label="Empresa" value={equipment.company} />
+              <InfoField label="Cliente" value={equipment.company} />
             </div>
           </SectionCard>
 

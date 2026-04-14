@@ -11,6 +11,19 @@ export default async function NovoEquipamentoPage() {
   if (!user) redirect('/login')
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
   if (!canWrite(profile?.role)) redirect('/equipamentos')
+
+  const { data: professionals } = await supabase
+    .from('professionals')
+    .select('id, name, clients(name)')
+    .eq('status', 'Ativo')
+    .order('name')
+
+  const profOptions = (professionals ?? []).map(p => ({
+    id: p.id,
+    name: p.name,
+    clientName: (p.clients as { name: string } | null)?.name ?? '',
+  }))
+
   return (
     <div className="space-y-6 max-w-3xl">
       {/* Header */}
@@ -30,6 +43,7 @@ export default async function NovoEquipamentoPage() {
 
       <EquipmentForm
         action={createEquipment}
+        professionals={profOptions}
         submitLabel="Criar Equipamento"
         cancelHref="/equipamentos"
       />
