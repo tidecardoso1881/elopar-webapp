@@ -17,6 +17,7 @@ const ENTIDADE_LABELS: Record<string, string> = {
   client: 'Cliente',
   equipment: 'Equipamento',
   vacation: 'Férias',
+  user: 'Usuário',
 }
 
 const ACAO_LABELS: Record<string, { label: string; className: string }> = {
@@ -44,6 +45,7 @@ interface SearchParams {
   entidade?: string
   page?: string
   dias?: string
+  userId?: string
 }
 
 interface AuditLogPageProps {
@@ -70,6 +72,7 @@ export default async function AuditLogPage({ searchParams }: AuditLogPageProps) 
   const page = Math.max(1, parseInt(params.page ?? '1', 10))
   const entidadeFilter = params.entidade ?? ''
   const dias = parseInt(params.dias ?? '90', 10)
+  const userIdFilter = params.userId ?? ''
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
 
@@ -77,6 +80,12 @@ export default async function AuditLogPage({ searchParams }: AuditLogPageProps) 
   const cutoff = new Date()
   cutoff.setDate(cutoff.getDate() - dias)
   const cutoffISO = cutoff.toISOString()
+
+  // Buscar todos os perfis para o select de usuários
+  const { data: allProfiles } = await supabase
+    .from('profiles')
+    .select('id, full_name')
+    .order('full_name', { ascending: true })
 
   // Query audit_log (admin client reads via RLS policy audit_log_read_admin)
   let query = supabase
@@ -87,6 +96,7 @@ export default async function AuditLogPage({ searchParams }: AuditLogPageProps) 
     .range(from, to)
 
   if (entidadeFilter) query = query.eq('entidade', entidadeFilter)
+  if (userIdFilter) query = query.eq('user_id', userIdFilter)
 
   const { data: logs, count, error } = await query
 
@@ -109,6 +119,7 @@ export default async function AuditLogPage({ searchParams }: AuditLogPageProps) 
     const p = new URLSearchParams()
     if (entidadeFilter) p.set('entidade', entidadeFilter)
     if (dias !== 90) p.set('dias', String(dias))
+    if (userIdFilter) p.set('userId', userIdFilter)
     if (newPage > 1) p.set('page', String(newPage))
     const qs = p.toString()
     return `/area-usuario/audit-log${qs ? `?${qs}` : ''}`
@@ -139,6 +150,20 @@ export default async function AuditLogPage({ searchParams }: AuditLogPageProps) 
             <option value="client">Cliente</option>
             <option value="equipment">Equipamento</option>
             <option value="vacation">Férias</option>
+            <option value="user">Usuário</option>
+          </select>
+
+          <select
+            name="userId"
+            defaultValue={userIdFilter}
+            className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Todos os usuários</option>
+            {(allProfiles ?? []).map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.full_name ?? p.id.slice(0, 8)}
+              </option>
+            ))}
           </select>
 
           <select
@@ -159,7 +184,7 @@ export default async function AuditLogPage({ searchParams }: AuditLogPageProps) 
             Filtrar
           </button>
 
-          {(entidadeFilter || dias !== 90) && (
+          {(entidadeFilter || dias !== 90 || userIdFilter) && (
             <Link
               href="/area-usuario/audit-log"
               className="px-3 py-1.5 text-sm text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
