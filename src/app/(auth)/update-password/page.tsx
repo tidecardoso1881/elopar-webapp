@@ -4,6 +4,7 @@ import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { updatePassword } from './actions'
 import { useState, useEffect } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
 
 function SubmitButton() {
   const { pending } = useFormStatus()
@@ -69,8 +70,11 @@ function PasswordInput({ id, name, label, placeholder }: { id: string; name: str
 export default function UpdatePasswordPage() {
   const [state, formAction] = useActionState(updatePassword, null)
   const [linkError, setLinkError] = useState<string | null>(null)
+  const [sessionReady, setSessionReady] = useState(false)
+  const [sessionError, setSessionError] = useState<string | null>(null)
 
   useEffect(() => {
+    // Verifica erros de link via query param (ex: otp_expired vindo do auth-hash-handler)
     const params = new URLSearchParams(window.location.search)
     const authError = params.get('auth_error')
     if (authError) {
@@ -79,6 +83,40 @@ export default function UpdatePasswordPage() {
           ? 'Seu link de convite expirou. Solicite um novo convite ao administrador.'
           : 'Link de convite inválido ou já utilizado. Solicite um novo convite ao administrador.'
       )
+      setSessionReady(false)
+      return
+    }
+
+    const hash = window.location.hash
+    if (!hash) {
+      // Sem hash: chegou via PKCE (/auth/callback) → sessão já está nos cookies
+      setSessionReady(true)
+      return
+    }
+
+    const hashParams = new URLSearchParams(hash.slice(1))
+    const accessToken = hashParams.get('access_token')
+    const refreshToken = hashParams.get('refresh_token')
+
+    if (accessToken && refreshToken) {
+      // Fluxo de convite via hash → forçar setSession para sobrescrever cookies do admin
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      )
+      supabase.auth
+        .setSession({ access_token: accessToken, refresh_token: refreshToken })
+        .then(({ error }) => {
+          if (error) {
+            setSessionError('Link de convite inválido ou expirado. Solicite um novo ao administrador.')
+          } else {
+            // Limpa o hash da URL para não expor tokens
+            window.history.replaceState(null, '', window.location.pathname + window.location.search)
+            setSessionReady(true)
+          }
+        })
+    } else {
+      setSessionReady(true)
     }
   }, [])
 
@@ -101,6 +139,7 @@ export default function UpdatePasswordPage() {
             Escolha uma senha com pelo menos 8 caracteres.
           </p>
 
+          {/* Erro de link via query param (otp_expired etc.) */}
           {linkError && (
             <div className="mb-4 flex gap-2 items-start p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">
               <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -110,22 +149,41 @@ export default function UpdatePasswordPage() {
             </div>
           )}
 
-          {state?.error && (
-            <div className="mb-4 flex gap-2 items-start p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+          {/* Aguardando sessão ser estabelecida via hash */}
+          {!linkError && !sessionReady && !sessionError && (
+            <div className="py-8 text-center text-sm text-gray-400">Verificando link de acesso...</div>
+          )}
+
+          {/* Erro ao estabelecer sessão (link expirado/inválido no hash) */}
+          {!linkError && sessionError && (
+            <div className="flex gap-2 items-start p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">
               <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
               </svg>
-              <span>{state.error}</span>
+              <span>{sessionError}</span>
             </div>
           )}
 
-          <form action={formAction} className="space-y-4">
-            <PasswordInput id="password" name="password" label="Nova senha" placeholder="Mínimo 8 caracteres" />
-            <PasswordInput id="confirmPassword" name="confirmPassword" label="Confirmar senha" placeholder="Repita a senha" />
-            <div className="pt-2">
-              <SubmitButton />
-            </div>
-          </form>
+          {/* Formulário — só aparece quando sessão pronta */}
+          {!linkError && sessionReady && !sessionError && (
+            <>
+              {state?.error && (
+                <div className="mb-4 flex gap-2 items-start p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+                  <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                  </svg>
+                  <span>{state.error}</span>
+                </div>
+              )}
+              <form action={formAction} className="space-y-4">
+                <PasswordInput id="password" name="password" label="Nova senha" placeholder="Mínimo 8 caracteres" />
+                <PasswordInput id="confirmPassword" name="confirmPassword" label="Confirmar senha" placeholder="Repita a senha" />
+                <div className="pt-2">
+                  <SubmitButton />
+                </div>
+              </form>
+            </>
+          )}
         </div>
       </div>
     </div>
