@@ -66,6 +66,7 @@ export function UsuariosTable({ users, currentUserId }: Props) {
   const [deactivating, setDeactivating] = useState<UserRow | null>(null)
   const [editingPermissions, setEditingPermissions] = useState<UserRow | null>(null)
   const [pendingAction, setPendingAction] = useState<string | null>(null)
+  const [resendFeedback, setResendFeedback] = useState<{ id: string; ok: boolean } | null>(null)
 
   const counts = {
     todos: users.length,
@@ -91,8 +92,11 @@ export function UsuariosTable({ users, currentUserId }: Props) {
 
   async function handleResendInvite(email: string, userId: string) {
     setPendingAction(userId)
-    await resendInviteAction(email)
+    setResendFeedback(null)
+    const result = await resendInviteAction(email)
     setPendingAction(null)
+    setResendFeedback({ id: userId, ok: result.success })
+    setTimeout(() => setResendFeedback(null), 3000)
   }
 
   const tabs: { key: TabFilter; label: string }[] = [
@@ -210,7 +214,11 @@ export function UsuariosTable({ users, currentUserId }: Props) {
                               title="Reenviar convite"
                               className="border border-gray-200 rounded-md px-2 py-1 text-xs text-gray-500 hover:border-blue-400 hover:text-blue-600 disabled:opacity-40 transition-colors"
                             >
-                              {isLoading ? '...' : '📧'}
+                              {isLoading
+                                ? '...'
+                                : resendFeedback?.id === u.id
+                                  ? resendFeedback.ok ? '✅' : '❌'
+                                  : '📧'}
                             </button>
                           )}
                           {u.status === 'desativado' && (
