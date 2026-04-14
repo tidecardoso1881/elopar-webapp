@@ -31,7 +31,7 @@ export default async function EditEquipmentPage({ params }: EditEquipmentPagePro
   const { data: professionals } = await supabase
     .from('professionals')
     .select('id, name, clients(name)')
-    .eq('status', 'Ativo')
+    .eq('status', 'ATIVO')
     .order('name')
 
   const profOptions = (professionals ?? []).map((p) => ({
