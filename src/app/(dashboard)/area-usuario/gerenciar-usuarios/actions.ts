@@ -19,6 +19,17 @@ async function requireAdmin(): Promise<string | null> {
   return profile?.role === 'admin' ? user.id : null
 }
 
+function getAdminClient() {
+  try {
+    return { client: createAdminClient(), error: null }
+  } catch {
+    return {
+      client: null,
+      error: 'Chave de administrador não configurada no servidor. Contate o suporte técnico.',
+    }
+  }
+}
+
 export async function createUserAction(formData: FormData): Promise<ActionResult> {
   const adminId = await requireAdmin()
   if (!adminId) return { success: false, error: 'Acesso negado' }
@@ -28,16 +39,17 @@ export async function createUserAction(formData: FormData): Promise<ActionResult
   const role = formData.get('role') as string
 
   if (!email || !fullName || !role) return { success: false, error: 'Preencha todos os campos' }
-  if (!['admin', 'manager'].includes(role)) return { success: false, error: 'Perfil inválido' }
+  if (!['admin', 'manager', 'consulta'].includes(role)) return { success: false, error: 'Perfil inválido' }
 
-  const admin = createAdminClient()
+  const { client: admin, error: clientError } = getAdminClient()
+  if (!admin) return { success: false, error: clientError! }
+
   const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
     data: { full_name: fullName, role },
   })
 
   if (error) return { success: false, error: error.message }
 
-  // Garantir que o perfil existe com os dados corretos (trigger pode demorar)
   if (data.user) {
     await admin
       .from('profiles')
@@ -53,7 +65,9 @@ export async function deactivateUserAction(userId: string): Promise<ActionResult
   if (!adminId) return { success: false, error: 'Acesso negado' }
   if (adminId === userId) return { success: false, error: 'Não é possível desativar o próprio usuário' }
 
-  const admin = createAdminClient()
+  const { client: admin, error: clientError } = getAdminClient()
+  if (!admin) return { success: false, error: clientError! }
+
   const { error } = await admin.auth.admin.updateUserById(userId, { ban_duration: '876600h' })
   if (error) return { success: false, error: error.message }
 
@@ -65,7 +79,9 @@ export async function reactivateUserAction(userId: string): Promise<ActionResult
   const adminId = await requireAdmin()
   if (!adminId) return { success: false, error: 'Acesso negado' }
 
-  const admin = createAdminClient()
+  const { client: admin, error: clientError } = getAdminClient()
+  if (!admin) return { success: false, error: clientError! }
+
   const { error } = await admin.auth.admin.updateUserById(userId, { ban_duration: 'none' })
   if (error) return { success: false, error: error.message }
 
@@ -77,7 +93,9 @@ export async function resendInviteAction(email: string): Promise<ActionResult> {
   const adminId = await requireAdmin()
   if (!adminId) return { success: false, error: 'Acesso negado' }
 
-  const admin = createAdminClient()
+  const { client: admin, error: clientError } = getAdminClient()
+  if (!admin) return { success: false, error: clientError! }
+
   const { error } = await admin.auth.admin.inviteUserByEmail(email)
   if (error) return { success: false, error: error.message }
 
@@ -93,12 +111,11 @@ export async function updateUserPermissionsAction(
   const adminId = await requireAdmin()
   if (!adminId) return { success: false, error: 'Acesso negado' }
 
-  // Impede que o admin remova seu próprio acesso admin
   if (adminId === userId && role !== 'admin') {
     return { success: false, error: 'Não é possível remover seu próprio acesso admin' }
   }
 
-  const validRoles = ['admin', 'gerente', 'consulta']
+  const validRoles = ['admin', 'manager', 'consulta']
   if (!validRoles.includes(role)) return { success: false, error: 'Perfil inválido' }
 
   const supabase = await createClient()
