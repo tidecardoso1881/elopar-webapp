@@ -81,13 +81,6 @@ export default async function FeriasPage({ searchParams }: FeriasPageProps) {
     calendarVacations = calData ?? []
   }
 
-  const buildYearUrl = (y: number) => {
-    const p = new URLSearchParams()
-    p.set('view', 'calendar')
-    p.set('year', String(y))
-    return `/ferias?${p.toString()}`
-  }
-
   const buildUrl = (newPage: number) => {
     const p = new URLSearchParams()
     if (search) p.set('q', search)
@@ -163,7 +156,6 @@ export default async function FeriasPage({ searchParams }: FeriasPageProps) {
         <CalendarView
           vacations={calendarVacations ?? []}
           year={year}
-          buildYearUrl={buildYearUrl}
         />
       ) : (
         /* ── Visualização Lista ── */
