@@ -5,7 +5,8 @@ import { formatDate } from '@/lib/utils/formatting'
 import { NovoUsuarioModal } from './novo-usuario-modal'
 import { DesativarUsuarioModal } from './desativar-usuario-modal'
 import { PermissionsModal } from './permissions-modal'
-import { reactivateUserAction, resendInviteAction } from '@/app/(dashboard)/area-usuario/gerenciar-usuarios/actions'
+import { reactivateUserAction, resendInviteAction, deleteUserAction } from '@/app/(dashboard)/area-usuario/gerenciar-usuarios/actions'
+import { ExcluirUsuarioModal } from './excluir-usuario-modal'
 import type { UserPermissions } from '@/types/permissions'
 
 export type UserStatus = 'ativo' | 'pendente' | 'desativado'
@@ -67,6 +68,7 @@ export function UsuariosTable({ users, currentUserId }: Props) {
   const [editingPermissions, setEditingPermissions] = useState<UserRow | null>(null)
   const [pendingAction, setPendingAction] = useState<string | null>(null)
   const [resendFeedback, setResendFeedback] = useState<{ id: string; ok: boolean } | null>(null)
+  const [deleting, setDeleting] = useState<UserRow | null>(null)
 
   const counts = {
     todos: users.length,
@@ -248,6 +250,16 @@ export function UsuariosTable({ users, currentUserId }: Props) {
                           >
                             🔑
                           </button>
+                          {!isSelf && (
+                            <button
+                              onClick={() => setDeleting(u)}
+                              disabled={isLoading}
+                              title="Excluir usuário permanentemente"
+                              className="border border-gray-200 rounded-md px-2 py-1 text-xs text-gray-500 hover:border-red-400 hover:text-red-600 disabled:opacity-40 transition-colors"
+                            >
+                              🗑️
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -274,6 +286,13 @@ export function UsuariosTable({ users, currentUserId }: Props) {
           currentRole={editingPermissions.role}
           currentPermissions={editingPermissions.permissions ?? null}
           onClose={() => setEditingPermissions(null)}
+        />
+      )}
+      {deleting && (
+        <ExcluirUsuarioModal
+          userId={deleting.id}
+          userName={deleting.full_name ?? deleting.email}
+          onClose={() => setDeleting(null)}
         />
       )}
     </>
