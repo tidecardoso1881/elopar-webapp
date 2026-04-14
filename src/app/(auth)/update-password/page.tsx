@@ -72,6 +72,7 @@ export default function UpdatePasswordPage() {
   const [linkError, setLinkError] = useState<string | null>(null)
   const [sessionReady, setSessionReady] = useState(false)
   const [sessionError, setSessionError] = useState<string | null>(null)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
 
   useEffect(() => {
     // Verifica erros de link via query param (ex: otp_expired vindo do auth-hash-handler)
@@ -113,6 +114,10 @@ export default function UpdatePasswordPage() {
             // Limpa o hash da URL para não expor tokens
             window.history.replaceState(null, '', window.location.pathname + window.location.search)
             setSessionReady(true)
+            // Ler e-mail da sessão estabelecida
+            supabase.auth.getUser().then(({ data }) => {
+              if (data.user?.email) setUserEmail(data.user.email)
+            })
           }
         })
     } else {
@@ -135,6 +140,11 @@ export default function UpdatePasswordPage() {
 
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-1">Criar nova senha</h2>
+          {userEmail && (
+            <p className="text-xs text-blue-600 font-medium mb-1">
+              Definindo senha para: <span className="font-semibold">{userEmail}</span>
+            </p>
+          )}
           <p className="text-sm text-gray-500 mb-6">
             Escolha uma senha com pelo menos 8 caracteres.
           </p>
