@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import type { UserPermissions } from '@/types/permissions'
 import { logAudit } from '@/lib/audit'
+import { insertNotification } from '@/lib/notifications'
 
 type ActionResult = { success: boolean; error?: string }
 
@@ -71,6 +72,17 @@ export async function createUserAction(formData: FormData): Promise<ActionResult
     dados_depois: { email, full_name: fullName, role },
   })
 
+  // Notificar todos os admins sobre novo convite
+  const { data: admins } = await admin.from('profiles').select('id').eq('role', 'admin')
+  for (const a of admins ?? []) {
+    await insertNotification({
+      user_id: a.id,
+      tipo: 'user_invited',
+      mensagem: `Novo usuário convidado: ${fullName} (${email})`,
+      link: '/area-usuario/gerenciar-usuarios',
+    })
+  }
+
   revalidatePath('/area-usuario/gerenciar-usuarios')
   return { success: true }
 }
@@ -93,6 +105,17 @@ export async function deactivateUserAction(userId: string): Promise<ActionResult
     dados_antes: { status: 'ativo' },
     dados_depois: { status: 'desativado' },
   })
+
+  // Notificar todos os admins sobre desativação
+  const { data: admins } = await admin.from('profiles').select('id').eq('role', 'admin')
+  for (const a of admins ?? []) {
+    await insertNotification({
+      user_id: a.id,
+      tipo: 'user_deactivated',
+      mensagem: `Usuário ${userId} foi desativado.`,
+      link: '/area-usuario/gerenciar-usuarios',
+    })
+  }
 
   revalidatePath('/area-usuario/gerenciar-usuarios')
   return { success: true }
