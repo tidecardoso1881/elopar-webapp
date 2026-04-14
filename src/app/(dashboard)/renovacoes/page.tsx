@@ -70,9 +70,8 @@ function SummaryCard({
   return (
     <div className={`rounded-lg border ${config.bgLight} p-4 hover:shadow-md transition-shadow`}>
       <div className="flex items-center gap-3">
-        <div className={`rounded-full ${config.bg} p-3`}>
-          <span className={`text-lg font-bold ${config.textColor}`}>{count}</span>
-        </div>
+        {/* Indicador de urgência — cor sem número */}
+        <div className={`rounded-full ${config.bg} w-11 h-11 flex-shrink-0`} />
         <div>
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
             {label}
