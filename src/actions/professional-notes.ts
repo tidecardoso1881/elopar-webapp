@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { insertNotification } from '@/lib/notifications'
 
 type ActionResult = { success: boolean; error?: string }
 
@@ -44,6 +45,27 @@ export async function createNoteAction(
     })
 
   if (error) return { success: false, error: error.message }
+
+  // Detectar @menções e notificar usuários mencionados
+  const mentionRegex = /@(\S+)/g
+  const mentions = [...trimmed.matchAll(mentionRegex)].map(m => m[1].toLowerCase())
+  if (mentions.length > 0) {
+    const { data: profiles } = await supabase.from('profiles').select('id, full_name')
+    for (const profile of profiles ?? []) {
+      const nameLower = (profile.full_name ?? '').toLowerCase().replace(/\s+/g, '')
+      if (
+        nameLower.length >= 3 &&
+        mentions.some(m => nameLower.includes(m) || m.includes(nameLower.slice(0, 4)))
+      ) {
+        await insertNotification({
+          user_id: profile.id,
+          tipo: 'mention',
+          mensagem: 'Você foi mencionado em uma nota de profissional.',
+          link: `/profissionais/${professionalId}`,
+        })
+      }
+    }
+  }
 
   revalidatePath(`/profissionais/${professionalId}`)
   return { success: true }

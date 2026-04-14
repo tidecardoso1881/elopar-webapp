@@ -20,3 +20,16 @@ export async function markAllAsRead() {
     .is('read_at', null)
   revalidatePath('/notificacoes')
 }
+
+export async function markSistemaAsRead() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (supabase as any)
+    .from('notifications')
+    .update({ lida: true })
+    .eq('user_id', user.id)
+    .eq('lida', false)
+  revalidatePath('/notificacoes')
+}
