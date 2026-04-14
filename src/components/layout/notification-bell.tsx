@@ -4,14 +4,12 @@ import Link from 'next/link'
 export async function NotificationBell() {
   const supabase = await createClient()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const supabaseAny = supabase as any
   const [{ count: countContratos }, { count: countNotif }] = await Promise.all([
     supabase
       .from('contract_notifications')
       .select('*', { count: 'exact', head: true })
       .is('read_at', null),
-    supabaseAny
+    supabase
       .from('notifications')
       .select('*', { count: 'exact', head: true })
       .eq('lida', false),

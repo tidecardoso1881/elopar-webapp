@@ -7,16 +7,6 @@ export const metadata: Metadata = {
   title: 'Notificações',
 }
 
-interface SistemaNotif {
-  id: string
-  user_id: string
-  tipo: string
-  mensagem: string
-  link: string | null
-  lida: boolean
-  criado_em: string
-}
-
 const URGENCY_CONFIG: Record<string, { label: string; icon: string; bg: string; border: string; text: string }> = {
   expired: { label: 'Vencido',      icon: '🔴', bg: 'bg-red-50',    border: 'border-red-200',    text: 'text-red-700'    },
   critical: { label: '≤30 dias',    icon: '🔴', bg: 'bg-red-50',    border: 'border-red-200',    text: 'text-red-700'    },
@@ -50,10 +40,8 @@ export default async function NotificacoesPage({ searchParams }: NotificacoesPag
     .order('created_at', { ascending: false })
     .limit(100)
 
-  // Notificações do sistema (tabela não está nos tipos gerados ainda — cast necessário)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const supabaseAny = supabase as any
-  let sistemaQuery = supabaseAny
+  // Notificações do sistema
+  let sistemaQuery = supabase
     .from('notifications')
     .select('*')
     .order('criado_em', { ascending: false })
@@ -61,7 +49,7 @@ export default async function NotificacoesPage({ searchParams }: NotificacoesPag
 
   if (tipoFilter) sistemaQuery = sistemaQuery.eq('tipo', tipoFilter)
 
-  const { data: sistemaNotifs } = await sistemaQuery as { data: SistemaNotif[] | null }
+  const { data: sistemaNotifs } = await sistemaQuery
 
   const allContracts = contractNotifs ?? []
   const unreadContracts = allContracts.filter((n) => !n.read_at)
