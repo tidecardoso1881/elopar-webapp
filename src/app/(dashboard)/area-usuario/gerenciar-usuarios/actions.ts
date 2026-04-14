@@ -44,8 +44,10 @@ export async function createUserAction(formData: FormData): Promise<ActionResult
   const { client: admin, error: clientError } = getAdminClient()
   if (!admin) return { success: false, error: clientError! }
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://elopar-webapp.vercel.app'
   const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
     data: { full_name: fullName, role },
+    redirectTo: `${appUrl}/update-password`,
   })
 
   if (error) return { success: false, error: error.message }
@@ -96,7 +98,10 @@ export async function resendInviteAction(email: string): Promise<ActionResult> {
   const { client: admin, error: clientError } = getAdminClient()
   if (!admin) return { success: false, error: clientError! }
 
-  const { error } = await admin.auth.admin.inviteUserByEmail(email)
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://elopar-webapp.vercel.app'
+  const { error } = await admin.auth.admin.inviteUserByEmail(email, {
+    redirectTo: `${appUrl}/update-password`,
+  })
   if (error) return { success: false, error: error.message }
 
   revalidatePath('/area-usuario/gerenciar-usuarios')
