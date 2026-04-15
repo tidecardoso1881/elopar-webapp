@@ -40,7 +40,7 @@ export default async function EditEquipmentPage({ params }: EditEquipmentPagePro
     clientName: (p.clients as { name: string } | null)?.name ?? '',
   }))
 
-  const boundUpdateEquipment = (prevState: ActionResult, formData: FormData) => updateEquipment(id, prevState, formData)
+  const boundUpdateEquipment = updateEquipment.bind(null, id)
 
   return (
     <div className="space-y-6 max-w-3xl">
