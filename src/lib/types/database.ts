@@ -130,6 +130,7 @@ export type Database = {
           machine_model: string | null
           machine_type: string | null
           office_package: boolean | null
+          professional_id: string | null
           professional_name: string
           software_details: string | null
           updated_at: string
@@ -141,6 +142,7 @@ export type Database = {
           machine_model?: string | null
           machine_type?: string | null
           office_package?: boolean | null
+          professional_id?: string | null
           professional_name: string
           software_details?: string | null
           updated_at?: string
@@ -152,11 +154,27 @@ export type Database = {
           machine_model?: string | null
           machine_type?: string | null
           office_package?: boolean | null
+          professional_id?: string | null
           professional_name?: string
           software_details?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "equipment_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "equipment_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "v_renewal_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       kanban_metrics_snapshot: {
         Row: {
@@ -193,6 +211,44 @@ export type Database = {
           wip_total?: number | null
         }
         Relationships: []
+      }
+      notifications: {
+        Row: {
+          criado_em: string
+          id: string
+          lida: boolean
+          link: string | null
+          mensagem: string
+          tipo: string
+          user_id: string
+        }
+        Insert: {
+          criado_em?: string
+          id?: string
+          lida?: boolean
+          link?: string | null
+          mensagem: string
+          tipo: string
+          user_id: string
+        }
+        Update: {
+          criado_em?: string
+          id?: string
+          lida?: boolean
+          link?: string | null
+          mensagem?: string
+          tipo?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       professional_notes: {
         Row: {
